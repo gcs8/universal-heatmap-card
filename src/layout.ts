@@ -12,6 +12,8 @@ const REFERENCE_CARD_WIDTH = 560;
 const CANVAS_GAP = 3;
 const CANVAS_MIN_CELL = 7;
 const CANVAS_MAX_CELL = 22;
+const CANVAS_VALUE_MIN_CELL = 14;
+const CANVAS_VALUE_MAX_CELL = 28;
 const CANVAS_LABEL_WIDTH = 58;
 const CANVAS_LABEL_HEIGHT = 18;
 
@@ -90,10 +92,13 @@ export function estimateCanvasHeight(config: NormalizedConfig, width = REFERENCE
   const labelWidth = config.axes.show && config.axes.y_labels ? CANVAS_LABEL_WIDTH : 0;
   const labelHeight = config.axes.show && config.axes.x_labels ? CANVAS_LABEL_HEIGHT : 0;
   const gridWidth = Math.max(160, width - labelWidth);
+  const reservesValues = config.tiles.show_values || config.tiles.show_value_toggle;
+  const minCell = reservesValues ? CANVAS_VALUE_MIN_CELL : CANVAS_MIN_CELL;
+  const maxCell = reservesValues ? CANVAS_VALUE_MAX_CELL : CANVAS_MAX_CELL;
   const cell = Math.max(
-    CANVAS_MIN_CELL,
+    minCell,
     Math.min(
-      CANVAS_MAX_CELL,
+      maxCell,
       Math.floor((gridWidth - Math.max(0, cols - 1) * CANVAS_GAP) / cols),
     ),
   );

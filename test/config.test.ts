@@ -87,6 +87,18 @@ describe("normalizeConfig", () => {
     expect(normalizeConfig({ entity: "sensor.room_temperature" }).axes.show_key).toBe(false);
   });
 
+  it("keeps tile value labels opt-in", () => {
+    const config = normalizeConfig({
+      entity: "sensor.room_temperature",
+      tiles: { show_values: true, show_value_toggle: true },
+    });
+
+    expect(config.tiles.show_values).toBe(true);
+    expect(config.tiles.show_value_toggle).toBe(true);
+    expect(normalizeConfig({ entity: "sensor.room_temperature" }).tiles.show_values).toBe(false);
+    expect(normalizeConfig({ entity: "sensor.room_temperature" }).tiles.show_value_toggle).toBe(false);
+  });
+
   it("defaults recorder refresh caching and accepts explicit refresh intervals", () => {
     const defaultConfig = normalizeConfig({ entity: "sensor.room_temperature" });
     const customConfig = normalizeConfig({

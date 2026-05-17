@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { normalizeConfig } from "../src/config";
 import {
+  estimateCanvasHeight,
   estimateMasonryCardSize,
   estimateSectionGridRows,
   sectionRowsForHeight,
@@ -48,5 +49,42 @@ describe("sections layout estimates", () => {
 
     expect(estimateSectionGridRows(daily)).toBeLessThan(estimateSectionGridRows(hourly));
     expect(estimateMasonryCardSize(hourly)).toBeGreaterThan(estimateSectionGridRows(hourly));
+  });
+
+  it("reserves larger cells when tile values are enabled", () => {
+    const plain = normalizeConfig({
+      entity: "sensor.room_temperature",
+      range: { days: 30 },
+      bucket: { interval: "day", value: "mean" },
+      scale: { preset: "temperature" },
+    });
+    const withValues = normalizeConfig({
+      entity: "sensor.room_temperature",
+      range: { days: 30 },
+      bucket: { interval: "day", value: "mean" },
+      scale: { preset: "temperature" },
+      tiles: { show_values: true },
+    });
+
+    expect(estimateCanvasHeight(withValues, 640)).toBeGreaterThan(estimateCanvasHeight(plain, 640));
+    expect(estimateMasonryCardSize(withValues)).toBeGreaterThanOrEqual(estimateMasonryCardSize(plain));
+  });
+
+  it("reserves value-label room when the on-card toggle is enabled", () => {
+    const plain = normalizeConfig({
+      entity: "sensor.room_temperature",
+      range: { days: 30 },
+      bucket: { interval: "day", value: "mean" },
+      scale: { preset: "temperature" },
+    });
+    const withToggle = normalizeConfig({
+      entity: "sensor.room_temperature",
+      range: { days: 30 },
+      bucket: { interval: "day", value: "mean" },
+      scale: { preset: "temperature" },
+      tiles: { show_value_toggle: true },
+    });
+
+    expect(estimateCanvasHeight(withToggle, 640)).toBeGreaterThan(estimateCanvasHeight(plain, 640));
   });
 });

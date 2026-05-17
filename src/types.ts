@@ -1,6 +1,6 @@
 export const CARD_TAG = "universal-heatmap-card";
 export const CARD_NAME = "Universal Heatmap Card";
-export const CARD_VERSION = "0.1.1";
+export const CARD_VERSION = "0.1.2";
 
 export type BucketInterval = "5minute" | "hour" | "day" | "week" | "month";
 export type BucketValueName =
@@ -100,6 +100,11 @@ export interface AxesConfig {
   show_key?: boolean;
 }
 
+export interface TilesConfig {
+  show_values?: boolean;
+  show_value_toggle?: boolean;
+}
+
 export interface HeatmapCardConfig {
   type?: string;
   title?: string;
@@ -120,6 +125,7 @@ export interface HeatmapCardConfig {
   layout?: LayoutConfig;
   navigation?: NavigationConfig;
   axes?: AxesConfig;
+  tiles?: TilesConfig;
   legend?: LegendConfig;
   tooltip?: TooltipConfig;
 }
@@ -163,6 +169,7 @@ export interface NormalizedConfig {
   layout: Required<LayoutConfig>;
   navigation: Required<NavigationConfig>;
   axes: Required<AxesConfig>;
+  tiles: Required<TilesConfig>;
   legend: Required<LegendConfig>;
   tooltip: Required<TooltipConfig>;
 }

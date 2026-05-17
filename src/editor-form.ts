@@ -96,6 +96,15 @@ export function buildEditorFormConfig(): EditorFormConfig {
       },
       {
         type: "expandable",
+        name: "tiles",
+        title: "Tiles",
+        schema: [
+          { name: "show_values", selector: { boolean: {} } },
+          { name: "show_value_toggle", selector: { boolean: {} } },
+        ],
+      },
+      {
+        type: "expandable",
         name: "data",
         title: "Data",
         schema: [
@@ -127,6 +136,8 @@ export function buildEditorFormConfig(): EditorFormConfig {
         unit: "Display unit",
         sensitivity: "Scale tuning",
         outlier_clip: "Outlier clip",
+        show_values: "Show values in cells",
+        show_value_toggle: "Show value toggle on card",
         align: "Alignment",
       };
       return schema.name ? labels[schema.name] : undefined;
@@ -146,6 +157,8 @@ export function buildEditorFormConfig(): EditorFormConfig {
         min: "Optional fixed lower scale bound. Leave empty to auto-range from observed bucket values.",
         max: "Optional fixed upper scale bound. Leave empty to auto-range from observed bucket values.",
         unit: "Optional label suffix for summary and legend values.",
+        show_values: "Draw compact bucket values inside each tile. Off by default; works best when the card has enough width for larger cells.",
+        show_value_toggle: "Adds a compact 123 button beside the current value chip so values can be toggled without opening edit mode.",
         refresh_interval: "Minimum seconds between recorder refreshes during Home Assistant updates. Set to 0 to cache until the card config changes.",
         defer_until_visible: "Keeps off-screen cards from asking recorder for history until they scroll near the viewport.",
         max_concurrent_requests: "Shared browser-side limit for recorder/history requests from this card type. Default is 2.",

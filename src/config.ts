@@ -78,6 +78,10 @@ export function normalizeConfig(
       y_labels: config.axes?.y_labels ?? true,
       show_key: config.axes?.show_key ?? false,
     },
+    tiles: {
+      show_values: config.tiles?.show_values ?? false,
+      show_value_toggle: config.tiles?.show_value_toggle ?? false,
+    },
     legend: {
       show: config.legend?.show ?? true,
     },

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Added optional per-cell value labels with `tiles.show_values`.
+- Added visual editor controls for tile values, including an optional on-card `123` toggle button.
+- Reserved larger cells when labels are enabled or when the on-card value toggle is available.
+
 ## 0.1.1
 
 - Added visual editor controls for per-entity display aliases.

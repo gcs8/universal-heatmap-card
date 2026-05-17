@@ -70,6 +70,30 @@ describe("editor form", () => {
     expect(form.computeHelper({ name: "sensitivity" })).toContain("exaggerate");
   });
 
+  it("exposes an opt-in tile value toggle", () => {
+    const form = buildEditorFormConfig();
+    const tilesField = form.schema.find((field) => field.name === "tiles");
+    const tilesSchema = tilesField?.schema as Array<Record<string, unknown>>;
+
+    expect(tilesField).toMatchObject({
+      type: "expandable",
+      name: "tiles",
+      title: "Tiles",
+    });
+    expect(tilesSchema.find((field) => field.name === "show_values")).toMatchObject({
+      name: "show_values",
+      selector: { boolean: {} },
+    });
+    expect(tilesSchema.find((field) => field.name === "show_value_toggle")).toMatchObject({
+      name: "show_value_toggle",
+      selector: { boolean: {} },
+    });
+    expect(form.computeLabel({ name: "show_values" })).toBe("Show values in cells");
+    expect(form.computeLabel({ name: "show_value_toggle" })).toBe("Show value toggle on card");
+    expect(form.computeHelper({ name: "show_values" })).toContain("inside each tile");
+    expect(form.computeHelper({ name: "show_value_toggle" })).toContain("123 button");
+  });
+
   it("preserves object entity options when the visual editor changes selected ids", () => {
     expect(
       mergeEditorEntities(

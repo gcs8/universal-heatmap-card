@@ -56,6 +56,7 @@ export class UniversalHeatmapCard extends LitElement {
     _error: { state: true },
     _loading: { state: true },
     _normalized: { state: true },
+    _tileValuesOverride: { state: true },
     _tooltip: { state: true },
     _warning: { state: true },
   };
@@ -70,6 +71,7 @@ export class UniversalHeatmapCard extends LitElement {
   private _error?: string;
   private _warning?: string;
   private _tooltip?: TooltipState;
+  private _tileValuesOverride?: boolean;
   private _cache = new Map<string, CachedSeries>();
   private _debug = false;
   private _deferredLoadPending = false;
@@ -88,6 +90,7 @@ export class UniversalHeatmapCard extends LitElement {
     this._loadSeq += 1;
     this._normalized = normalizeConfig(config, this.hass);
     this._activeIndex = this._resolveActiveIndex(previousEntity);
+    this._tileValuesOverride = undefined;
     this._tooltip = undefined;
     debugLog(this._debug, "config applied", {
       entityCount: this._normalized.entities.length,
@@ -176,6 +179,7 @@ export class UniversalHeatmapCard extends LitElement {
     if (
       changed.has("_buckets") ||
       changed.has("_loading") ||
+      changed.has("_tileValuesOverride") ||
       changed.has("_warning")
     ) {
       void this.updateComplete.then(() => this._drawHeatmap());
@@ -201,9 +205,25 @@ export class UniversalHeatmapCard extends LitElement {
               ? html`<div class="subtitle">${activeEntity.entity}</div>`
               : nothing}
           </div>
-          ${stateObj
-            ? html`<div class="state-chip">${this._formatEntityState(stateObj)}</div>`
-            : nothing}
+          <div class="header-actions">
+            ${this._normalized.tiles.show_value_toggle
+              ? html`
+                  <button
+                    type="button"
+                    class=${`tile-value-toggle ${this._showTileValues() ? "active" : ""}`}
+                    title="Toggle cell values"
+                    aria-label="Toggle cell values"
+                    aria-pressed=${this._showTileValues() ? "true" : "false"}
+                    @click=${this._toggleTileValues}
+                  >
+                    123
+                  </button>
+                `
+              : nothing}
+            ${stateObj
+              ? html`<div class="state-chip">${this._formatEntityState(stateObj)}</div>`
+              : nothing}
+          </div>
         </div>
 
         ${this._renderNavigation()}
@@ -652,6 +672,8 @@ export class UniversalHeatmapCard extends LitElement {
         ctx.fillStyle = "rgba(255, 255, 255, 0.34)";
         ctx.fillRect(x, y + layout.cell - 3, layout.cell, 3);
       }
+
+      this._drawCellValue(ctx, bucket, layout, x, y);
     });
 
     this._renderLayout = layout;
@@ -685,8 +707,12 @@ export class UniversalHeatmapCard extends LitElement {
     const labelHeight = this._shouldShowXAxisLabels() ? 18 : 0;
     const gridWidth = Math.max(160, width - labelWidth);
     const rows = Math.ceil(count / cols);
+    const showValues = this._shouldReserveForTileValues();
     const minCell = 7;
-    let cell = Math.max(minCell, Math.min(22, Math.floor((gridWidth - gap * (cols - 1)) / cols)));
+    const preferredMinCell = showValues ? 14 : minCell;
+    const maxCell = showValues ? 28 : 22;
+    let cell = Math.min(maxCell, Math.floor((gridWidth - gap * (cols - 1)) / cols));
+    cell = Math.max(cell >= preferredMinCell ? preferredMinCell : minCell, cell);
     if (typeof maxHeight === "number") {
       const availableGridHeight = Math.max(0, maxHeight - labelHeight);
       const heightBoundCell = Math.floor((availableGridHeight - Math.max(0, rows - 1) * gap) / rows);
@@ -709,6 +735,116 @@ export class UniversalHeatmapCard extends LitElement {
       gridY: labelHeight,
       gridWidth: actualGridWidth,
       gridHeight,
+    };
+  }
+
+  private _drawCellValue(
+    ctx: CanvasRenderingContext2D,
+    bucket: BucketValue,
+    layout: HeatmapRenderLayout,
+    x: number,
+    y: number,
+  ): void {
+    if (!this._showTileValues() || !this._scale || bucket.value === null) {
+      return;
+    }
+
+    const fontSize = this._cellValueFontSize(layout.cell);
+    if (fontSize <= 0) {
+      return;
+    }
+
+    const label = this._formatCellValue(bucket.value, layout.cell);
+    if (!label) {
+      return;
+    }
+
+    const fill = colorForValue(bucket.value, this._scale);
+    const textColor = this._cellTextColor(fill);
+    const outlineColor = textColor === "#111827" ? "rgba(255, 255, 255, 0.26)" : "rgba(0, 0, 0, 0.32)";
+    const centerX = x + layout.cell / 2;
+    const centerY = y + layout.cell / 2 + 0.5;
+    const maxWidth = Math.max(4, layout.cell - 2);
+
+    ctx.save();
+    ctx.font = `600 ${fontSize}px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = Math.max(1.5, fontSize / 4);
+    ctx.strokeStyle = outlineColor;
+    ctx.fillStyle = textColor;
+    ctx.strokeText(label, centerX, centerY, maxWidth);
+    ctx.fillText(label, centerX, centerY, maxWidth);
+    ctx.restore();
+  }
+
+  private _cellValueFontSize(cell: number): number {
+    if (cell < 14) {
+      return 0;
+    }
+    return Math.max(9, Math.min(13, Math.floor(cell * 0.48)));
+  }
+
+  private _formatCellValue(value: number, cell: number): string {
+    if (!Number.isFinite(value) || !this._scale) {
+      return "";
+    }
+
+    const abs = Math.abs(value);
+    if (abs >= 1000 && cell < 24) {
+      return new Intl.NumberFormat(this.hass?.locale?.language, {
+        compactDisplay: "short",
+        maximumFractionDigits: 1,
+        notation: "compact",
+      }).format(value);
+    }
+
+    const span = Math.abs(this._scale.max - this._scale.min);
+    let fractionDigits = span < 1 ? 2 : span < 20 ? 1 : 0;
+    if (cell < 18) {
+      fractionDigits = Math.min(fractionDigits, 0);
+    }
+
+    return new Intl.NumberFormat(this.hass?.locale?.language, {
+      maximumFractionDigits: fractionDigits,
+      minimumFractionDigits: fractionDigits,
+    }).format(value);
+  }
+
+  private _cellTextColor(fill: string): "#111827" | "#ffffff" {
+    const rgb = this._parseColor(fill);
+    if (!rgb) {
+      return "#ffffff";
+    }
+
+    const luminance = (0.2126 * rgb.r + 0.7152 * rgb.g + 0.0722 * rgb.b) / 255;
+    return luminance > 0.62 ? "#111827" : "#ffffff";
+  }
+
+  private _parseColor(color: string): { r: number; g: number; b: number } | undefined {
+    const rgb = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/i.exec(color);
+    if (rgb) {
+      const [, r = "0", g = "0", b = "0"] = rgb;
+      return {
+        r: Number(r),
+        g: Number(g),
+        b: Number(b),
+      };
+    }
+
+    const hex = color.replace("#", "").trim();
+    const normalized = hex.length === 3
+      ? hex.split("").map((char) => `${char}${char}`).join("")
+      : hex;
+    if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
+      return undefined;
+    }
+
+    return {
+      r: Number.parseInt(normalized.slice(0, 2), 16),
+      g: Number.parseInt(normalized.slice(2, 4), 16),
+      b: Number.parseInt(normalized.slice(4, 6), 16),
     };
   }
 
@@ -857,6 +993,22 @@ export class UniversalHeatmapCard extends LitElement {
         detail: { entityId: activeEntity.entity },
       }),
     );
+  }
+
+  private _showTileValues(): boolean {
+    return this._tileValuesOverride ?? this._normalized?.tiles.show_values ?? false;
+  }
+
+  private _shouldReserveForTileValues(): boolean {
+    return Boolean(
+      this._normalized?.tiles.show_values ||
+      this._normalized?.tiles.show_value_toggle,
+    );
+  }
+
+  private _toggleTileValues(event: Event): void {
+    event.stopPropagation();
+    this._tileValuesOverride = !this._showTileValues();
   }
 
   private _heatmapDescription(title: string): string {
@@ -1124,6 +1276,23 @@ export class UniversalHeatmapCard extends LitElement {
       font-size: 12px;
       line-height: 1;
       padding: 7px 10px;
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      align-items: center;
+      display: flex;
+      flex: 0 0 auto;
+      gap: 6px;
+    }
+
+    .tile-value-toggle {
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+      min-height: 28px;
+      padding: 0 8px;
       white-space: nowrap;
     }
 
