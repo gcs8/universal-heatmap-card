@@ -1,0 +1,38 @@
+{
+  "name": "universal-heatmap-card",
+  "version": "0.1.0",
+  "description": "A Home Assistant custom card for reusable time-bucket heatmaps across sensors and units.",
+  "type": "module",
+  "license": "0BSD",
+  "private": true,
+  "packageManager": "npm@11.12.1",
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "ci:guard": "node scripts/ci-resource-guard.mjs",
+    "dev": "vite --host 0.0.0.0",
+    "docs:demo-svg": "node scripts/generate-demo-svg.mjs --write",
+    "perf": "node scripts/perf-harness.mjs",
+    "perf:stress": "node scripts/perf-harness.mjs --stress",
+    "preview": "vite preview --host 0.0.0.0",
+    "sync:ha-fixture": "node scripts/sync-ha-fixture.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "home-assistant",
+    "lovelace",
+    "custom-card",
+    "hacs",
+    "heatmap"
+  ],
+  "dependencies": {
+    "lit": "3.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.19",
+    "typescript": "5.9.3",
+    "vite": "6.4.2",
+    "vitest": "3.2.4"
+  }
+}

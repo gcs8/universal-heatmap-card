@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" width="1200" height="610" viewBox="0 0 1200 610" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Universal Heatmap Card interactive demo</title>
+  <desc id="desc">Synthetic Home Assistant heatmap demo. Open this SVG directly to switch rooms and inspect cell values.</desc>
+  <defs>
+    <filter id="soft-shadow" x="-12%" y="-12%" width="124%" height="124%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#334155" flood-opacity="0.14"/>
+    </filter>
+    <linearGradient id="legend-gradient" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0%" stop-color="#2f7ebc"/>
+      <stop offset="28%" stop-color="#55ad8a"/>
+      <stop offset="56%" stop-color="#f0cf62"/>
+      <stop offset="78%" stop-color="#f29a42"/>
+      <stop offset="100%" stop-color="#e33f32"/>
+    </linearGradient>
+  </defs>
+  <style type="text/css"><![CDATA[
+    :root { color-scheme: light; }
+    .page { fill: #f3f6fb; }
+    .card { fill: #ffffff; stroke: #dce5ef; stroke-width: 2; filter: url(#soft-shadow); }
+    text { font-family: "Segoe UI", Arial, sans-serif; fill: #0f2138; }
+    .title { font-size: 38px; font-weight: 750; letter-spacing: 0; }
+    .subtitle, .axis-label, .meta, .details, .legend-label { fill: #708298; }
+    .subtitle { font-size: 20px; }
+    .axis-label { font-size: 15px; text-anchor: end; }
+    .tick { text-anchor: middle; }
+    .details { font-size: 16px; }
+    .summary { font-size: 21px; font-weight: 700; text-anchor: middle; fill: #1d3b5d; }
+    .chip { fill: #f0f5fb; stroke: #dbe5f0; stroke-width: 2; }
+    .tab rect { fill: #eef4fa; stroke: #d6e0ea; stroke-width: 2; cursor: pointer; }
+    .tab text { font-size: 20px; fill: #36506d; text-anchor: middle; pointer-events: none; }
+    .tab:hover rect, .tab:focus rect { stroke: #2f7ebc; }
+    .tab.active rect { fill: #2f74b5; stroke: #2f74b5; }
+    .tab.active text { fill: #ffffff; font-weight: 700; }
+    .cell { cursor: pointer; shape-rendering: crispEdges; stroke: #ffffff; stroke-width: 1; }
+    .cell:hover, .cell:focus, .cell.active { stroke: #0f2138; stroke-width: 2.4; }
+    .legend-track { fill: url(#legend-gradient); }
+    .legend-label { font-size: 15px; }
+    .low { text-anchor: start; }
+    .high { text-anchor: middle; }
+    .latest { text-anchor: end; }
+    .link { fill: #2f74b5; font-size: 16px; font-weight: 650; text-decoration: underline; }
+  ]]></style>
+  <script type="text/ecmascript">
+<![CDATA[
+(function () {
+  "use strict";
+  var days = ["May 10","May 11","May 12","May 13","May 14","May 15","May 16"];
+  var hours = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
+  var colors = ["#2f7ebc","#55ad8a","#f0cf62","#f29a42","#e33f32"];
+  var series = [{"name":"Kitchen","entity":"sensor.example_kitchen_temperature","unit":"\\u00b0F","values":[[69.1,69.5,69.9,70.3,70.6,70.9,71.2,71.6,72.3,73.2,74.3,75.5,76.5,77.2,77.4,77,76.3,75.3,74.3,73.2,72.1,71.1,70.3,69.7],[70.5,70.6,70.6,70.6,70.7,70.8,71.2,71.9,72.9,74.2,75.6,76.9,77.9,78.3,78.1,77.4,76.3,75.2,74.2,73.4,72.7,72.1,71.6,71.2],[70.7,70.4,70.1,69.9,69.9,70.3,71,72.1,73.5,74.9,76.3,77.5,78.1,78.1,77.5,76.6,75.6,74.7,74.1,73.7,73.3,72.9,72.3,71.7],[69.5,69,63.8,63.8,64.1,69.7,70.8,72.1,73.5,74.9,76,76.7,76.9,76.7,76.1,75.3,74.6,74.1,73.8,73.7,73.4,72.8,71.9,70.9],[68,67.6,67.5,67.9,68.6,69.7,70.9,72.1,73.3,74.2,74.9,75.3,75.4,75.3,75,74.6,74.3,74.1,73.9,73.7,73.1,72.1,70.9,69.6],[67.5,67.4,67.8,68.5,69.4,70.4,71.4,72.3,73,73.6,74.1,74.6,74.9,75.2,75.2,75.2,75,74.8,74.4,73.8,72.8,71.5,70.1,68.8],[68.4,68.6,69.2,69.9,70.7,71.4,71.9,72.5,73,73.5,74.2,75,75.8,76.4,76.7,76.6,76.3,75.8,75,74,72.8,71.5,70.2,69.3]]},{"name":"Living Room","entity":"sensor.example_living_room_temperature","unit":"\\u00b0F","values":[[68,68.1,68.4,68.6,68.8,68.9,69.1,69.4,70,70.8,71.9,73.1,74.2,75,75.4,75.3,74.7,73.9,73,71.9,70.8,69.8,69,68.5],[69.1,69,68.9,68.7,68.6,68.6,68.8,69.4,70.3,71.6,72.9,74.3,75.3,75.8,75.9,75.4,74.5,73.6,72.7,71.9,71.2,70.6,70.1,69.7],[69.3,68.8,68.3,67.9,67.8,68,68.6,69.6,70.9,72.3,73.7,74.8,75.5,75.6,75.3,74.6,73.8,73.1,72.5,72.1,71.8,71.4,70.9,70.2],[68.4,67.6,62.3,62.1,62.3,67.7,68.7,69.9,71.2,72.5,73.5,74.3,74.6,74.5,74.1,73.6,73.1,72.7,72.5,72.4,72.1,71.5,70.7,69.7],[67.2,66.5,66.3,66.4,67,67.9,69,70.2,71.2,72.1,72.7,73.2,73.4,73.4,73.3,73.1,73,73,72.9,72.6,72.1,71.1,69.9,68.6],[66.7,66.4,66.5,67,67.8,68.7,69.5,70.3,71,71.5,72,72.4,72.9,73.2,73.5,73.7,73.8,73.7,73.4,72.8,71.8,70.5,69.2,67.9],[67.2,67.3,67.7,68.2,68.8,69.4,69.8,70.2,70.7,71.2,71.8,72.6,73.4,74.2,74.7,74.9,74.8,74.4,73.7,72.7,71.5,70.2,69,68.1]]},{"name":"Office","entity":"sensor.example_office_temperature","unit":"\\u00b0F","values":[[70.2,70.7,71.4,71.9,72.4,72.8,73.2,73.7,74.3,75.2,76.3,77.5,78.5,79,79,78.4,77.5,76.4,75.3,74.3,73.2,72.3,71.4,70.9],[71.9,72.1,72.4,72.5,72.7,73,73.4,74.2,75.2,76.5,77.9,79.2,80.1,80.4,80,79,77.8,76.6,75.6,74.8,74.1,73.5,73,72.6],[72,71.9,71.8,71.8,72,72.5,73.3,74.4,75.8,77.3,78.7,79.8,80.3,80.2,79.4,78.3,77,76,75.4,75,74.7,74.3,73.8,73.2],[70.6,70.2,65.3,65.4,65.9,71.6,72.8,74.2,75.6,76.9,78,78.7,78.9,78.5,77.7,76.7,75.8,75.2,74.9,74.8,74.5,74,73.1,72.1],[68.9,68.6,68.7,69.3,70.1,71.3,72.6,73.9,75,76,76.7,77.1,77.1,76.9,76.3,75.7,75.2,74.9,74.7,74.5,74,73,71.8,70.5],[68.4,68.5,69,69.8,70.9,72,73.1,74,74.8,75.4,75.9,76.4,76.6,76.7,76.6,76.3,76,75.6,75.2,74.6,73.7,72.4,71,69.8],[69.5,69.9,70.7,71.6,72.5,73.3,73.9,74.5,75,75.6,76.3,77.1,77.7,78.2,78.3,78,77.5,76.8,76,75.1,73.9,72.6,71.4,70.5]]}];
+  var selected = 0;
+  var pinnedIndex = null;
+
+  function byId(id) {
+    return document.getElementById(id);
+  }
+
+  function flatten(values) {
+    var output = [];
+    values.forEach(function (row) {
+      row.forEach(function (value) {
+        if (Number.isFinite(value)) output.push(value);
+      });
+    });
+    return output;
+  }
+
+  function getStats(item) {
+    var values = flatten(item.values);
+    return {
+      min: Math.min.apply(null, values),
+      max: Math.max.apply(null, values),
+      latest: values[values.length - 1],
+    };
+  }
+
+  function hexToRgb(hex) {
+    var value = parseInt(hex.slice(1), 16);
+    return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
+  }
+
+  function rgbToHex(parts) {
+    return "#" + parts.map(function (part) {
+      return Math.round(part).toString(16).padStart(2, "0");
+    }).join("");
+  }
+
+  function mixColor(left, right, amount) {
+    var a = hexToRgb(left);
+    var b = hexToRgb(right);
+    return rgbToHex([
+      a[0] + (b[0] - a[0]) * amount,
+      a[1] + (b[1] - a[1]) * amount,
+      a[2] + (b[2] - a[2]) * amount,
+    ]);
+  }
+
+  function colorFor(value, min, max) {
+    if (!Number.isFinite(value)) return "#e5e7eb";
+    if (max <= min) return colors[Math.floor(colors.length / 2)];
+    var normalized = Math.max(0, Math.min(1, (value - min) / (max - min)));
+    var scaled = normalized * (colors.length - 1);
+    var index = Math.min(colors.length - 2, Math.floor(scaled));
+    return mixColor(colors[index], colors[index + 1], scaled - index);
+  }
+
+  function valueAt(index) {
+    var row = Math.floor(index / 24);
+    var col = index % 24;
+    return series[selected].values[row][col];
+  }
+
+  function formatValue(value) {
+    return value.toFixed(1) + " \u00b0F";
+  }
+
+  function describe(index) {
+    var row = Math.floor(index / 24);
+    var col = index % 24;
+    return series[selected].name + " - " + days[row] + " " + String(hours[col]).padStart(2, "0") + ":00 - " + formatValue(valueAt(index));
+  }
+
+  function setText(id, text) {
+    byId(id).textContent = text;
+  }
+
+  function updateDetails(index, pinned) {
+    if (index == null) {
+      setText("details", "Hover a cell for exact bucket details. Click a cell to pin it.");
+      return;
+    }
+    setText("details", (pinned ? "Pinned: " : "Bucket: ") + describe(index));
+  }
+
+  function clearActiveCell() {
+    Array.prototype.forEach.call(document.querySelectorAll(".cell.active"), function (cell) {
+      cell.classList.remove("active");
+    });
+  }
+
+  function setActiveCell(index) {
+    clearActiveCell();
+    if (index == null) return;
+    var cell = document.querySelector('.cell[data-index="' + index + '"]');
+    if (cell) cell.classList.add("active");
+  }
+
+  function switchSeries(index) {
+    selected = index;
+    pinnedIndex = null;
+    var item = series[selected];
+    var itemStats = getStats(item);
+    setText("entity", item.entity);
+    setText("chip", formatValue(itemStats.latest));
+    setText("low", "Low " + formatValue(itemStats.min));
+    setText("high", "High " + formatValue(itemStats.max));
+    setText("latest", "Latest " + formatValue(itemStats.latest));
+    setText("legend-min", formatValue(Math.floor(itemStats.min)));
+    setText("legend-max", formatValue(Math.ceil(itemStats.max)));
+    Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (tab) {
+      tab.classList.toggle("active", Number(tab.getAttribute("data-series")) === index);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".cell"), function (cell) {
+      var cellIndex = Number(cell.getAttribute("data-index"));
+      var value = valueAt(cellIndex);
+      cell.setAttribute("fill", colorFor(value, itemStats.min, itemStats.max));
+      cell.querySelector("title").textContent = describe(cellIndex);
+    });
+    setActiveCell(null);
+    updateDetails(null, false);
+  }
+
+  function findTarget(node, attr) {
+    while (node && node !== document) {
+      if (node.getAttribute && node.hasAttribute(attr)) return node;
+      node = node.parentNode;
+    }
+    return null;
+  }
+
+  function activate(node) {
+    var tab = findTarget(node, "data-series");
+    if (tab) {
+      switchSeries(Number(tab.getAttribute("data-series")));
+      return;
+    }
+    var cell = findTarget(node, "data-index");
+    if (cell) {
+      pinnedIndex = Number(cell.getAttribute("data-index"));
+      setActiveCell(pinnedIndex);
+      updateDetails(pinnedIndex, true);
+    }
+  }
+
+  function init() {
+    switchSeries(0);
+    window.addEventListener("click", function (event) {
+      activate(event.target);
+    }, false);
+    window.addEventListener("mouseover", function (event) {
+      var cell = findTarget(event.target, "data-index");
+      if (cell && pinnedIndex == null) updateDetails(Number(cell.getAttribute("data-index")), false);
+    }, false);
+    window.addEventListener("mouseout", function (event) {
+      var cell = findTarget(event.target, "data-index");
+      if (cell && pinnedIndex == null) updateDetails(null, false);
+    }, false);
+    window.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        var target = findTarget(event.target, "data-index") || findTarget(event.target, "data-series");
+        if (target) {
+          event.preventDefault();
+          activate(target);
+        }
+      }
+      if (event.key === "Escape") {
+        pinnedIndex = null;
+        setActiveCell(null);
+        updateDetails(null, false);
+      }
+    }, false);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, false);
+  } else {
+    init();
+  }
+}());
+]]>
+</script>
+  <rect class="page" x="0" y="0" width="1200" height="610"/>
+  <rect class="card" x="86" y="58" width="1028" height="535" rx="14"/>
+  <text class="title" x="124" y="118">Universal Heatmap Card</text>
+  <text id="entity" class="subtitle" x="124" y="158">sensor.example_kitchen_temperature</text>
+  <rect class="chip" x="918" y="88" width="148" height="46" rx="24"/>
+  <text id="chip" class="summary" x="992" y="118">69.3 &#176;F</text>
+    <g class="tab active" data-series="0" tabindex="0" role="button" aria-label="Show Kitchen">
+      <rect x="124" y="170" width="120" height="46" rx="8"></rect>
+      <text x="184" y="200">Kitchen</text>
+    </g>
+    <g class="tab" data-series="1" tabindex="0" role="button" aria-label="Show Living Room">
+      <rect x="258" y="170" width="140" height="46" rx="8"></rect>
+      <text x="328" y="200">Living Room</text>
+    </g>
+    <g class="tab" data-series="2" tabindex="0" role="button" aria-label="Show Office">
+      <rect x="412" y="170" width="120" height="46" rx="8"></rect>
+      <text x="472" y="200">Office</text>
+    </g>
+  <g id="axis">
+      <text class="axis-label tick" x="206" y="234">12am</text>
+      <text class="axis-label tick" x="422" y="234">6am</text>
+      <text class="axis-label tick" x="638" y="234">12pm</text>
+      <text class="axis-label tick" x="854" y="234">6pm</text>
+      <text class="axis-label tick" x="1034" y="234">11pm</text>
+      <text class="axis-label" x="162" y="266">May 10</text>
+      <text class="axis-label" x="162" y="294">May 11</text>
+      <text class="axis-label" x="162" y="322">May 12</text>
+      <text class="axis-label" x="162" y="350">May 13</text>
+      <text class="axis-label" x="162" y="378">May 14</text>
+      <text class="axis-label" x="162" y="406">May 15</text>
+      <text class="axis-label" x="162" y="434">May 16</text>
+  </g>
+  <g id="cells" aria-label="Interactive heatmap cells">
+      <rect class="cell" data-index="0" tabindex="0" role="button" x="190" y="250" width="32" height="24" rx="3" fill="#9dbd78"><title>Kitchen - May 10 00:00 - 69.1 F</title></rect>
+      <rect class="cell" data-index="1" tabindex="0" role="button" x="226" y="250" width="32" height="24" rx="3" fill="#aec073"><title>Kitchen - May 10 01:00 - 69.5 F</title></rect>
+      <rect class="cell" data-index="2" tabindex="0" role="button" x="262" y="250" width="32" height="24" rx="3" fill="#bfc46f"><title>Kitchen - May 10 02:00 - 69.9 F</title></rect>
+      <rect class="cell" data-index="3" tabindex="0" role="button" x="298" y="250" width="32" height="24" rx="3" fill="#d0c86a"><title>Kitchen - May 10 03:00 - 70.3 F</title></rect>
+      <rect class="cell" data-index="4" tabindex="0" role="button" x="334" y="250" width="32" height="24" rx="3" fill="#ddcb67"><title>Kitchen - May 10 04:00 - 70.6 F</title></rect>
+      <rect class="cell" data-index="5" tabindex="0" role="button" x="370" y="250" width="32" height="24" rx="3" fill="#eace64"><title>Kitchen - May 10 05:00 - 70.9 F</title></rect>
+      <rect class="cell" data-index="6" tabindex="0" role="button" x="406" y="250" width="32" height="24" rx="3" fill="#f0cd61"><title>Kitchen - May 10 06:00 - 71.2 F</title></rect>
+      <rect class="cell" data-index="7" tabindex="0" role="button" x="442" y="250" width="32" height="24" rx="3" fill="#f0c75d"><title>Kitchen - May 10 07:00 - 71.6 F</title></rect>
+      <rect class="cell" data-index="8" tabindex="0" role="button" x="478" y="250" width="32" height="24" rx="3" fill="#f1bd57"><title>Kitchen - May 10 08:00 - 72.3 F</title></rect>
+      <rect class="cell" data-index="9" tabindex="0" role="button" x="514" y="250" width="32" height="24" rx="3" fill="#f1b04f"><title>Kitchen - May 10 09:00 - 73.2 F</title></rect>
+      <rect class="cell" data-index="10" tabindex="0" role="button" x="550" y="250" width="32" height="24" rx="3" fill="#f29f45"><title>Kitchen - May 10 10:00 - 74.3 F</title></rect>
+      <rect class="cell" data-index="11" tabindex="0" role="button" x="586" y="250" width="32" height="24" rx="3" fill="#ef853e"><title>Kitchen - May 10 11:00 - 75.5 F</title></rect>
+      <rect class="cell" data-index="12" tabindex="0" role="button" x="622" y="250" width="32" height="24" rx="3" fill="#ea6c3a"><title>Kitchen - May 10 12:00 - 76.5 F</title></rect>
+      <rect class="cell" data-index="13" tabindex="0" role="button" x="658" y="250" width="32" height="24" rx="3" fill="#e85b37"><title>Kitchen - May 10 13:00 - 77.2 F</title></rect>
+      <rect class="cell" data-index="14" tabindex="0" role="button" x="694" y="250" width="32" height="24" rx="3" fill="#e75636"><title>Kitchen - May 10 14:00 - 77.4 F</title></rect>
+      <rect class="cell" data-index="15" tabindex="0" role="button" x="730" y="250" width="32" height="24" rx="3" fill="#e86038"><title>Kitchen - May 10 15:00 - 77.0 F</title></rect>
+      <rect class="cell" data-index="16" tabindex="0" role="button" x="766" y="250" width="32" height="24" rx="3" fill="#eb713b"><title>Kitchen - May 10 16:00 - 76.3 F</title></rect>
+      <rect class="cell" data-index="17" tabindex="0" role="button" x="802" y="250" width="32" height="24" rx="3" fill="#ef8a3f"><title>Kitchen - May 10 17:00 - 75.3 F</title></rect>
+      <rect class="cell" data-index="18" tabindex="0" role="button" x="838" y="250" width="32" height="24" rx="3" fill="#f29f45"><title>Kitchen - May 10 18:00 - 74.3 F</title></rect>
+      <rect class="cell" data-index="19" tabindex="0" role="button" x="874" y="250" width="32" height="24" rx="3" fill="#f1b04f"><title>Kitchen - May 10 19:00 - 73.2 F</title></rect>
+      <rect class="cell" data-index="20" tabindex="0" role="button" x="910" y="250" width="32" height="24" rx="3" fill="#f1c059"><title>Kitchen - May 10 20:00 - 72.1 F</title></rect>
+      <rect class="cell" data-index="21" tabindex="0" role="button" x="946" y="250" width="32" height="24" rx="3" fill="#f0ce62"><title>Kitchen - May 10 21:00 - 71.1 F</title></rect>
+      <rect class="cell" data-index="22" tabindex="0" role="button" x="982" y="250" width="32" height="24" rx="3" fill="#d0c86a"><title>Kitchen - May 10 22:00 - 70.3 F</title></rect>
+      <rect class="cell" data-index="23" tabindex="0" role="button" x="1018" y="250" width="32" height="24" rx="3" fill="#b6c271"><title>Kitchen - May 10 23:00 - 69.7 F</title></rect>
+      <rect class="cell" data-index="24" tabindex="0" role="button" x="190" y="278" width="32" height="24" rx="3" fill="#d8ca68"><title>Kitchen - May 11 00:00 - 70.5 F</title></rect>
+      <rect class="cell" data-index="25" tabindex="0" role="button" x="226" y="278" width="32" height="24" rx="3" fill="#ddcb67"><title>Kitchen - May 11 01:00 - 70.6 F</title></rect>
+      <rect class="cell" data-index="26" tabindex="0" role="button" x="262" y="278" width="32" height="24" rx="3" fill="#ddcb67"><title>Kitchen - May 11 02:00 - 70.6 F</title></rect>
+      <rect class="cell" data-index="27" tabindex="0" role="button" x="298" y="278" width="32" height="24" rx="3" fill="#ddcb67"><title>Kitchen - May 11 03:00 - 70.6 F</title></rect>
+      <rect class="cell" data-index="28" tabindex="0" role="button" x="334" y="278" width="32" height="24" rx="3" fill="#e1cc66"><title>Kitchen - May 11 04:00 - 70.7 F</title></rect>
+      <rect class="cell" data-index="29" tabindex="0" role="button" x="370" y="278" width="32" height="24" rx="3" fill="#e5cd65"><title>Kitchen - May 11 05:00 - 70.8 F</title></rect>
+      <rect class="cell" data-index="30" tabindex="0" role="button" x="406" y="278" width="32" height="24" rx="3" fill="#f0cd61"><title>Kitchen - May 11 06:00 - 71.2 F</title></rect>
+      <rect class="cell" data-index="31" tabindex="0" role="button" x="442" y="278" width="32" height="24" rx="3" fill="#f0c35a"><title>Kitchen - May 11 07:00 - 71.9 F</title></rect>
+      <rect class="cell" data-index="32" tabindex="0" role="button" x="478" y="278" width="32" height="24" rx="3" fill="#f1b452"><title>Kitchen - May 11 08:00 - 72.9 F</title></rect>
+      <rect class="cell" data-index="33" tabindex="0" role="button" x="514" y="278" width="32" height="24" rx="3" fill="#f2a146"><title>Kitchen - May 11 09:00 - 74.2 F</title></rect>
+      <rect class="cell" data-index="34" tabindex="0" role="button" x="550" y="278" width="32" height="24" rx="3" fill="#ee833e"><title>Kitchen - May 11 10:00 - 75.6 F</title></rect>
+      <rect class="cell" data-index="35" tabindex="0" role="button" x="586" y="278" width="32" height="24" rx="3" fill="#e96238"><title>Kitchen - May 11 11:00 - 76.9 F</title></rect>
+      <rect class="cell" data-index="36" tabindex="0" role="button" x="622" y="278" width="32" height="24" rx="3" fill="#e54934"><title>Kitchen - May 11 12:00 - 77.9 F</title></rect>
+      <rect class="cell" data-index="37" tabindex="0" role="button" x="658" y="278" width="32" height="24" rx="3" fill="#e33f32"><title>Kitchen - May 11 13:00 - 78.3 F</title></rect>
+      <rect class="cell" data-index="38" tabindex="0" role="button" x="694" y="278" width="32" height="24" rx="3" fill="#e44433"><title>Kitchen - May 11 14:00 - 78.1 F</title></rect>
+      <rect class="cell" data-index="39" tabindex="0" role="button" x="730" y="278" width="32" height="24" rx="3" fill="#e75636"><title>Kitchen - May 11 15:00 - 77.4 F</title></rect>
+      <rect class="cell" data-index="40" tabindex="0" role="button" x="766" y="278" width="32" height="24" rx="3" fill="#eb713b"><title>Kitchen - May 11 16:00 - 76.3 F</title></rect>
+      <rect class="cell" data-index="41" tabindex="0" role="button" x="802" y="278" width="32" height="24" rx="3" fill="#f08d40"><title>Kitchen - May 11 17:00 - 75.2 F</title></rect>
+      <rect class="cell" data-index="42" tabindex="0" role="button" x="838" y="278" width="32" height="24" rx="3" fill="#f2a146"><title>Kitchen - May 11 18:00 - 74.2 F</title></rect>
+      <rect class="cell" data-index="43" tabindex="0" role="button" x="874" y="278" width="32" height="24" rx="3" fill="#f1ad4d"><title>Kitchen - May 11 19:00 - 73.4 F</title></rect>
+      <rect class="cell" data-index="44" tabindex="0" role="button" x="910" y="278" width="32" height="24" rx="3" fill="#f1b753"><title>Kitchen - May 11 20:00 - 72.7 F</title></rect>
+      <rect class="cell" data-index="45" tabindex="0" role="button" x="946" y="278" width="32" height="24" rx="3" fill="#f1c059"><title>Kitchen - May 11 21:00 - 72.1 F</title></rect>
+      <rect class="cell" data-index="46" tabindex="0" role="button" x="982" y="278" width="32" height="24" rx="3" fill="#f0c75d"><title>Kitchen - May 11 22:00 - 71.6 F</title></rect>
+      <rect class="cell" data-index="47" tabindex="0" role="button" x="1018" y="278" width="32" height="24" rx="3" fill="#f0cd61"><title>Kitchen - May 11 23:00 - 71.2 F</title></rect>
+      <rect class="cell" data-index="48" tabindex="0" role="button" x="190" y="306" width="32" height="24" rx="3" fill="#e1cc66"><title>Kitchen - May 12 00:00 - 70.7 F</title></rect>
+      <rect class="cell" data-index="49" tabindex="0" role="button" x="226" y="306" width="32" height="24" rx="3" fill="#d4c969"><title>Kitchen - May 12 01:00 - 70.4 F</title></rect>
+      <rect class="cell" data-index="50" tabindex="0" role="button" x="262" y="306" width="32" height="24" rx="3" fill="#c7c66c"><title>Kitchen - May 12 02:00 - 70.1 F</title></rect>
+      <rect class="cell" data-index="51" tabindex="0" role="button" x="298" y="306" width="32" height="24" rx="3" fill="#bfc46f"><title>Kitchen - May 12 03:00 - 69.9 F</title></rect>
+      <rect class="cell" data-index="52" tabindex="0" role="button" x="334" y="306" width="32" height="24" rx="3" fill="#bfc46f"><title>Kitchen - May 12 04:00 - 69.9 F</title></rect>
+      <rect class="cell" data-index="53" tabindex="0" role="button" x="370" y="306" width="32" height="24" rx="3" fill="#d0c86a"><title>Kitchen - May 12 05:00 - 70.3 F</title></rect>
+      <rect class="cell" data-index="54" tabindex="0" role="button" x="406" y="306" width="32" height="24" rx="3" fill="#eecf63"><title>Kitchen - May 12 06:00 - 71.0 F</title></rect>
+      <rect class="cell" data-index="55" tabindex="0" role="button" x="442" y="306" width="32" height="24" rx="3" fill="#f1c059"><title>Kitchen - May 12 07:00 - 72.1 F</title></rect>
+      <rect class="cell" data-index="56" tabindex="0" role="button" x="478" y="306" width="32" height="24" rx="3" fill="#f1ab4c"><title>Kitchen - May 12 08:00 - 73.5 F</title></rect>
+      <rect class="cell" data-index="57" tabindex="0" role="button" x="514" y="306" width="32" height="24" rx="3" fill="#f19441"><title>Kitchen - May 12 09:00 - 74.9 F</title></rect>
+      <rect class="cell" data-index="58" tabindex="0" role="button" x="550" y="306" width="32" height="24" rx="3" fill="#eb713b"><title>Kitchen - May 12 10:00 - 76.3 F</title></rect>
+      <rect class="cell" data-index="59" tabindex="0" role="button" x="586" y="306" width="32" height="24" rx="3" fill="#e65336"><title>Kitchen - May 12 11:00 - 77.5 F</title></rect>
+      <rect class="cell" data-index="60" tabindex="0" role="button" x="622" y="306" width="32" height="24" rx="3" fill="#e44433"><title>Kitchen - May 12 12:00 - 78.1 F</title></rect>
+      <rect class="cell" data-index="61" tabindex="0" role="button" x="658" y="306" width="32" height="24" rx="3" fill="#e44433"><title>Kitchen - May 12 13:00 - 78.1 F</title></rect>
+      <rect class="cell" data-index="62" tabindex="0" role="button" x="694" y="306" width="32" height="24" rx="3" fill="#e65336"><title>Kitchen - May 12 14:00 - 77.5 F</title></rect>
+      <rect class="cell" data-index="63" tabindex="0" role="button" x="730" y="306" width="32" height="24" rx="3" fill="#ea6a3a"><title>Kitchen - May 12 15:00 - 76.6 F</title></rect>
+      <rect class="cell" data-index="64" tabindex="0" role="button" x="766" y="306" width="32" height="24" rx="3" fill="#ee833e"><title>Kitchen - May 12 16:00 - 75.6 F</title></rect>
+      <rect class="cell" data-index="65" tabindex="0" role="button" x="802" y="306" width="32" height="24" rx="3" fill="#f29942"><title>Kitchen - May 12 17:00 - 74.7 F</title></rect>
+      <rect class="cell" data-index="66" tabindex="0" role="button" x="838" y="306" width="32" height="24" rx="3" fill="#f2a247"><title>Kitchen - May 12 18:00 - 74.1 F</title></rect>
+      <rect class="cell" data-index="67" tabindex="0" role="button" x="874" y="306" width="32" height="24" rx="3" fill="#f1a84b"><title>Kitchen - May 12 19:00 - 73.7 F</title></rect>
+      <rect class="cell" data-index="68" tabindex="0" role="button" x="910" y="306" width="32" height="24" rx="3" fill="#f1ae4e"><title>Kitchen - May 12 20:00 - 73.3 F</title></rect>
+      <rect class="cell" data-index="69" tabindex="0" role="button" x="946" y="306" width="32" height="24" rx="3" fill="#f1b452"><title>Kitchen - May 12 21:00 - 72.9 F</title></rect>
+      <rect class="cell" data-index="70" tabindex="0" role="button" x="982" y="306" width="32" height="24" rx="3" fill="#f1bd57"><title>Kitchen - May 12 22:00 - 72.3 F</title></rect>
+      <rect class="cell" data-index="71" tabindex="0" role="button" x="1018" y="306" width="32" height="24" rx="3" fill="#f0c55c"><title>Kitchen - May 12 23:00 - 71.7 F</title></rect>
+      <rect class="cell" data-index="72" tabindex="0" role="button" x="190" y="334" width="32" height="24" rx="3" fill="#aec073"><title>Kitchen - May 13 00:00 - 69.5 F</title></rect>
+      <rect class="cell" data-index="73" tabindex="0" role="button" x="226" y="334" width="32" height="24" rx="3" fill="#98bc79"><title>Kitchen - May 13 01:00 - 69.0 F</title></rect>
+      <rect class="cell" data-index="74" tabindex="0" role="button" x="262" y="334" width="32" height="24" rx="3" fill="#2f7ebc"><title>Kitchen - May 13 02:00 - 63.8 F</title></rect>
+      <rect class="cell" data-index="75" tabindex="0" role="button" x="298" y="334" width="32" height="24" rx="3" fill="#2f7ebc"><title>Kitchen - May 13 03:00 - 63.8 F</title></rect>
+      <rect class="cell" data-index="76" tabindex="0" role="button" x="334" y="334" width="32" height="24" rx="3" fill="#3282b8"><title>Kitchen - May 13 04:00 - 64.1 F</title></rect>
+      <rect class="cell" data-index="77" tabindex="0" role="button" x="370" y="334" width="32" height="24" rx="3" fill="#b6c271"><title>Kitchen - May 13 05:00 - 69.7 F</title></rect>
+      <rect class="cell" data-index="78" tabindex="0" role="button" x="406" y="334" width="32" height="24" rx="3" fill="#e5cd65"><title>Kitchen - May 13 06:00 - 70.8 F</title></rect>
+      <rect class="cell" data-index="79" tabindex="0" role="button" x="442" y="334" width="32" height="24" rx="3" fill="#f1c059"><title>Kitchen - May 13 07:00 - 72.1 F</title></rect>
+      <rect class="cell" data-index="80" tabindex="0" role="button" x="478" y="334" width="32" height="24" rx="3" fill="#f1ab4c"><title>Kitchen - May 13 08:00 - 73.5 F</title></rect>
+      <rect class="cell" data-index="81" tabindex="0" role="button" x="514" y="334" width="32" height="24" rx="3" fill="#f19441"><title>Kitchen - May 13 09:00 - 74.9 F</title></rect>
+      <rect class="cell" data-index="82" tabindex="0" role="button" x="550" y="334" width="32" height="24" rx="3" fill="#ed793c"><title>Kitchen - May 13 10:00 - 76.0 F</title></rect>
+      <rect class="cell" data-index="83" tabindex="0" role="button" x="586" y="334" width="32" height="24" rx="3" fill="#ea6739"><title>Kitchen - May 13 11:00 - 76.7 F</title></rect>
+      <rect class="cell" data-index="84" tabindex="0" role="button" x="622" y="334" width="32" height="24" rx="3" fill="#e96238"><title>Kitchen - May 13 12:00 - 76.9 F</title></rect>
+      <rect class="cell" data-index="85" tabindex="0" role="button" x="658" y="334" width="32" height="24" rx="3" fill="#ea6739"><title>Kitchen - May 13 13:00 - 76.7 F</title></rect>
+      <rect class="cell" data-index="86" tabindex="0" role="button" x="694" y="334" width="32" height="24" rx="3" fill="#ec763c"><title>Kitchen - May 13 14:00 - 76.1 F</title></rect>
+      <rect class="cell" data-index="87" tabindex="0" role="button" x="730" y="334" width="32" height="24" rx="3" fill="#ef8a3f"><title>Kitchen - May 13 15:00 - 75.3 F</title></rect>
+      <rect class="cell" data-index="88" tabindex="0" role="button" x="766" y="334" width="32" height="24" rx="3" fill="#f29b43"><title>Kitchen - May 13 16:00 - 74.6 F</title></rect>
+      <rect class="cell" data-index="89" tabindex="0" role="button" x="802" y="334" width="32" height="24" rx="3" fill="#f2a247"><title>Kitchen - May 13 17:00 - 74.1 F</title></rect>
+      <rect class="cell" data-index="90" tabindex="0" role="button" x="838" y="334" width="32" height="24" rx="3" fill="#f2a74a"><title>Kitchen - May 13 18:00 - 73.8 F</title></rect>
+      <rect class="cell" data-index="91" tabindex="0" role="button" x="874" y="334" width="32" height="24" rx="3" fill="#f1a84b"><title>Kitchen - May 13 19:00 - 73.7 F</title></rect>
+      <rect class="cell" data-index="92" tabindex="0" role="button" x="910" y="334" width="32" height="24" rx="3" fill="#f1ad4d"><title>Kitchen - May 13 20:00 - 73.4 F</title></rect>
+      <rect class="cell" data-index="93" tabindex="0" role="button" x="946" y="334" width="32" height="24" rx="3" fill="#f1b553"><title>Kitchen - May 13 21:00 - 72.8 F</title></rect>
+      <rect class="cell" data-index="94" tabindex="0" role="button" x="982" y="334" width="32" height="24" rx="3" fill="#f0c35a"><title>Kitchen - May 13 22:00 - 71.9 F</title></rect>
+      <rect class="cell" data-index="95" tabindex="0" role="button" x="1018" y="334" width="32" height="24" rx="3" fill="#eace64"><title>Kitchen - May 13 23:00 - 70.9 F</title></rect>
+      <rect class="cell" data-index="96" tabindex="0" role="button" x="190" y="362" width="32" height="24" rx="3" fill="#6eb284"><title>Kitchen - May 14 00:00 - 68.0 F</title></rect>
+      <rect class="cell" data-index="97" tabindex="0" role="button" x="226" y="362" width="32" height="24" rx="3" fill="#5caf88"><title>Kitchen - May 14 01:00 - 67.6 F</title></rect>
+      <rect class="cell" data-index="98" tabindex="0" role="button" x="262" y="362" width="32" height="24" rx="3" fill="#58ae89"><title>Kitchen - May 14 02:00 - 67.5 F</title></rect>
+      <rect class="cell" data-index="99" tabindex="0" role="button" x="298" y="362" width="32" height="24" rx="3" fill="#69b185"><title>Kitchen - May 14 03:00 - 67.9 F</title></rect>
+      <rect class="cell" data-index="100" tabindex="0" role="button" x="334" y="362" width="32" height="24" rx="3" fill="#87b87d"><title>Kitchen - May 14 04:00 - 68.6 F</title></rect>
+      <rect class="cell" data-index="101" tabindex="0" role="button" x="370" y="362" width="32" height="24" rx="3" fill="#b6c271"><title>Kitchen - May 14 05:00 - 69.7 F</title></rect>
+      <rect class="cell" data-index="102" tabindex="0" role="button" x="406" y="362" width="32" height="24" rx="3" fill="#eace64"><title>Kitchen - May 14 06:00 - 70.9 F</title></rect>
+      <rect class="cell" data-index="103" tabindex="0" role="button" x="442" y="362" width="32" height="24" rx="3" fill="#f1c059"><title>Kitchen - May 14 07:00 - 72.1 F</title></rect>
+      <rect class="cell" data-index="104" tabindex="0" role="button" x="478" y="362" width="32" height="24" rx="3" fill="#f1ae4e"><title>Kitchen - May 14 08:00 - 73.3 F</title></rect>
+      <rect class="cell" data-index="105" tabindex="0" role="button" x="514" y="362" width="32" height="24" rx="3" fill="#f2a146"><title>Kitchen - May 14 09:00 - 74.2 F</title></rect>
+      <rect class="cell" data-index="106" tabindex="0" role="button" x="550" y="362" width="32" height="24" rx="3" fill="#f19441"><title>Kitchen - May 14 10:00 - 74.9 F</title></rect>
+      <rect class="cell" data-index="107" tabindex="0" role="button" x="586" y="362" width="32" height="24" rx="3" fill="#ef8a3f"><title>Kitchen - May 14 11:00 - 75.3 F</title></rect>
+      <rect class="cell" data-index="108" tabindex="0" role="button" x="622" y="362" width="32" height="24" rx="3" fill="#ef883f"><title>Kitchen - May 14 12:00 - 75.4 F</title></rect>
+      <rect class="cell" data-index="109" tabindex="0" role="button" x="658" y="362" width="32" height="24" rx="3" fill="#ef8a3f"><title>Kitchen - May 14 13:00 - 75.3 F</title></rect>
+      <rect class="cell" data-index="110" tabindex="0" role="button" x="694" y="362" width="32" height="24" rx="3" fill="#f19241"><title>Kitchen - May 14 14:00 - 75.0 F</title></rect>
+      <rect class="cell" data-index="111" tabindex="0" role="button" x="730" y="362" width="32" height="24" rx="3" fill="#f29b43"><title>Kitchen - May 14 15:00 - 74.6 F</title></rect>
+      <rect class="cell" data-index="112" tabindex="0" role="button" x="766" y="362" width="32" height="24" rx="3" fill="#f29f45"><title>Kitchen - May 14 16:00 - 74.3 F</title></rect>
+      <rect class="cell" data-index="113" tabindex="0" role="button" x="802" y="362" width="32" height="24" rx="3" fill="#f2a247"><title>Kitchen - May 14 17:00 - 74.1 F</title></rect>
+      <rect class="cell" data-index="114" tabindex="0" role="button" x="838" y="362" width="32" height="24" rx="3" fill="#f2a549"><title>Kitchen - May 14 18:00 - 73.9 F</title></rect>
+      <rect class="cell" data-index="115" tabindex="0" role="button" x="874" y="362" width="32" height="24" rx="3" fill="#f1a84b"><title>Kitchen - May 14 19:00 - 73.7 F</title></rect>
+      <rect class="cell" data-index="116" tabindex="0" role="button" x="910" y="362" width="32" height="24" rx="3" fill="#f1b150"><title>Kitchen - May 14 20:00 - 73.1 F</title></rect>
+      <rect class="cell" data-index="117" tabindex="0" role="button" x="946" y="362" width="32" height="24" rx="3" fill="#f1c059"><title>Kitchen - May 14 21:00 - 72.1 F</title></rect>
+      <rect class="cell" data-index="118" tabindex="0" role="button" x="982" y="362" width="32" height="24" rx="3" fill="#eace64"><title>Kitchen - May 14 22:00 - 70.9 F</title></rect>
+      <rect class="cell" data-index="119" tabindex="0" role="button" x="1018" y="362" width="32" height="24" rx="3" fill="#b2c172"><title>Kitchen - May 14 23:00 - 69.6 F</title></rect>
+      <rect class="cell" data-index="120" tabindex="0" role="button" x="190" y="390" width="32" height="24" rx="3" fill="#58ae89"><title>Kitchen - May 15 00:00 - 67.5 F</title></rect>
+      <rect class="cell" data-index="121" tabindex="0" role="button" x="226" y="390" width="32" height="24" rx="3" fill="#55ad8a"><title>Kitchen - May 15 01:00 - 67.4 F</title></rect>
+      <rect class="cell" data-index="122" tabindex="0" role="button" x="262" y="390" width="32" height="24" rx="3" fill="#65b186"><title>Kitchen - May 15 02:00 - 67.8 F</title></rect>
+      <rect class="cell" data-index="123" tabindex="0" role="button" x="298" y="390" width="32" height="24" rx="3" fill="#83b77e"><title>Kitchen - May 15 03:00 - 68.5 F</title></rect>
+      <rect class="cell" data-index="124" tabindex="0" role="button" x="334" y="390" width="32" height="24" rx="3" fill="#a9c074"><title>Kitchen - May 15 04:00 - 69.4 F</title></rect>
+      <rect class="cell" data-index="125" tabindex="0" role="button" x="370" y="390" width="32" height="24" rx="3" fill="#d4c969"><title>Kitchen - May 15 05:00 - 70.4 F</title></rect>
+      <rect class="cell" data-index="126" tabindex="0" role="button" x="406" y="390" width="32" height="24" rx="3" fill="#f0ca5f"><title>Kitchen - May 15 06:00 - 71.4 F</title></rect>
+      <rect class="cell" data-index="127" tabindex="0" role="button" x="442" y="390" width="32" height="24" rx="3" fill="#f1bd57"><title>Kitchen - May 15 07:00 - 72.3 F</title></rect>
+      <rect class="cell" data-index="128" tabindex="0" role="button" x="478" y="390" width="32" height="24" rx="3" fill="#f1b251"><title>Kitchen - May 15 08:00 - 73.0 F</title></rect>
+      <rect class="cell" data-index="129" tabindex="0" role="button" x="514" y="390" width="32" height="24" rx="3" fill="#f1aa4b"><title>Kitchen - May 15 09:00 - 73.6 F</title></rect>
+      <rect class="cell" data-index="130" tabindex="0" role="button" x="550" y="390" width="32" height="24" rx="3" fill="#f2a247"><title>Kitchen - May 15 10:00 - 74.1 F</title></rect>
+      <rect class="cell" data-index="131" tabindex="0" role="button" x="586" y="390" width="32" height="24" rx="3" fill="#f29b43"><title>Kitchen - May 15 11:00 - 74.6 F</title></rect>
+      <rect class="cell" data-index="132" tabindex="0" role="button" x="622" y="390" width="32" height="24" rx="3" fill="#f19441"><title>Kitchen - May 15 12:00 - 74.9 F</title></rect>
+      <rect class="cell" data-index="133" tabindex="0" role="button" x="658" y="390" width="32" height="24" rx="3" fill="#f08d40"><title>Kitchen - May 15 13:00 - 75.2 F</title></rect>
+      <rect class="cell" data-index="134" tabindex="0" role="button" x="694" y="390" width="32" height="24" rx="3" fill="#f08d40"><title>Kitchen - May 15 14:00 - 75.2 F</title></rect>
+      <rect class="cell" data-index="135" tabindex="0" role="button" x="730" y="390" width="32" height="24" rx="3" fill="#f08d40"><title>Kitchen - May 15 15:00 - 75.2 F</title></rect>
+      <rect class="cell" data-index="136" tabindex="0" role="button" x="766" y="390" width="32" height="24" rx="3" fill="#f19241"><title>Kitchen - May 15 16:00 - 75.0 F</title></rect>
+      <rect class="cell" data-index="137" tabindex="0" role="button" x="802" y="390" width="32" height="24" rx="3" fill="#f19741"><title>Kitchen - May 15 17:00 - 74.8 F</title></rect>
+      <rect class="cell" data-index="138" tabindex="0" role="button" x="838" y="390" width="32" height="24" rx="3" fill="#f29e44"><title>Kitchen - May 15 18:00 - 74.4 F</title></rect>
+      <rect class="cell" data-index="139" tabindex="0" role="button" x="874" y="390" width="32" height="24" rx="3" fill="#f2a74a"><title>Kitchen - May 15 19:00 - 73.8 F</title></rect>
+      <rect class="cell" data-index="140" tabindex="0" role="button" x="910" y="390" width="32" height="24" rx="3" fill="#f1b553"><title>Kitchen - May 15 20:00 - 72.8 F</title></rect>
+      <rect class="cell" data-index="141" tabindex="0" role="button" x="946" y="390" width="32" height="24" rx="3" fill="#f0c85e"><title>Kitchen - May 15 21:00 - 71.5 F</title></rect>
+      <rect class="cell" data-index="142" tabindex="0" role="button" x="982" y="390" width="32" height="24" rx="3" fill="#c7c66c"><title>Kitchen - May 15 22:00 - 70.1 F</title></rect>
+      <rect class="cell" data-index="143" tabindex="0" role="button" x="1018" y="390" width="32" height="24" rx="3" fill="#90ba7b"><title>Kitchen - May 15 23:00 - 68.8 F</title></rect>
+      <rect class="cell" data-index="144" tabindex="0" role="button" x="190" y="418" width="32" height="24" rx="3" fill="#7fb67f"><title>Kitchen - May 16 00:00 - 68.4 F</title></rect>
+      <rect class="cell" data-index="145" tabindex="0" role="button" x="226" y="418" width="32" height="24" rx="3" fill="#87b87d"><title>Kitchen - May 16 01:00 - 68.6 F</title></rect>
+      <rect class="cell" data-index="146" tabindex="0" role="button" x="262" y="418" width="32" height="24" rx="3" fill="#a1be76"><title>Kitchen - May 16 02:00 - 69.2 F</title></rect>
+      <rect class="cell" data-index="147" tabindex="0" role="button" x="298" y="418" width="32" height="24" rx="3" fill="#bfc46f"><title>Kitchen - May 16 03:00 - 69.9 F</title></rect>
+      <rect class="cell" data-index="148" tabindex="0" role="button" x="334" y="418" width="32" height="24" rx="3" fill="#e1cc66"><title>Kitchen - May 16 04:00 - 70.7 F</title></rect>
+      <rect class="cell" data-index="149" tabindex="0" role="button" x="370" y="418" width="32" height="24" rx="3" fill="#f0ca5f"><title>Kitchen - May 16 05:00 - 71.4 F</title></rect>
+      <rect class="cell" data-index="150" tabindex="0" role="button" x="406" y="418" width="32" height="24" rx="3" fill="#f0c35a"><title>Kitchen - May 16 06:00 - 71.9 F</title></rect>
+      <rect class="cell" data-index="151" tabindex="0" role="button" x="442" y="418" width="32" height="24" rx="3" fill="#f1ba55"><title>Kitchen - May 16 07:00 - 72.5 F</title></rect>
+      <rect class="cell" data-index="152" tabindex="0" role="button" x="478" y="418" width="32" height="24" rx="3" fill="#f1b251"><title>Kitchen - May 16 08:00 - 73.0 F</title></rect>
+      <rect class="cell" data-index="153" tabindex="0" role="button" x="514" y="418" width="32" height="24" rx="3" fill="#f1ab4c"><title>Kitchen - May 16 09:00 - 73.5 F</title></rect>
+      <rect class="cell" data-index="154" tabindex="0" role="button" x="550" y="418" width="32" height="24" rx="3" fill="#f2a146"><title>Kitchen - May 16 10:00 - 74.2 F</title></rect>
+      <rect class="cell" data-index="155" tabindex="0" role="button" x="586" y="418" width="32" height="24" rx="3" fill="#f19241"><title>Kitchen - May 16 11:00 - 75.0 F</title></rect>
+      <rect class="cell" data-index="156" tabindex="0" role="button" x="622" y="418" width="32" height="24" rx="3" fill="#ed7e3d"><title>Kitchen - May 16 12:00 - 75.8 F</title></rect>
+      <rect class="cell" data-index="157" tabindex="0" role="button" x="658" y="418" width="32" height="24" rx="3" fill="#eb6f3a"><title>Kitchen - May 16 13:00 - 76.4 F</title></rect>
+      <rect class="cell" data-index="158" tabindex="0" role="button" x="694" y="418" width="32" height="24" rx="3" fill="#ea6739"><title>Kitchen - May 16 14:00 - 76.7 F</title></rect>
+      <rect class="cell" data-index="159" tabindex="0" role="button" x="730" y="418" width="32" height="24" rx="3" fill="#ea6a3a"><title>Kitchen - May 16 15:00 - 76.6 F</title></rect>
+      <rect class="cell" data-index="160" tabindex="0" role="button" x="766" y="418" width="32" height="24" rx="3" fill="#eb713b"><title>Kitchen - May 16 16:00 - 76.3 F</title></rect>
+      <rect class="cell" data-index="161" tabindex="0" role="button" x="802" y="418" width="32" height="24" rx="3" fill="#ed7e3d"><title>Kitchen - May 16 17:00 - 75.8 F</title></rect>
+      <rect class="cell" data-index="162" tabindex="0" role="button" x="838" y="418" width="32" height="24" rx="3" fill="#f19241"><title>Kitchen - May 16 18:00 - 75.0 F</title></rect>
+      <rect class="cell" data-index="163" tabindex="0" role="button" x="874" y="418" width="32" height="24" rx="3" fill="#f2a448"><title>Kitchen - May 16 19:00 - 74.0 F</title></rect>
+      <rect class="cell" data-index="164" tabindex="0" role="button" x="910" y="418" width="32" height="24" rx="3" fill="#f1b553"><title>Kitchen - May 16 20:00 - 72.8 F</title></rect>
+      <rect class="cell" data-index="165" tabindex="0" role="button" x="946" y="418" width="32" height="24" rx="3" fill="#f0c85e"><title>Kitchen - May 16 21:00 - 71.5 F</title></rect>
+      <rect class="cell" data-index="166" tabindex="0" role="button" x="982" y="418" width="32" height="24" rx="3" fill="#ccc76b"><title>Kitchen - May 16 22:00 - 70.2 F</title></rect>
+      <rect class="cell" data-index="167" tabindex="0" role="button" x="1018" y="418" width="32" height="24" rx="3" fill="#a5bf75"><title>Kitchen - May 16 23:00 - 69.3 F</title></rect>
+  </g>
+  <text id="details" class="details" x="124" y="490">Hover a cell for exact bucket details. Click a cell to pin it.</text>
+  <text id="low" class="legend-label low" x="124" y="522">Low 63.8 &#176;F</text>
+  <text id="high" class="legend-label high" x="600" y="522">High 78.3 &#176;F</text>
+  <text id="latest" class="legend-label latest" x="1066" y="522">Latest 69.3 &#176;F</text>
+  <rect class="legend-track" x="124" y="536" width="942" height="15" rx="8"/>
+  <text id="legend-min" class="legend-label low" x="124" y="576">63.0 &#176;F</text>
+  <text id="legend-max" class="legend-label latest" x="1066" y="576">79.0 &#176;F</text>
+</svg>

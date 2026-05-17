@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Universal Heatmap Card Demo</title>
+    <style>
+      :root {
+        --card-background-color: #ffffff;
+        --divider-color: #d8dee8;
+        --error-color: #db4437;
+        --ha-card-box-shadow: 0 8px 24px rgba(20, 32, 48, 0.12);
+        --primary-color: #315f9d;
+        --primary-text-color: #1e293b;
+        --secondary-background-color: #eef3f8;
+        --secondary-text-color: #64748b;
+        --text-primary-color: #ffffff;
+        --warning-color: #c87f0a;
+      }
+
+      body {
+        background: #f5f7fb;
+        color: #1e293b;
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        margin: 0;
+      }
+
+      main {
+        margin: 0 auto;
+        max-width: 860px;
+        padding: 32px 16px;
+      }
+
+      h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 4px;
+      }
+
+      .note {
+        color: #64748b;
+        font-size: 13px;
+        margin: 0 0 18px;
+      }
+
+      .demo-controls {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 0 14px;
+      }
+
+      .demo-controls button {
+        background: #eef3f8;
+        border: 1px solid #d8dee8;
+        border-radius: 6px;
+        color: #1e293b;
+        cursor: pointer;
+        font: inherit;
+        min-height: 32px;
+        padding: 0 10px;
+      }
+
+      .demo-controls button.active {
+        background: #315f9d;
+        border-color: #315f9d;
+        color: #ffffff;
+      }
+
+      .demo-controls button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .view-controls,
+      .scale-controls {
+        align-items: center;
+        color: #64748b;
+        display: flex;
+        flex-wrap: wrap;
+        font-size: 13px;
+        gap: 8px;
+        margin: -4px 0 14px;
+      }
+
+      .view-controls:empty,
+      .scale-controls:empty {
+        display: none;
+      }
+
+      .view-controls label,
+      .scale-controls label {
+        font-weight: 600;
+      }
+
+      .view-controls select,
+      .scale-controls select {
+        background: #eef3f8;
+        border: 1px solid #d8dee8;
+        border-radius: 6px;
+        color: #1e293b;
+        font: inherit;
+        min-height: 32px;
+        padding: 0 8px;
+      }
+
+      universal-heatmap-card {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Universal Heatmap Card Demo</h1>
+      <p id="demo-note" class="note">Loading demo data...</p>
+      <div id="demo-controls" class="demo-controls"></div>
+      <div id="view-controls" class="view-controls"></div>
+      <div id="scale-controls" class="scale-controls"></div>
+      <div id="app"></div>
+    </main>
+    <script type="module" src="./demo.ts"></script>
+  </body>
+</html>

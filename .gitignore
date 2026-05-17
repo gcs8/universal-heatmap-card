@@ -1,0 +1,13 @@
+node_modules/
+dist/*
+!dist/
+!dist/universal-heatmap-card.js
+coverage/
+.vite/
+.idea/
+.vscode/
+*.log
+*.err
+*.tsbuildinfo
+demo/fixtures/local-*.json
+demo/fixtures/local-sync-config.json
