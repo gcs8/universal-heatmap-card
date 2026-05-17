@@ -1,6 +1,6 @@
 export const CARD_TAG = "universal-heatmap-card";
 export const CARD_NAME = "Universal Heatmap Card";
-export const CARD_VERSION = "0.1.0";
+export const CARD_VERSION = "0.1.1";
 
 export type BucketInterval = "5minute" | "hour" | "day" | "week" | "month";
 export type BucketValueName =

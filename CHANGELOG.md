@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- Added visual editor controls for per-entity display aliases.
+- Added clearer labels and helper text for scale preset, fixed min/max, display unit, sensitivity, and outlier clipping.
+
 ## 0.1.0
 
 - Initial public release candidate.

@@ -205,7 +205,7 @@ data:
 - Wide dashboards are protected by lazy loading and a shared request queue. Off-screen cards wait until they are near the viewport, repeated Home Assistant state updates reuse the in-flight load for the same card, and `data.max_concurrent_requests` defaults to `2`.
 - Multi-entity cards work best when all entities share comparable bucket semantics and units. Per-entity `scale` overrides are supported.
 - Binary runtime aggregation is planned, but not ready yet. `percent_on` and `duration_on` are reserved bucket values for that pass.
-- The graphical editor covers common single- and multi-entity options, including reordered entity lists. Use YAML mode for custom color stops, per-entity scale overrides, and unusual nested config.
+- The graphical editor covers common single- and multi-entity options, including reordered entity lists, entity display aliases, fixed/rolling alignment, scale preset, fixed min/max, sensitivity, and outlier clipping. Use YAML mode for custom color stops, per-entity scale overrides, and unusual nested config.
 - Compare mode is not included yet.
 
 ## Development

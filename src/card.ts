@@ -3,7 +3,12 @@ import { normalizeConfig } from "./config";
 import { fetchHeatmapBuckets } from "./data/provider";
 import { heatmapRequestQueueState, scheduleHeatmapRequest } from "./data/request-queue";
 import { debugLog, debugNow, isDebugEnabled, roundMs } from "./debug";
-import { buildEditorFormConfig, editorEntityIds } from "./editor-form";
+import {
+  buildEditorFormConfig,
+  editorEntityIds,
+  mergeEditorEntities,
+  updateEditorEntityName,
+} from "./editor-form";
 import {
   estimateCardChromeHeight,
   estimateMasonryCardSize,
@@ -21,7 +26,6 @@ import {
   type BucketValue,
   type HassEntity,
   type HeatmapCardConfig,
-  type HeatmapEntityConfig,
   type HeatmapRenderLayout,
   type HomeAssistant,
   type NormalizedConfig,
@@ -1311,6 +1315,7 @@ class UniversalHeatmapCardEditor extends LitElement {
         .computeHelper=${this._form.computeHelper}
         @value-changed=${this._handleValueChanged}
       ></ha-form>
+      ${this._renderEntityNameEditor()}
     `;
   }
 
@@ -1332,17 +1337,9 @@ class UniversalHeatmapCardEditor extends LitElement {
     const nextConfig: HeatmapCardConfig = {
       ...this._config,
       ...value,
-      entities: this._mergeSelectedEntities(selectedEntities),
+      entities: mergeEditorEntities(this._config, selectedEntities),
     };
-    delete nextConfig.entity;
-    this._config = nextConfig;
-    this.dispatchEvent(
-      new CustomEvent("config-changed", {
-        bubbles: true,
-        composed: true,
-        detail: { config: nextConfig },
-      }),
-    );
+    this._applyConfig(nextConfig);
   }
 
   private _selectedEntities(value: unknown): string[] {
@@ -1355,23 +1352,154 @@ class UniversalHeatmapCardEditor extends LitElement {
     return editorEntityIds(this._config ?? {});
   }
 
-  private _mergeSelectedEntities(selectedEntities: string[]): Array<string | HeatmapEntityConfig> {
-    const existing = new Map<string, string | HeatmapEntityConfig>();
-    const source = this._config?.entities?.length
-      ? this._config.entities
-      : this._config?.entity
-        ? [this._config.entity]
-        : [];
-
-    for (const entry of source) {
-      const entity = typeof entry === "string" ? entry : entry.entity;
-      if (entity) {
-        existing.set(entity, typeof entry === "string" ? entry : { ...entry });
-      }
+  private _renderEntityNameEditor() {
+    if (!this._config) {
+      return nothing;
     }
 
-    return selectedEntities.map((entity) => existing.get(entity) ?? entity);
+    const entries = mergeEditorEntities(this._config, editorEntityIds(this._config));
+    if (entries.length === 0) {
+      return nothing;
+    }
+
+    return html`
+      <section class="editor-section" aria-label="Entity labels">
+        <div class="editor-title">Entity labels</div>
+        <div class="editor-helper">
+          Optional tab/card labels. Leave blank to use Home Assistant's entity name.
+        </div>
+        ${entries.map((entry) => {
+          const entity = typeof entry === "string" ? entry : entry.entity;
+          const alias = typeof entry === "string" ? "" : entry.name ?? "";
+          return html`
+            <label class="alias-row">
+              <span class="alias-copy">
+                <span class="alias-entity">${entity}</span>
+                <span class="alias-default">${this._defaultEntityName(entity)}</span>
+              </span>
+              <input
+                .value=${alias}
+                placeholder="Use Home Assistant name"
+                @input=${(event: Event) => this._handleEntityNameInput(entity, event)}
+              />
+            </label>
+          `;
+        })}
+      </section>
+    `;
   }
+
+  private _handleEntityNameInput(entityId: string, event: Event): void {
+    if (!this._config) {
+      return;
+    }
+
+    const input = event.target as HTMLInputElement;
+    this._applyConfig(updateEditorEntityName(this._config, entityId, input.value));
+  }
+
+  private _defaultEntityName(entityId: string): string {
+    const stateObj = this.hass?.states[entityId];
+    if (stateObj && this.hass?.formatEntityName) {
+      return this.hass.formatEntityName(stateObj);
+    }
+    if (stateObj?.attributes.friendly_name) {
+      return String(stateObj.attributes.friendly_name);
+    }
+    return entityId;
+  }
+
+  private _applyConfig(nextConfig: HeatmapCardConfig): void {
+    delete nextConfig.entity;
+    this._config = nextConfig;
+    this.dispatchEvent(
+      new CustomEvent("config-changed", {
+        bubbles: true,
+        composed: true,
+        detail: { config: nextConfig },
+      }),
+    );
+  }
+
+  static override styles = css`
+    .editor-section {
+      border-top: 1px solid var(--divider-color);
+      margin-top: 16px;
+      padding-top: 16px;
+    }
+
+    .editor-title {
+      color: var(--primary-text-color);
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .editor-helper {
+      color: var(--secondary-text-color);
+      font-size: 12px;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .alias-row {
+      align-items: center;
+      display: grid;
+      gap: 10px;
+      grid-template-columns: minmax(0, 1fr) minmax(140px, 220px);
+      margin: 0 0 10px;
+    }
+
+    .alias-copy {
+      min-width: 0;
+    }
+
+    .alias-entity,
+    .alias-default {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .alias-entity {
+      color: var(--primary-text-color);
+      font-size: 13px;
+    }
+
+    .alias-default {
+      color: var(--secondary-text-color);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    input {
+      background: var(--input-fill-color, var(--secondary-background-color));
+      border: 1px solid var(--divider-color);
+      border-radius: 6px;
+      box-sizing: border-box;
+      color: var(--primary-text-color);
+      font: inherit;
+      min-height: 40px;
+      padding: 8px 10px;
+      width: 100%;
+    }
+
+    input::placeholder {
+      color: var(--secondary-text-color);
+    }
+
+    input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+
+    @media (max-width: 640px) {
+      .alias-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  `;
 }
 
 if (!customElements.get(CARD_TAG)) {

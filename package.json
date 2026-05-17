@@ -1,6 +1,6 @@
 {
   "name": "universal-heatmap-card",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A Home Assistant custom card for reusable time-bucket heatmaps across sensors and units.",
   "type": "module",
   "license": "0BSD",
