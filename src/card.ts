@@ -1,5 +1,6 @@
 import { css, html, LitElement, nothing, type PropertyValues } from "lit";
 import { normalizeConfig } from "./config";
+import { cellValueFontSize, cellValueFractionDigits } from "./cell-values";
 import { fetchHeatmapBuckets } from "./data/provider";
 import { heatmapRequestQueueState, scheduleHeatmapRequest } from "./data/request-queue";
 import { debugLog, debugNow, isDebugEnabled, roundMs } from "./debug";
@@ -749,7 +750,7 @@ export class UniversalHeatmapCard extends LitElement {
       return;
     }
 
-    const fontSize = this._cellValueFontSize(layout.cell);
+    const fontSize = cellValueFontSize(layout.cell);
     if (fontSize <= 0) {
       return;
     }
@@ -779,13 +780,6 @@ export class UniversalHeatmapCard extends LitElement {
     ctx.restore();
   }
 
-  private _cellValueFontSize(cell: number): number {
-    if (cell < 14) {
-      return 0;
-    }
-    return Math.max(9, Math.min(13, Math.floor(cell * 0.48)));
-  }
-
   private _formatCellValue(value: number, cell: number): string {
     if (!Number.isFinite(value) || !this._scale) {
       return "";
@@ -801,10 +795,7 @@ export class UniversalHeatmapCard extends LitElement {
     }
 
     const span = Math.abs(this._scale.max - this._scale.min);
-    let fractionDigits = span < 1 ? 2 : span < 20 ? 1 : 0;
-    if (cell < 18) {
-      fractionDigits = Math.min(fractionDigits, 0);
-    }
+    const fractionDigits = cellValueFractionDigits(span, cell);
 
     return new Intl.NumberFormat(this.hass?.locale?.language, {
       maximumFractionDigits: fractionDigits,

@@ -45,10 +45,10 @@ const yt = (s) => new st(typeof s == "string" ? s : s + "", void 0, xe), rt = (s
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const { is: wt, defineProperty: $t, getOwnPropertyDescriptor: At, getOwnPropertyNames: St, getOwnPropertySymbols: kt, getPrototypeOf: Et } = Object, x = globalThis, Ue = x.trustedTypes, Ct = Ue ? Ue.emptyScript : "", ae = x.reactiveElementPolyfillSupport, P = (s, e) => s, de = { toAttribute(s, e) {
+const { is: wt, defineProperty: $t, getOwnPropertyDescriptor: At, getOwnPropertyNames: St, getOwnPropertySymbols: kt, getPrototypeOf: Et } = Object, x = globalThis, Ue = x.trustedTypes, Mt = Ue ? Ue.emptyScript : "", ae = x.reactiveElementPolyfillSupport, P = (s, e) => s, de = { toAttribute(s, e) {
   switch (e) {
     case Boolean:
-      s = s ? Ct : null;
+      s = s ? Mt : null;
       break;
     case Object:
     case Array:
@@ -284,7 +284,7 @@ N.elementStyles = [], N.shadowRootOptions = { mode: "open" }, N[P("elementProper
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const O = globalThis, Ve = (s) => s, Q = O.trustedTypes, Be = Q ? Q.createPolicy("lit-html", { createHTML: (s) => s }) : void 0, at = "$lit$", y = `lit$${Math.random().toFixed(9).slice(2)}$`, ot = "?" + y, Mt = `<${ot}>`, E = document, F = () => E.createComment(""), U = (s) => s === null || typeof s != "object" && typeof s != "function", we = Array.isArray, Nt = (s) => we(s) || typeof (s == null ? void 0 : s[Symbol.iterator]) == "function", oe = `[ 	
+const O = globalThis, Ve = (s) => s, Q = O.trustedTypes, Be = Q ? Q.createPolicy("lit-html", { createHTML: (s) => s }) : void 0, at = "$lit$", y = `lit$${Math.random().toFixed(9).slice(2)}$`, ot = "?" + y, Ct = `<${ot}>`, E = document, F = () => E.createComment(""), U = (s) => s === null || typeof s != "object" && typeof s != "function", we = Array.isArray, Nt = (s) => we(s) || typeof (s == null ? void 0 : s[Symbol.iterator]) == "function", oe = `[ 	
 \f\r]`, D = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, We = /-->/g, Ge = />/g, $ = RegExp(`>|${oe}(?:([^\\s"'>=/]+)(${oe}*=${oe}*(?:[^ 	
 \f\r"'\`<>=]|("|')|))|$)`, "g"), Xe = /'/g, je = /"/g, lt = /^(?:script|style|textarea|title)$/i, Tt = (s) => (e, ...t) => ({ _$litType$: s, strings: e, values: t }), g = Tt(1), L = Symbol.for("lit-noChange"), m = Symbol.for("lit-nothing"), Ke = /* @__PURE__ */ new WeakMap(), A = E.createTreeWalker(E, 129);
 function ct(s, e) {
@@ -299,7 +299,7 @@ const Lt = (s, e) => {
     let c, u, h = -1, d = 0;
     for (; d < l.length && (a.lastIndex = d, u = a.exec(l), u !== null); ) d = a.lastIndex, a === D ? u[1] === "!--" ? a = We : u[1] !== void 0 ? a = Ge : u[2] !== void 0 ? (lt.test(u[2]) && (r = RegExp("</" + u[2], "g")), a = $) : u[3] !== void 0 && (a = $) : a === $ ? u[0] === ">" ? (a = r ?? D, h = -1) : u[1] === void 0 ? h = -2 : (h = a.lastIndex - u[2].length, c = u[1], a = u[3] === void 0 ? $ : u[3] === '"' ? je : Xe) : a === je || a === Xe ? a = $ : a === We || a === Ge ? a = D : (a = $, r = void 0);
     const p = a === $ && s[o + 1].startsWith("/>") ? " " : "";
-    n += a === D ? l + Mt : h >= 0 ? (i.push(c), l.slice(0, h) + at + l.slice(h) + y + p) : l + y + (h === -2 ? o : p);
+    n += a === D ? l + Ct : h >= 0 ? (i.push(c), l.slice(0, h) + at + l.slice(h) + y + p) : l + y + (h === -2 ? o : p);
   }
   return [ct(s, n + (s[t] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), i];
 };
@@ -766,7 +766,7 @@ function Ae(s) {
 }
 const Bt = 5e3, Wt = 24, Gt = 300;
 function Je(s, e) {
-  var h, d, p, _, f, B, I, W, R, G, C, Ee, Ce, Me, Ne, Te, Le, ze, Ie, Re, De, He, Pe;
+  var h, d, p, _, f, B, I, W, R, G, M, Ee, Me, Ce, Ne, Te, Le, ze, Ie, Re, De, He, Pe;
   const t = Kt(s, e);
   if (t.length === 0)
     throw new Error("Universal Heatmap Card requires entity or entities.");
@@ -790,11 +790,11 @@ function Je(s, e) {
       max_cells: ((W = s.data) == null ? void 0 : W.max_cells) ?? Bt,
       raw_history_hours: ((R = s.data) == null ? void 0 : R.raw_history_hours) ?? Wt,
       refresh_interval: Xt((G = s.data) == null ? void 0 : G.refresh_interval),
-      defer_until_visible: ((C = s.data) == null ? void 0 : C.defer_until_visible) ?? !0,
+      defer_until_visible: ((M = s.data) == null ? void 0 : M.defer_until_visible) ?? !0,
       max_concurrent_requests: $e((Ee = s.data) == null ? void 0 : Ee.max_concurrent_requests)
     },
     missing: {
-      mode: ((Ce = s.missing) == null ? void 0 : Ce.mode) ?? "empty"
+      mode: ((Me = s.missing) == null ? void 0 : Me.mode) ?? "empty"
     },
     scale: {
       ...o.scale,
@@ -802,7 +802,7 @@ function Je(s, e) {
       preset: a
     },
     layout: {
-      mode: ((Me = s.layout) == null ? void 0 : Me.mode) ?? "auto",
+      mode: ((Ce = s.layout) == null ? void 0 : Ce.mode) ?? "auto",
       bound_to_grid: ((Ne = s.layout) == null ? void 0 : Ne.bound_to_grid) ?? "auto"
     },
     navigation: {
@@ -884,10 +884,19 @@ function dt(s, e = /* @__PURE__ */ new Date()) {
       return Math.ceil(i / 24);
   }
 }
+function Qt(s) {
+  return s < 9 ? 0 : s < 14 ? Math.max(6, Math.min(8, Math.floor(s * 0.72))) : Math.max(9, Math.min(13, Math.floor(s * 0.48)));
+}
+function Zt(s, e) {
+  if (e < 14)
+    return 0;
+  const t = s < 1 ? 2 : s < 20 ? 1 : 0;
+  return e < 18 ? Math.min(t, 0) : t;
+}
 function Se(s) {
   return s === "last" ? "state" : ["mean", "min", "max", "state", "sum", "change"].includes(s) ? s : null;
 }
-function Qt(s, e) {
+function ei(s, e) {
   const t = new Date(s);
   if (t.setMilliseconds(0), t.setSeconds(0), e !== "5minute" ? t.setMinutes(0) : t.setMinutes(Math.floor(t.getMinutes() / 5) * 5), (e === "day" || e === "week" || e === "month") && t.setHours(0, 0, 0, 0), e === "week") {
     const i = t.getDay(), r = i === 0 ? -6 : 1 - i;
@@ -895,7 +904,7 @@ function Qt(s, e) {
   }
   return e === "month" && t.setDate(1), t;
 }
-function Zt(s, e) {
+function ti(s, e) {
   const t = new Date(s);
   switch (e) {
     case "5minute":
@@ -912,11 +921,11 @@ function Zt(s, e) {
       return t;
   }
 }
-function ei(s, e) {
+function ii(s, e) {
   const t = [];
-  let i = Qt(s.start, e);
+  let i = ei(s.start, e);
   for (; i < s.end; ) {
-    const r = Zt(i, e);
+    const r = ti(i, e);
     r > s.start && t.push({ start: new Date(i), end: new Date(r) }), i = r;
   }
   return t;
@@ -929,7 +938,7 @@ function w(s, e) {
     source: e
   }));
 }
-function ti(s, e, t, i) {
+function si(s, e, t, i) {
   const r = Se(t), n = w(s, "statistics");
   if (!r)
     return me(n, i);
@@ -937,7 +946,7 @@ function ti(s, e, t, i) {
     const o = a.start ? new Date(a.start) : void 0;
     if (!o || Number.isNaN(o.getTime()))
       continue;
-    const l = ri(s, o);
+    const l = ai(s, o);
     if (l < 0)
       continue;
     const c = s[l];
@@ -953,7 +962,7 @@ function ti(s, e, t, i) {
   }
   return me(n, i);
 }
-function ii(s, e, t, i) {
+function ri(s, e, t, i) {
   var a;
   const r = s.map(() => []);
   for (const o of e) {
@@ -970,7 +979,7 @@ function ii(s, e, t, i) {
     h >= 0 && ((a = r[h]) == null || a.push({ at: u, value: l }));
   }
   const n = s.map((o, l) => {
-    const c = r[l] ?? [], u = si(c, t);
+    const c = r[l] ?? [], u = ni(c, t);
     return {
       ...o,
       value: u,
@@ -986,7 +995,7 @@ function me(s, e) {
   let t = null;
   return s.map((i) => i.value !== null ? (t = i.value, i) : e === "zero" ? { ...i, value: 0, quality: "ok" } : e === "carry_forward" && t !== null ? { ...i, value: t, quality: "carried" } : i);
 }
-function si(s, e) {
+function ni(s, e) {
   var t, i;
   if (s.length === 0)
     return null;
@@ -1014,7 +1023,7 @@ function si(s, e) {
       return s.reduce((r, n) => r + n.value, 0) / s.length;
   }
 }
-function ri(s, e) {
+function ai(s, e) {
   return mt(s, e.getTime());
 }
 function mt(s, e) {
@@ -1032,8 +1041,8 @@ function mt(s, e) {
   }
   return -1;
 }
-async function ni(s, e, t) {
-  const i = dt(e), r = ne(e.range), n = ei(r, e.bucket.interval);
+async function oi(s, e, t) {
+  const i = dt(e), r = ne(e.range), n = ii(r, e.bucket.interval);
   if (i > e.data.max_cells)
     return {
       source: "current",
@@ -1043,7 +1052,7 @@ async function ni(s, e, t) {
   const a = e.data.provider, o = Se(e.bucket.value) !== null;
   if ((a === "auto" || a === "statistics") && o)
     try {
-      const l = await ai(s, e, t, n);
+      const l = await li(s, e, t, n);
       if (l.some((c) => c.value !== null) || a === "statistics")
         return { source: "statistics", buckets: l };
     } catch (l) {
@@ -1054,13 +1063,13 @@ async function ni(s, e, t) {
           warning: pt(l, "Statistics query failed.")
         };
     }
-  return a === "auto" || a === "history" ? oi(s, e, t, n) : {
+  return a === "auto" || a === "history" ? ci(s, e, t, n) : {
     source: "current",
     buckets: w(n, "current"),
     warning: "No supported data provider is available for this bucket value yet."
   };
 }
-async function ai(s, e, t, i) {
+async function li(s, e, t, i) {
   const r = Se(e.bucket.value);
   if (!r)
     return w(i, "statistics");
@@ -1072,9 +1081,9 @@ async function ai(s, e, t, i) {
     period: e.bucket.interval,
     types: [r]
   }))[t.entity] ?? [];
-  return ti(i, o, e.bucket.value, e.missing.mode);
+  return si(i, o, e.bucket.value, e.missing.mode);
 }
-async function oi(s, e, t, i) {
+async function ci(s, e, t, i) {
   const r = ne(e.range), n = (r.end.getTime() - r.start.getTime()) / 36e5;
   if (!s.callApi)
     return {
@@ -1101,7 +1110,7 @@ async function oi(s, e, t, i) {
     )).flat();
     return {
       source: "history",
-      buckets: ii(i, o, e.bucket.value, e.missing.mode)
+      buckets: ri(i, o, e.bucket.value, e.missing.mode)
     };
   } catch (a) {
     return {
@@ -1114,15 +1123,15 @@ async function oi(s, e, t, i) {
 function pt(s, e) {
   return s instanceof Error && s.message ? s.message : e;
 }
-const li = "universal-heatmap-card:debug";
-function ci(s) {
+const ui = "universal-heatmap-card:debug";
+function hi(s) {
   var e;
   if ((s == null ? void 0 : s.debug) === !0)
     return !0;
   if ((s == null ? void 0 : s.debug) === !1 || typeof window > "u")
     return !1;
   try {
-    const t = (e = window.localStorage) == null ? void 0 : e.getItem(li);
+    const t = (e = window.localStorage) == null ? void 0 : e.getItem(ui);
     return t === "1" || t === "true";
   } catch {
     return !1;
@@ -1317,7 +1326,7 @@ function pe(s, e) {
   }
   return e.map((i) => t.get(i) ?? i);
 }
-function ui(s, e, t) {
+function di(s, e, t) {
   const i = J(s), r = t.trim(), n = pe(s, i).map((o) => {
     const l = typeof o == "string" ? o : o.entity;
     if (l !== e)
@@ -1330,42 +1339,42 @@ function ui(s, e, t) {
   };
   return delete a.entity, a;
 }
-const gt = 56, _e = 8, hi = 12, di = 6, ke = 4, mi = 12, pi = 560, Qe = 3, _i = 7, fi = 22, gi = 14, bi = 28, vi = 58, yi = 18;
-function xi(s) {
+const gt = 56, _e = 8, mi = 12, pi = 6, ke = 4, _i = 12, fi = 560, Qe = 3, gi = 7, bi = 22, vi = 14, yi = 28, xi = 58, wi = 18;
+function $i(s) {
   const e = Math.max(1, Math.floor(s));
   return e * gt + Math.max(0, e - 1) * _e;
 }
-function wi(s) {
+function Ai(s) {
   return !Number.isFinite(s) || s <= 0 ? ke : Math.ceil((s + _e) / (gt + _e));
 }
-function $i(s, e = {}) {
-  return Ci(
-    wi(bt(s, e)),
+function Si(s, e = {}) {
+  return Ni(
+    Ai(bt(s, e)),
     ke,
-    mi
+    _i
   );
 }
-function Ai(s, e = {}) {
+function ki(s, e = {}) {
   return Math.max(1, Math.ceil(bt(s, e) / 50));
 }
 function bt(s, e = {}) {
-  return vt(s, e) + Si(s);
+  return vt(s, e) + Ei(s);
 }
 function vt(s, e = {}) {
   let t = 58;
-  return t += 16, s.entities.length > 1 && (t += ki(s)), (e.loading || e.warning || e.error) && (t += 33), s.axes.show_key && (t += 24), t += 25, s.legend.show && (t += 25), t;
+  return t += 16, s.entities.length > 1 && (t += Mi(s)), (e.loading || e.warning || e.error) && (t += 33), s.axes.show_key && (t += 24), t += 25, s.legend.show && (t += 25), t;
 }
-function Si(s, e = pi) {
-  const t = Math.max(1, dt(s)), i = Ei(s.bucket.interval, t), r = Math.ceil(t / i), n = s.axes.show && s.axes.y_labels ? vi : 0, a = s.axes.show && s.axes.x_labels ? yi : 0, o = Math.max(160, e - n), l = s.tiles.show_values || s.tiles.show_value_toggle, h = Math.max(
-    l ? gi : _i,
+function Ei(s, e = fi) {
+  const t = Math.max(1, dt(s)), i = Ci(s.bucket.interval, t), r = Math.ceil(t / i), n = s.axes.show && s.axes.y_labels ? xi : 0, a = s.axes.show && s.axes.x_labels ? wi : 0, o = Math.max(160, e - n), l = s.tiles.show_values || s.tiles.show_value_toggle, h = Math.max(
+    l ? vi : gi,
     Math.min(
-      l ? bi : fi,
+      l ? yi : bi,
       Math.floor((o - Math.max(0, i - 1) * Qe) / i)
     )
   );
   return a + r * h + Math.max(0, r - 1) * Qe;
 }
-function ki(s) {
+function Mi(s) {
   switch (s.navigation.mode) {
     case "dots":
       return 24;
@@ -1379,20 +1388,20 @@ function ki(s) {
       return 42;
   }
 }
-function Ei(s, e) {
+function Ci(s, e) {
   return s === "hour" ? 24 : s === "5minute" ? 48 : s === "day" ? 7 : s === "month" ? 12 : Math.min(12, Math.ceil(Math.sqrt(e * 1.8)));
 }
-function Ci(s, e, t) {
+function Ni(s, e, t) {
   return Math.max(e, Math.min(t, s));
 }
-const Mi = [
+const Ti = [
   { value: 0, color: "#3a6ea5" },
   { value: 0.5, color: "#6fbf73" },
   { value: 1, color: "#f6c85f" }
 ];
-function Ni(s, e) {
+function Li(s, e) {
   var _;
-  const t = s.map((f) => f.value).filter((f) => typeof f == "number" && Number.isFinite(f)), i = t.filter((f) => f > 0), n = e.ignore_zero === !0 || e.ignore_zero !== !1 && i.length > 0 && t.some((f) => f === 0) && Math.min(...i) > 0 ? i : t, a = zi(n, e.outlier_clip), o = a.min, l = a.max, c = typeof e.min == "number" ? e.min : o, u = typeof e.max == "number" ? e.max : l === c ? c + 1 : l, h = (_ = e.stops) != null && _.length ? e.stops : Mi, d = Li(h, c, u, e.invert ?? !1), p = Ri(e.sensitivity);
+  const t = s.map((f) => f.value).filter((f) => typeof f == "number" && Number.isFinite(f)), i = t.filter((f) => f > 0), n = e.ignore_zero === !0 || e.ignore_zero !== !1 && i.length > 0 && t.some((f) => f === 0) && Math.min(...i) > 0 ? i : t, a = Ri(n, e.outlier_clip), o = a.min, l = a.max, c = typeof e.min == "number" ? e.min : o, u = typeof e.max == "number" ? e.max : l === c ? c + 1 : l, h = (_ = e.stops) != null && _.length ? e.stops : Ti, d = Ii(h, c, u, e.invert ?? !1), p = Hi(e.sensitivity);
   return {
     min: c,
     max: u,
@@ -1407,7 +1416,7 @@ function fe(s, e) {
   var r, n, a, o;
   if (s === null || !Number.isFinite(s))
     return "rgba(127, 127, 127, 0.22)";
-  const t = Di(s, e), i = e.stops;
+  const t = Pi(s, e), i = e.stops;
   if (i.length === 0)
     return "#999999";
   if (i.length === 1)
@@ -1416,19 +1425,19 @@ function fe(s, e) {
     const c = i[l], u = i[l + 1];
     if (!(!c || !u) && t >= c.value && t <= u.value) {
       const h = u.value - c.value || 1, d = (t - c.value) / h;
-      return Hi(c.color, u.color, d);
+      return Oi(c.color, u.color, d);
     }
   }
   return t < (((n = i[0]) == null ? void 0 : n.value) ?? e.min) ? ((a = i[0]) == null ? void 0 : a.color) ?? "#999999" : ((o = i[i.length - 1]) == null ? void 0 : o.color) ?? "#999999";
 }
-function Ti(s, e = 18) {
+function zi(s, e = 18) {
   const t = s.max - s.min || 1, i = Math.max(2, e);
   return Array.from({ length: i }, (r, n) => {
     const a = n / (i - 1), o = s.min + t * a;
     return `${fe(o, s)} ${a * 100}%`;
   }).join(", ");
 }
-function M(s, e, t) {
+function C(s, e, t) {
   if (s === null || !Number.isFinite(s))
     return "missing";
   const i = Math.abs(s), r = i >= 100 ? 0 : i >= 10 ? 1 : 2, n = new Intl.NumberFormat(t, {
@@ -1436,7 +1445,7 @@ function M(s, e, t) {
   }).format(s);
   return e.unit ? `${n} ${e.unit}` : n;
 }
-function Li(s, e, t, i) {
+function Ii(s, e, t, i) {
   const r = s.every((l) => l.value >= 0 && l.value <= 1), a = s.map((l) => r ? { ...l, value: e + l.value * (t - e) } : l).sort((l, c) => l.value - c.value);
   if (!i)
     return a;
@@ -1446,10 +1455,10 @@ function Li(s, e, t, i) {
     color: o[c] ?? l.color
   }));
 }
-function zi(s, e) {
+function Ri(s, e) {
   if (s.length === 0)
     return { min: 0, max: 1 };
-  const t = [...s].sort((a, o) => a - o), i = Ii(e);
+  const t = [...s].sort((a, o) => a - o), i = Di(e);
   if (!i)
     return {
       min: t[0] ?? 0,
@@ -1461,7 +1470,7 @@ function zi(s, e) {
     max: t[t.length - 1] ?? r + 1
   } : { min: r, max: n };
 }
-function Ii(s) {
+function Di(s) {
   if (typeof s == "number") {
     if (!Number.isFinite(s) || s <= 0)
       return null;
@@ -1486,14 +1495,14 @@ function Ze(s, e) {
   );
   return s[t] ?? s[0] ?? 0;
 }
-function Ri(s) {
+function Hi(s) {
   return typeof s != "number" || !Number.isFinite(s) || s <= 0 ? 1 : k(s, 0.1, 5);
 }
-function Di(s, e) {
+function Pi(s, e) {
   const t = e.max - e.min || 1, r = (k(s, e.min, e.max) - e.min) / t, n = k(0.5 + (r - 0.5) * e.sensitivity, 0, 1);
   return e.min + n * t;
 }
-function Hi(s, e, t) {
+function Oi(s, e, t) {
   const i = et(s), r = et(e);
   if (!i || !r)
     return t < 0.5 ? s : e;
@@ -1511,7 +1520,7 @@ function et(s) {
 function k(s, e, t) {
   return s < e ? e : s > t ? t : s;
 }
-const ee = "universal-heatmap-card", te = "Universal Heatmap Card", Pi = "0.1.2", ge = `${ee}-editor`;
+const ee = "universal-heatmap-card", te = "Universal Heatmap Card", Fi = "0.1.3", ge = `${ee}-editor`;
 class tt extends Error {
   constructor() {
     super("Stale heatmap load skipped.");
@@ -1524,7 +1533,7 @@ const ie = class ie extends T {
   setConfig(e) {
     var i, r;
     const t = (r = (i = this._normalized) == null ? void 0 : i.entities[this._activeIndex]) == null ? void 0 : r.entity;
-    this._config = e, this._debug = ci(e), this._cache.clear(), this._inFlightKey = void 0, this._loadSeq += 1, this._normalized = Je(e, this.hass), this._activeIndex = this._resolveActiveIndex(t), this._tileValuesOverride = void 0, this._tooltip = void 0, b(this._debug, "config applied", {
+    this._config = e, this._debug = hi(e), this._cache.clear(), this._inFlightKey = void 0, this._loadSeq += 1, this._normalized = Je(e, this.hass), this._activeIndex = this._resolveActiveIndex(t), this._tileValuesOverride = void 0, this._tooltip = void 0, b(this._debug, "config applied", {
       entityCount: this._normalized.entities.length,
       bucket: this._normalized.bucket,
       range: this._normalized.range,
@@ -1539,12 +1548,12 @@ const ie = class ie extends T {
   }
   getGridOptions() {
     var o, l, c, u, h, d, p, _;
-    const e = (l = (o = this._config) == null ? void 0 : o.grid_options) == null ? void 0 : l.rows, t = (u = (c = this._config) == null ? void 0 : c.grid_options) == null ? void 0 : u.columns, i = typeof e == "number" && Number.isFinite(e) ? Math.max(1, e) : this._estimatedGridRows(), r = typeof t == "number" && Number.isFinite(t) ? Math.max(1, t) : hi, n = (d = (h = this._config) == null ? void 0 : h.grid_options) == null ? void 0 : d.min_rows, a = (_ = (p = this._config) == null ? void 0 : p.grid_options) == null ? void 0 : _.min_columns;
+    const e = (l = (o = this._config) == null ? void 0 : o.grid_options) == null ? void 0 : l.rows, t = (u = (c = this._config) == null ? void 0 : c.grid_options) == null ? void 0 : u.columns, i = typeof e == "number" && Number.isFinite(e) ? Math.max(1, e) : this._estimatedGridRows(), r = typeof t == "number" && Number.isFinite(t) ? Math.max(1, t) : mi, n = (d = (h = this._config) == null ? void 0 : h.grid_options) == null ? void 0 : d.min_rows, a = (_ = (p = this._config) == null ? void 0 : p.grid_options) == null ? void 0 : _.min_columns;
     return {
       rows: i,
       columns: r,
       min_rows: typeof n == "number" && Number.isFinite(n) ? Math.min(n, i) : Math.min(ke, i),
-      min_columns: typeof a == "number" && Number.isFinite(a) ? Math.min(a, r) : Math.min(di, r)
+      min_columns: typeof a == "number" && Number.isFinite(a) ? Math.min(a, r) : Math.min(pi, r)
     };
   }
   connectedCallback() {
@@ -1695,11 +1704,11 @@ const ie = class ie extends T {
   }
   _estimatedGridRows() {
     const e = this._normalized;
-    return e ? $i(e, this._layoutState()) : 6;
+    return e ? Si(e, this._layoutState()) : 6;
   }
   _estimatedMasonryRows() {
     const e = this._normalized;
-    return e ? Ai(e, this._layoutState()) : 6;
+    return e ? ki(e, this._layoutState()) : 6;
   }
   _layoutState() {
     return {
@@ -1718,9 +1727,9 @@ const ie = class ie extends T {
     const t = (o = (a = this.hass) == null ? void 0 : a.locale) == null ? void 0 : o.language, i = Math.min(...e), r = Math.max(...e), n = ((l = [...this._buckets].reverse().find((c) => c.value !== null)) == null ? void 0 : l.value) ?? null;
     return g`
       <div class="summary" aria-live="polite">
-        <span>Low ${M(i, this._scale, t)}</span>
-        <span>High ${M(r, this._scale, t)}</span>
-        <span>Latest ${M(n, this._scale, t)}</span>
+        <span>Low ${C(i, this._scale, t)}</span>
+        <span>High ${C(r, this._scale, t)}</span>
+        <span>Latest ${C(n, this._scale, t)}</span>
       </div>
     `;
   }
@@ -1737,11 +1746,11 @@ const ie = class ie extends T {
     var i, r, n, a;
     if (!this._scale)
       return m;
-    const e = `${this._scale.clippedLow ? "≤ " : ""}${M(
+    const e = `${this._scale.clippedLow ? "≤ " : ""}${C(
       this._scale.min,
       this._scale,
       (r = (i = this.hass) == null ? void 0 : i.locale) == null ? void 0 : r.language
-    )}`, t = `${this._scale.clippedHigh ? "≥ " : ""}${M(
+    )}`, t = `${this._scale.clippedHigh ? "≥ " : ""}${C(
       this._scale.max,
       this._scale,
       (a = (n = this.hass) == null ? void 0 : n.locale) == null ? void 0 : a.language
@@ -1751,7 +1760,7 @@ const ie = class ie extends T {
         <span>${e}</span>
         <div
           class="legend-bar"
-          style=${`background: linear-gradient(90deg, ${Ti(this._scale)});`}
+          style=${`background: linear-gradient(90deg, ${zi(this._scale)});`}
         ></div>
         <span>${t}</span>
       </div>
@@ -1797,7 +1806,7 @@ const ie = class ie extends T {
         async () => {
           if (a !== this._loadSeq)
             throw new tt();
-          return ni(t, e, i);
+          return oi(t, e, i);
         },
         {
           maxConcurrent: e.data.max_concurrent_requests,
@@ -1813,7 +1822,7 @@ const ie = class ie extends T {
       );
       if (a !== this._loadSeq)
         return;
-      const u = this._debug ? H(v() - l) : 0, h = this._debug ? v() : 0, d = Ni(c.buckets, {
+      const u = this._debug ? H(v() - l) : 0, h = this._debug ? v() : 0, d = Li(c.buckets, {
         ...e.scale,
         ...i.scale
       }), p = this._debug ? H(v() - h) : 0;
@@ -1919,8 +1928,8 @@ const ie = class ie extends T {
     const i = ((R = this._normalized) == null ? void 0 : R.bucket.interval) ?? "day", r = Math.max(1, this._buckets.length), n = i === "hour" ? 24 : i === "5minute" ? 48 : i === "day" ? 7 : i === "month" ? 12 : Math.min(12, Math.ceil(Math.sqrt(r * 1.8))), a = 3, o = this._shouldShowRowLabels() ? 58 : 0, l = this._shouldShowXAxisLabels() ? 18 : 0, c = Math.max(160, e - o), u = Math.ceil(r / n), h = this._shouldReserveForTileValues(), d = 7, p = h ? 14 : d;
     let f = Math.min(h ? 28 : 22, Math.floor((c - a * (n - 1)) / n));
     if (f = Math.max(f >= p ? p : d, f), typeof t == "number") {
-      const G = Math.max(0, t - l), C = Math.floor((G - Math.max(0, u - 1) * a) / u);
-      Number.isFinite(C) && C >= d && (f = Math.min(f, C));
+      const G = Math.max(0, t - l), M = Math.floor((G - Math.max(0, u - 1) * a) / u);
+      Number.isFinite(M) && M >= d && (f = Math.min(f, M));
     }
     const B = n * f + Math.max(0, n - 1) * a, I = u * f + Math.max(0, u - 1) * a, W = l + I;
     return {
@@ -1939,7 +1948,7 @@ const ie = class ie extends T {
   _drawCellValue(e, t, i, r, n) {
     if (!this._showTileValues() || !this._scale || t.value === null)
       return;
-    const a = this._cellValueFontSize(i.cell);
+    const a = Qt(i.cell);
     if (a <= 0)
       return;
     const o = this._formatCellValue(t.value, i.cell);
@@ -1947,9 +1956,6 @@ const ie = class ie extends T {
       return;
     const l = fe(t.value, this._scale), c = this._cellTextColor(l), u = c === "#111827" ? "rgba(255, 255, 255, 0.26)" : "rgba(0, 0, 0, 0.32)", h = r + i.cell / 2, d = n + i.cell / 2 + 0.5, p = Math.max(4, i.cell - 2);
     e.save(), e.font = `600 ${a}px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`, e.textAlign = "center", e.textBaseline = "middle", e.lineJoin = "round", e.lineWidth = Math.max(1.5, a / 4), e.strokeStyle = u, e.fillStyle = c, e.strokeText(o, h, d, p), e.fillText(o, h, d, p), e.restore();
-  }
-  _cellValueFontSize(e) {
-    return e < 14 ? 0 : Math.max(9, Math.min(13, Math.floor(e * 0.48)));
   }
   _formatCellValue(e, t) {
     var a, o, l, c;
@@ -1961,9 +1967,8 @@ const ie = class ie extends T {
         maximumFractionDigits: 1,
         notation: "compact"
       }).format(e);
-    const r = Math.abs(this._scale.max - this._scale.min);
-    let n = r < 1 ? 2 : r < 20 ? 1 : 0;
-    return t < 18 && (n = Math.min(n, 0)), new Intl.NumberFormat((c = (l = this.hass) == null ? void 0 : l.locale) == null ? void 0 : c.language, {
+    const r = Math.abs(this._scale.max - this._scale.min), n = Zt(r, t);
+    return new Intl.NumberFormat((c = (l = this.hass) == null ? void 0 : l.locale) == null ? void 0 : c.language, {
       maximumFractionDigits: n,
       minimumFractionDigits: n
     }).format(e);
@@ -2000,7 +2005,7 @@ const ie = class ie extends T {
     const t = this._normalized;
     if (!t)
       return;
-    const i = xi(e) - vt(t, this._layoutState());
+    const i = $i(e) - vt(t, this._layoutState());
     if (!(i <= 0))
       return Math.max(120, i);
   }
@@ -2051,7 +2056,7 @@ const ie = class ie extends T {
       this._tooltip = void 0;
       return;
     }
-    const h = `${this._formatDate(u.start)} - ${this._formatDate(u.end)}: ${M(
+    const h = `${this._formatDate(u.start)} - ${this._formatDate(u.end)}: ${C(
       u.value,
       this._scale,
       (_ = (p = this.hass) == null ? void 0 : p.locale) == null ? void 0 : _.language
@@ -2563,7 +2568,7 @@ const se = class se extends T {
     if (!this._config)
       return;
     const i = t.target;
-    this._applyConfig(ui(this._config, e, i.value));
+    this._applyConfig(di(this._config, e, i.value));
   }
   _defaultEntityName(e) {
     var i, r;
@@ -2674,7 +2679,7 @@ window.customCards.push({
   documentationURL: "https://github.com/gcs8/universal-heatmap-card"
 });
 console.info(
-  `%c${te}%c ${Pi}`,
+  `%c${te}%c ${Fi}`,
   "color: #3a6ea5; font-weight: 700;",
   "color: inherit;"
 );

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Made tile value labels degrade to compact whole-number labels on narrower cards instead of disappearing while the `123` toggle is active.
+
 ## 0.1.2
 
 - Added optional per-cell value labels with `tiles.show_values`.
