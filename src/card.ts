@@ -81,6 +81,7 @@ export class UniversalHeatmapCard extends LitElement {
   private _visibilityObserver?: IntersectionObserver;
   private _loadSeq = 0;
   private _renderLayout?: HeatmapRenderLayout;
+  private _cellFormatCache = new Map<string, Intl.NumberFormat>();
 
   setConfig(config: HeatmapCardConfig): void {
     const previousEntity = this._normalized?.entities[this._activeIndex]?.entity;
@@ -666,7 +667,8 @@ export class UniversalHeatmapCard extends LitElement {
       const row = Math.floor(index / layout.cols);
       const x = layout.gridX + col * (layout.cell + layout.gap);
       const y = layout.gridY + row * (layout.cell + layout.gap);
-      ctx.fillStyle = colorForValue(bucket.value, this._scale!);
+      const fill = colorForValue(bucket.value, this._scale!);
+      ctx.fillStyle = fill;
       ctx.fillRect(x, y, layout.cell, layout.cell);
 
       if (bucket.quality === "carried") {
@@ -674,7 +676,7 @@ export class UniversalHeatmapCard extends LitElement {
         ctx.fillRect(x, y + layout.cell - 3, layout.cell, 3);
       }
 
-      this._drawCellValue(ctx, bucket, layout, x, y);
+      this._drawCellValue(ctx, bucket, layout, x, y, fill);
     });
 
     this._renderLayout = layout;
@@ -745,6 +747,7 @@ export class UniversalHeatmapCard extends LitElement {
     layout: HeatmapRenderLayout,
     x: number,
     y: number,
+    fill: string,
   ): void {
     if (!this._showTileValues() || !this._scale || bucket.value === null) {
       return;
@@ -760,7 +763,6 @@ export class UniversalHeatmapCard extends LitElement {
       return;
     }
 
-    const fill = colorForValue(bucket.value, this._scale);
     const textColor = this._cellTextColor(fill);
     const outlineColor = textColor === "#111827" ? "rgba(255, 255, 255, 0.26)" : "rgba(0, 0, 0, 0.32)";
     const centerX = x + layout.cell / 2;
@@ -787,7 +789,7 @@ export class UniversalHeatmapCard extends LitElement {
 
     const abs = Math.abs(value);
     if (abs >= 1000 && cell < 24) {
-      return new Intl.NumberFormat(this.hass?.locale?.language, {
+      return this._cellNumberFormat("compact:1", {
         compactDisplay: "short",
         maximumFractionDigits: 1,
         notation: "compact",
@@ -797,10 +799,26 @@ export class UniversalHeatmapCard extends LitElement {
     const span = Math.abs(this._scale.max - this._scale.min);
     const fractionDigits = cellValueFractionDigits(span, cell);
 
-    return new Intl.NumberFormat(this.hass?.locale?.language, {
+    return this._cellNumberFormat(`fixed:${fractionDigits}`, {
       maximumFractionDigits: fractionDigits,
       minimumFractionDigits: fractionDigits,
     }).format(value);
+  }
+
+  private _cellNumberFormat(variant: string, options: Intl.NumberFormatOptions): Intl.NumberFormat {
+    // Intl.NumberFormat construction is expensive and _formatCellValue runs
+    // once per visible cell per draw, so memoize the handful of distinct
+    // locale/option combinations instead of allocating per cell.
+    const key = `${this.hass?.locale?.language ?? ""}|${variant}`;
+    let format = this._cellFormatCache.get(key);
+    if (!format) {
+      if (this._cellFormatCache.size >= 8) {
+        this._cellFormatCache.clear();
+      }
+      format = new Intl.NumberFormat(this.hass?.locale?.language, options);
+      this._cellFormatCache.set(key, format);
+    }
+    return format;
   }
 
   private _cellTextColor(fill: string): "#111827" | "#ffffff" {
