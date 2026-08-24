@@ -245,3 +245,41 @@ describe("calculateRange", () => {
     expect((range.end.getTime() - range.start.getTime()) / 3_600_000).toBe(24);
   });
 });
+
+describe("normalizeConfig range validation", () => {
+  it("rejects zero-length day ranges at config time", () => {
+    expect(() =>
+      normalizeConfig({ entity: "sensor.room_temperature", range: { days: 0 } }),
+    ).toThrow(/start must be before end/);
+  });
+
+  it("rejects reversed explicit start and end dates at config time", () => {
+    expect(() =>
+      normalizeConfig({
+        entity: "sensor.room_temperature",
+        range: { start: "2026-05-02T00:00:00Z", end: "2026-05-01T00:00:00Z" },
+      }),
+    ).toThrow(/start must be before end/);
+  });
+
+  it("rejects unparseable range dates at config time", () => {
+    expect(() =>
+      normalizeConfig({
+        entity: "sensor.room_temperature",
+        range: { start: "not-a-date" },
+      }),
+    ).toThrow(/invalid range date/);
+  });
+
+  it("still accepts valid rolling and day-aligned ranges", () => {
+    expect(() =>
+      normalizeConfig({
+        entity: "sensor.room_temperature",
+        range: { hours: 24, align: "rolling" },
+      }),
+    ).not.toThrow();
+    expect(() =>
+      normalizeConfig({ entity: "sensor.room_temperature", range: { days: 30 } }),
+    ).not.toThrow();
+  });
+});

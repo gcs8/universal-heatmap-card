@@ -38,6 +38,10 @@ export function normalizeConfig(
     ...config.range,
     align: normalizeRangeAlignment(config.range?.align),
   };
+  // Validate now so a bad range (days: 0, reversed start/end, unparseable
+  // dates) throws inside setConfig, where Home Assistant renders its error
+  // card, instead of escaping later from getCardSize/getGridOptions.
+  calculateRange(range);
 
   const navigationMode =
     config.navigation?.mode ?? (entities.length > 8 ? "dropdown" : "tabs");
