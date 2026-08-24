@@ -1102,19 +1102,16 @@ async function ui(s, e, t, i) {
       warning: `Raw history fallback is capped at ${e.data.raw_history_hours} hours by default. Use recorder statistics or reduce range.`
     };
   try {
-    const o = (await s.callApi(
+    const a = new URLSearchParams({
+      end_time: r.end.toISOString(),
+      filter_entity_id: t.entity
+    }), l = (await s.callApi(
       "GET",
-      `history/period/${r.start.toISOString()}`,
-      {
-        end_time: r.end.toISOString(),
-        filter_entity_id: t.entity,
-        minimal_response: !0,
-        no_attributes: !0
-      }
+      `history/period/${r.start.toISOString()}?${a.toString()}&minimal_response&no_attributes`
     )).flat();
     return {
       source: "history",
-      buckets: ni(i, o, e.bucket.value, e.missing.mode)
+      buckets: ni(i, l, e.bucket.value, e.missing.mode)
     };
   } catch (a) {
     return {

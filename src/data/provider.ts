@@ -118,15 +118,16 @@ async function fetchHistoryBuckets(
   }
 
   try {
+    // hass.callApi serializes its parameters argument into the request body for
+    // every HTTP method, and fetch() rejects GET requests that carry a body, so
+    // the history query must be encoded into the path instead.
+    const query = new URLSearchParams({
+      end_time: range.end.toISOString(),
+      filter_entity_id: entity.entity,
+    });
     const response = await hass.callApi<HistoryResponse>(
       "GET",
-      `history/period/${range.start.toISOString()}`,
-      {
-        end_time: range.end.toISOString(),
-        filter_entity_id: entity.entity,
-        minimal_response: true,
-        no_attributes: true,
-      },
+      `history/period/${range.start.toISOString()}?${query.toString()}&minimal_response&no_attributes`,
     );
     const rows = response.flat();
     return {
