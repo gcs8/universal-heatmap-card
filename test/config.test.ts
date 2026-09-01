@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { calculateRange, estimateCellCount, normalizeConfig } from "../src/config";
 import type { HomeAssistant } from "../src/types";
 
@@ -243,5 +243,49 @@ describe("calculateRange", () => {
     expect(range.end.getHours()).toBe(0);
     expect(range.end.getMinutes()).toBe(0);
     expect((range.end.getTime() - range.start.getTime()) / 3_600_000).toBe(24);
+  });
+});
+
+describe("calculateRange across DST transitions", () => {
+  const originalTz = process.env.TZ;
+
+  beforeAll(() => {
+    process.env.TZ = "America/New_York";
+  });
+
+  afterAll(() => {
+    if (originalTz === undefined) {
+      delete process.env.TZ;
+    } else {
+      process.env.TZ = originalTz;
+    }
+  });
+
+  it("keeps day-aligned hour windows on local midnight when the day is 23 or 25 hours", () => {
+    // Guard: if the runtime ignored the TZ switch there is no transition to test.
+    const springOffset = new Date(2026, 2, 8, 12).getTimezoneOffset();
+    const winterOffset = new Date(2026, 2, 7, 12).getTimezoneOffset();
+    if (springOffset === winterOffset) {
+      return;
+    }
+
+    const springForward = calculateRange({ hours: 24, align: "day" }, new Date(2026, 2, 8, 15));
+    expect(springForward.start.getTime()).toBe(new Date(2026, 2, 8, 0, 0, 0, 0).getTime());
+    expect(springForward.end.getTime()).toBe(new Date(2026, 2, 9, 0, 0, 0, 0).getTime());
+
+    const fallBack = calculateRange({ hours: 24, align: "day" }, new Date(2026, 10, 1, 15));
+    expect(fallBack.start.getTime()).toBe(new Date(2026, 10, 1, 0, 0, 0, 0).getTime());
+    expect(fallBack.end.getTime()).toBe(new Date(2026, 10, 2, 0, 0, 0, 0).getTime());
+
+    const week = calculateRange({ hours: 168, align: "day" }, new Date(2026, 2, 12, 15));
+    expect(week.start.getTime()).toBe(new Date(2026, 2, 6, 0, 0, 0, 0).getTime());
+  });
+
+  it("keeps rolling hour windows on absolute elapsed time", () => {
+    const now = new Date(2026, 2, 8, 15);
+    const rolling = calculateRange({ hours: 24, align: "rolling" }, now);
+
+    expect(rolling.end.getTime()).toBe(now.getTime());
+    expect(now.getTime() - rolling.start.getTime()).toBe(24 * 3_600_000);
   });
 });
