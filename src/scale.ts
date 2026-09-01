@@ -11,14 +11,16 @@ export function buildScale(buckets: BucketValue[], config: ScaleConfig): ScaleMo
     .map((bucket) => bucket.value)
     .filter((value): value is number => typeof value === "number" && Number.isFinite(value));
 
-  const positiveValues = allValues.filter((value) => value > 0);
+  // Ignoring zero must only drop zeros. Negative values are real data and stay
+  // in the domain; the auto heuristic is meant for non-negative sensors only.
+  const nonZeroValues = allValues.filter((value) => value !== 0);
   const shouldIgnoreZero =
     config.ignore_zero === true ||
     (config.ignore_zero !== false &&
-      positiveValues.length > 0 &&
+      nonZeroValues.length > 0 &&
       allValues.some((value) => value === 0) &&
-      Math.min(...positiveValues) > 0);
-  const values = shouldIgnoreZero ? positiveValues : allValues;
+      !allValues.some((value) => value < 0));
+  const values = shouldIgnoreZero ? nonZeroValues : allValues;
   const clippedRange = calculateDataRange(values, config.outlier_clip);
   const dataMin = clippedRange.min;
   const dataMax = clippedRange.max;

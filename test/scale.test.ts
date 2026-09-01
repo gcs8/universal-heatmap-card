@@ -19,6 +19,14 @@ const buckets: BucketValue[] = [
   },
 ];
 
+const signedBuckets: BucketValue[] = [-8, -3, 0, 2, 5].map((value, index) => ({
+  start: new Date(`2026-05-01T0${index}:00:00Z`),
+  end: new Date(`2026-05-01T0${index + 1}:00:00Z`),
+  value,
+  quality: "ok" as const,
+  source: "statistics" as const,
+}));
+
 describe("scale", () => {
   it("builds a fixed scale", () => {
     const scale = buildScale(buckets, { min: 0, max: 100, unit: "%" });
@@ -136,5 +144,29 @@ describe("scale", () => {
     expect(colorForValue(75, normal)).toBe("rgb(191, 191, 191)");
     expect(colorForValue(75, softened)).toBe("rgb(159, 159, 159)");
     expect(legendGradient(softened)).toContain("rgb(");
+  });
+
+  it("keeps negative values when zero is ignored explicitly", () => {
+    const scale = buildScale(signedBuckets, {
+      ignore_zero: true,
+      stops: [
+        { value: 0, color: "#000000" },
+        { value: 1, color: "#ffffff" },
+      ],
+    });
+
+    expect(scale.min).toBe(-8);
+    expect(scale.max).toBe(5);
+    expect(colorForValue(-8, scale)).not.toBe(colorForValue(2, scale));
+  });
+
+  it("does not auto-ignore zero for signed series", () => {
+    for (const config of [{}, { ignore_zero: "auto" as const }]) {
+      const scale = buildScale(signedBuckets, config);
+
+      expect(scale.min).toBe(-8);
+      expect(scale.max).toBe(5);
+      expect(scale.clippedLow).toBe(false);
+    }
   });
 });
