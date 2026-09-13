@@ -284,7 +284,7 @@ N.elementStyles = [], N.shadowRootOptions = { mode: "open" }, N[P("elementProper
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const F = globalThis, qe = (s) => s, Z = F.trustedTypes, Ve = Z ? Z.createPolicy("lit-html", { createHTML: (s) => s }) : void 0, nt = "$lit$", y = `lit$${Math.random().toFixed(9).slice(2)}$`, at = "?" + y, Mt = `<${at}>`, E = document, O = () => E.createComment(""), U = (s) => s === null || typeof s != "object" && typeof s != "function", xe = Array.isArray, Nt = (s) => xe(s) || typeof (s == null ? void 0 : s[Symbol.iterator]) == "function", oe = `[ 	
+const F = globalThis, qe = (s) => s, Q = F.trustedTypes, Ve = Q ? Q.createPolicy("lit-html", { createHTML: (s) => s }) : void 0, nt = "$lit$", y = `lit$${Math.random().toFixed(9).slice(2)}$`, at = "?" + y, Mt = `<${at}>`, E = document, O = () => E.createComment(""), U = (s) => s === null || typeof s != "object" && typeof s != "function", xe = Array.isArray, Nt = (s) => xe(s) || typeof (s == null ? void 0 : s[Symbol.iterator]) == "function", oe = `[ 	
 \f\r]`, I = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Be = /-->/g, We = />/g, $ = RegExp(`>|${oe}(?:([^\\s"'>=/]+)(${oe}*=${oe}*(?:[^ 	
 \f\r"'\`<>=]|("|')|))|$)`, "g"), Ge = /'/g, Xe = /"/g, ot = /^(?:script|style|textarea|title)$/i, Tt = (s) => (e, ...t) => ({ _$litType$: s, strings: e, values: t }), g = Tt(1), L = Symbol.for("lit-noChange"), m = Symbol.for("lit-nothing"), je = /* @__PURE__ */ new WeakMap(), A = E.createTreeWalker(E, 129);
 function lt(s, e) {
@@ -322,7 +322,7 @@ class q {
         if (ot.test(r.tagName)) {
           const h = r.textContent.split(y), d = h.length - 1;
           if (d > 0) {
-            r.textContent = Z ? Z.emptyScript : "";
+            r.textContent = Q ? Q.emptyScript : "";
             for (let p = 0; p < d; p++) r.append(h[p], O()), A.nextNode(), l.push({ type: 2, index: ++n });
             r.append(h[d], O());
           }
@@ -850,7 +850,7 @@ function B(s, e = /* @__PURE__ */ new Date()) {
   if (s.start)
     r = new Date(s.start);
   else if (typeof s.hours == "number")
-    r = t ? Qt(i, s.hours) : new Date(i.getTime() - s.hours * 60 * 60 * 1e3);
+    r = t ? Zt(i, s.hours) : new Date(i.getTime() - s.hours * 60 * 60 * 1e3);
   else {
     const n = typeof s.days == "number" ? s.days : 30;
     r = t ? Jt(i, n) : new Date(i.getTime() - n * 24 * 60 * 60 * 1e3);
@@ -869,7 +869,7 @@ function Jt(s, e) {
   const t = new Date(s);
   return t.setDate(t.getDate() - e), t;
 }
-function Qt(s, e) {
+function Zt(s, e) {
   const t = Math.trunc(e), i = new Date(s);
   return i.setHours(i.getHours() - t), new Date(i.getTime() - (e - t) * 60 * 60 * 1e3);
 }
@@ -890,7 +890,7 @@ function ht(s, e = /* @__PURE__ */ new Date()) {
       return Math.ceil(i / 24);
   }
 }
-function Zt(s) {
+function Qt(s) {
   return s < 9 ? 0 : s < 14 ? Math.max(6, Math.min(8, Math.floor(s * 0.72))) : Math.max(9, Math.min(13, Math.floor(s * 0.48)));
 }
 function ei(s, e) {
@@ -1314,7 +1314,7 @@ function pt() {
     }
   };
 }
-function Q(s) {
+function Z(s) {
   return _t(s).map((e) => typeof e == "string" ? e : e.entity).filter((e) => typeof e == "string" && e.length > 0);
 }
 function _t(s) {
@@ -1330,7 +1330,7 @@ function pe(s, e) {
   return e.map((i) => t.get(i) ?? i);
 }
 function mi(s, e, t) {
-  const i = Q(s), r = t.trim(), n = pe(s, i).map((o) => {
+  const i = Z(s), r = t.trim(), n = pe(s, i).map((o) => {
     const l = typeof o == "string" ? o : o.entity;
     if (l !== e)
       return o;
@@ -1404,7 +1404,7 @@ const Li = [
 ];
 function zi(s, e) {
   var f;
-  const t = s.map((_) => _.value).filter((_) => typeof _ == "number" && Number.isFinite(_)), i = t.filter((_) => _ > 0), n = e.ignore_zero === !0 || e.ignore_zero !== !1 && i.length > 0 && t.some((_) => _ === 0) && Math.min(...i) > 0 ? i : t, a = Ii(n, e.outlier_clip), o = a.min, l = a.max, c = typeof e.min == "number" ? e.min : o, u = typeof e.max == "number" ? e.max : l === c ? c + 1 : l, h = (f = e.stops) != null && f.length ? e.stops : Li, d = Ri(h, c, u, e.invert ?? !1), p = Pi(e.sensitivity);
+  const t = s.map((_) => _.value).filter((_) => typeof _ == "number" && Number.isFinite(_)), i = t.filter((_) => _ !== 0), n = e.ignore_zero === !0 || e.ignore_zero !== !1 && i.length > 0 && t.some((_) => _ === 0) && !t.some((_) => _ < 0) ? i : t, a = Ii(n, e.outlier_clip), o = a.min, l = a.max, c = typeof e.min == "number" ? e.min : o, u = typeof e.max == "number" ? e.max : l === c ? c + 1 : l, h = (f = e.stops) != null && f.length ? e.stops : Li, d = Ri(h, c, u, e.invert ?? !1), p = Pi(e.sensitivity);
   return {
     min: c,
     max: u,
@@ -1467,7 +1467,7 @@ function Ii(s, e) {
       min: t[0] ?? 0,
       max: t[t.length - 1] ?? 1
     };
-  const r = Qe(t, i.low), n = Qe(t, i.high);
+  const r = Ze(t, i.low), n = Ze(t, i.high);
   return n <= r ? {
     min: t[0] ?? 0,
     max: t[t.length - 1] ?? r + 1
@@ -1488,7 +1488,7 @@ function Hi(s) {
     high: k(t, 0, 100)
   };
 }
-function Qe(s, e) {
+function Ze(s, e) {
   if (s.length === 0)
     return 0;
   const t = k(
@@ -1506,13 +1506,13 @@ function Fi(s, e) {
   return e.min + n * t;
 }
 function Oi(s, e, t) {
-  const i = Ze(s), r = Ze(e);
+  const i = Qe(s), r = Qe(e);
   if (!i || !r)
     return t < 0.5 ? s : e;
   const n = Math.round(i.r + (r.r - i.r) * t), a = Math.round(i.g + (r.g - i.g) * t), o = Math.round(i.b + (r.b - i.b) * t);
   return `rgb(${n}, ${a}, ${o})`;
 }
-function Ze(s) {
+function Qe(s) {
   const e = s.replace("#", "").trim(), t = e.length === 3 ? e.split("").map((i) => `${i}${i}`).join("") : e;
   return /^[0-9a-fA-F]{6}$/.test(t) ? {
     r: Number.parseInt(t.slice(0, 2), 16),
@@ -1951,7 +1951,7 @@ const se = class se extends T {
   _drawCellValue(e, t, i, r, n, a) {
     if (!this._showTileValues() || !this._scale || t.value === null)
       return;
-    const o = Zt(i.cell);
+    const o = Qt(i.cell);
     if (o <= 0)
       return;
     const l = this._formatCellValue(t.value, i.cell);
@@ -2527,7 +2527,7 @@ const re = class re extends T {
     const { entity: e, ...t } = this._config ?? {};
     return {
       ...t,
-      entities: Q(this._config ?? {})
+      entities: Z(this._config ?? {})
     };
   }
   _handleValueChanged(e) {
@@ -2541,12 +2541,12 @@ const re = class re extends T {
     this._applyConfig(r);
   }
   _selectedEntities(e) {
-    return Array.isArray(e) ? e.filter((t) => typeof t == "string" && t.length > 0) : typeof e == "string" && e.length > 0 ? [e] : Q(this._config ?? {});
+    return Array.isArray(e) ? e.filter((t) => typeof t == "string" && t.length > 0) : typeof e == "string" && e.length > 0 ? [e] : Z(this._config ?? {});
   }
   _renderEntityNameEditor() {
     if (!this._config)
       return m;
-    const e = pe(this._config, Q(this._config));
+    const e = pe(this._config, Z(this._config));
     return e.length === 0 ? m : g`
       <section class="editor-section" aria-label="Entity labels">
         <div class="editor-title">Entity labels</div>
