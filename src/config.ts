@@ -139,7 +139,11 @@ export function calculateRange(range: NormalizedConfig["range"], now = new Date(
   if (range.start) {
     start = new Date(range.start);
   } else if (typeof range.hours === "number") {
-    start = new Date(end.getTime() - range.hours * 60 * 60 * 1000);
+    // Day-aligned windows count local wall-clock hours (like subtractLocalDays)
+    // so the window still starts at local midnight on 23- and 25-hour DST days.
+    start = dayAligned
+      ? subtractLocalHours(end, range.hours)
+      : new Date(end.getTime() - range.hours * 60 * 60 * 1000);
   } else {
     const days = typeof range.days === "number" ? range.days : 30;
     start = dayAligned ? subtractLocalDays(end, days) : new Date(end.getTime() - days * 24 * 60 * 60 * 1000);
@@ -166,6 +170,13 @@ function subtractLocalDays(date: Date, days: number): Date {
   const result = new Date(date);
   result.setDate(result.getDate() - days);
   return result;
+}
+
+function subtractLocalHours(date: Date, hours: number): Date {
+  const wholeHours = Math.trunc(hours);
+  const result = new Date(date);
+  result.setHours(result.getHours() - wholeHours);
+  return new Date(result.getTime() - (hours - wholeHours) * 60 * 60 * 1000);
 }
 
 export function estimateCellCount(config: NormalizedConfig, now = new Date()): number {
