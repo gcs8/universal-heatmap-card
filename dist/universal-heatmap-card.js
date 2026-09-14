@@ -1858,7 +1858,7 @@ function _n(e) {
 }
 //#endregion
 //#region src/types.ts
-var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.3", bn = `${vn}-editor`, xn = class extends Error {
+var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", bn = `${vn}-editor`, xn = class extends Error {
 	constructor() {
 		super("Stale heatmap load skipped.");
 	}
