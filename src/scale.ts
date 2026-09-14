@@ -134,7 +134,9 @@ function resolveBounds(
 function resolveWidenAmount(bound: number): number {
   const magnitude = Math.abs(bound);
   const delta = magnitude * Number.EPSILON * 4;
-  return delta > 0 && Number.isFinite(delta) ? delta : Number.MIN_VALUE;
+  // Preserve a useful gradient at zero and subnormal magnitudes. A single
+  // Number.MIN_VALUE step has no representable midpoint for relative stops.
+  return delta > 0 && Number.isFinite(delta) ? delta : 1;
 }
 
 function normalizeStops(

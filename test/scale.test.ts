@@ -218,6 +218,18 @@ describe("scale", () => {
     expect(scale.max - scale.min).toBeLessThan(1e-20);
   });
 
+  it("keeps a usable gradient when a fixed zero max sits below positive data", () => {
+    const scale = buildScale(bucketsFor([1, 2, 3]), { max: 0 });
+
+    expect(scale.min).toBe(-1);
+    expect(scale.max).toBe(0);
+    expect(scale.stops[1]?.value).toBeGreaterThan(scale.min);
+    expect(scale.stops[1]?.value).toBeLessThan(scale.max);
+
+    const legendColors = new Set(legendGradient(scale).match(/rgb\([^)]*\)/g) ?? []);
+    expect(legendColors.size).toBeGreaterThan(2);
+  });
+
   it("keeps distinguishable colors across an inverted-bound scale", () => {
     const scale = buildScale(bucketsFor([10, 12, 15, 20]), { min: 50 });
 
