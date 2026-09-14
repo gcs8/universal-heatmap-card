@@ -1,4 +1,5 @@
-import { estimateCellCount } from "./config";
+import { calculateRange, estimateCellCount } from "./config";
+import { generateBucketWindows } from "./data/buckets";
 import type { BucketInterval, NormalizedConfig } from "./types";
 
 export const SECTION_GRID_ROW_HEIGHT = 56;
@@ -15,6 +16,7 @@ const CANVAS_MAX_CELL = 22;
 const CANVAS_VALUE_MIN_CELL = 14;
 const CANVAS_VALUE_MAX_CELL = 28;
 const CANVAS_LABEL_WIDTH = 58;
+const CANVAS_FIVE_MINUTE_LABEL_WIDTH = 82;
 const CANVAS_LABEL_HEIGHT = 18;
 
 interface CardChromeState {
@@ -123,9 +125,10 @@ export function sectionRowsForHeight(height: number): number {
 export function estimateSectionGridRows(
   config: NormalizedConfig,
   state: CardChromeState = {},
+  now = new Date(),
 ): number {
   return clamp(
-    sectionRowsForHeight(estimateCardHeight(config, state)),
+    sectionRowsForHeight(estimateCardHeight(config, state, now)),
     SECTION_MIN_ROWS,
     SECTION_MAX_ROWS,
   );
@@ -134,15 +137,17 @@ export function estimateSectionGridRows(
 export function estimateMasonryCardSize(
   config: NormalizedConfig,
   state: CardChromeState = {},
+  now = new Date(),
 ): number {
-  return Math.max(1, Math.ceil(estimateCardHeight(config, state) / 50));
+  return Math.max(1, Math.ceil(estimateCardHeight(config, state, now) / 50));
 }
 
 export function estimateCardHeight(
   config: NormalizedConfig,
   state: CardChromeState = {},
+  now = new Date(),
 ): number {
-  return estimateCardChromeHeight(config, state) + estimateCanvasHeight(config);
+  return estimateCardChromeHeight(config, state) + estimateCanvasHeight(config, REFERENCE_CARD_WIDTH, now);
 }
 
 export function estimateCardChromeHeight(
@@ -170,11 +175,17 @@ export function estimateCardChromeHeight(
   return height;
 }
 
-export function estimateCanvasHeight(config: NormalizedConfig, width = REFERENCE_CARD_WIDTH): number {
-  const count = Math.max(1, estimateCellCount(config));
+export function estimateCanvasHeight(
+  config: NormalizedConfig,
+  width = REFERENCE_CARD_WIDTH,
+  now = new Date(),
+): number {
+  const count = Math.max(1, estimateCellCount(config, now));
   const cols = columnsForInterval(config.bucket.interval, count);
-  const rows = Math.ceil(count / cols);
-  const labelWidth = config.axes.show && config.axes.y_labels ? CANVAS_LABEL_WIDTH : 0;
+  const rows = estimateGridRows(config, now);
+  const labelWidth = config.axes.show && config.axes.y_labels
+    ? rowLabelWidthForInterval(config.bucket.interval)
+    : 0;
   const labelHeight = config.axes.show && config.axes.x_labels ? CANVAS_LABEL_HEIGHT : 0;
   const gridWidth = Math.max(160, width - labelWidth);
   const reservesValues = config.tiles.show_values || config.tiles.show_value_toggle;
@@ -189,6 +200,21 @@ export function estimateCanvasHeight(config: NormalizedConfig, width = REFERENCE
   );
 
   return labelHeight + rows * cell + Math.max(0, rows - 1) * CANVAS_GAP;
+}
+
+export function estimateGridRows(config: NormalizedConfig, now: Date): number {
+  const count = Math.max(1, estimateCellCount(config, now));
+  const cols = columnsForInterval(config.bucket.interval, count);
+  if (config.bucket.interval !== "hour") {
+    return Math.ceil(count / cols);
+  }
+
+  const windows = generateBucketWindows(calculateRange(config.range, now), "hour");
+  return placeBucketsOnGrid(windows, "hour", cols).rows;
+}
+
+export function rowLabelWidthForInterval(interval: BucketInterval): number {
+  return interval === "5minute" ? CANVAS_FIVE_MINUTE_LABEL_WIDTH : CANVAS_LABEL_WIDTH;
 }
 
 function estimateNavigationHeight(config: NormalizedConfig): number {

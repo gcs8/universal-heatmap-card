@@ -108,6 +108,14 @@ range:
   align: rolling
 ```
 
+Exact `YYYY-MM-DD` start/end values are interpreted as local midnight. Values that include an explicit time or zone use normal JavaScript timestamp parsing:
+
+```yaml
+range:
+  start: "2026-05-01"
+  end: "2026-05-02"
+```
+
 ## Axes And Legend
 
 Axis tick labels are shown by default. The extra explanatory key is off by default because it is redundant when the graph is already well labeled:
@@ -120,7 +128,7 @@ axes:
   show_key: false
 ```
 
-Set `axes.show_key: true` when you want the card to explicitly spell out the encoding, for example `X = time of day`, `Y = date`, and `Color = average value`.
+Set `axes.show_key: true` when you want the card to explicitly spell out the encoding. Hourly cards use `X = time of day` and `Y = date`. The 5-minute interval keeps native 5-minute buckets in 48-column, 4-hour rows: x-axis ticks show elapsed offsets within each row, row labels show the local date and strip start time, and tooltips include local hours and minutes.
 
 By default, color scales use the observed bucket values in the rendered time window unless you set fixed `scale.min` or `scale.max`. For positive sensors, `scale.ignore_zero: auto` keeps an isolated zero from flattening a large active range.
 

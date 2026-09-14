@@ -364,6 +364,25 @@ describe("calculateRange across DST transitions", () => {
     }
   });
 
+  it("parses exact date-only range boundaries as local midnight", () => {
+    const range = calculateRange({
+      start: "2026-05-01",
+      end: "2026-05-02",
+      align: "rolling",
+    });
+
+    expect(range.start.getFullYear()).toBe(2026);
+    expect(range.start.getMonth()).toBe(4);
+    expect(range.start.getDate()).toBe(1);
+    expect(range.start.getHours()).toBe(0);
+    expect(range.start.getMinutes()).toBe(0);
+    expect(range.end.getFullYear()).toBe(2026);
+    expect(range.end.getMonth()).toBe(4);
+    expect(range.end.getDate()).toBe(2);
+    expect(range.end.getHours()).toBe(0);
+    expect(range.end.getMinutes()).toBe(0);
+  });
+
   it("keeps day-aligned hour windows on local midnight when the day is 23 or 25 hours", () => {
     // Guard: if the runtime ignored the TZ switch there is no transition to test.
     const springOffset = new Date(2026, 2, 8, 12).getTimezoneOffset();
@@ -414,6 +433,15 @@ describe("normalizeConfig range validation", () => {
       normalizeConfig({
         entity: "sensor.room_temperature",
         range: { start: "not-a-date" },
+      }),
+    ).toThrow(/invalid range date/);
+  });
+
+  it("rejects impossible exact date-only range values", () => {
+    expect(() =>
+      normalizeConfig({
+        entity: "sensor.room_temperature",
+        range: { start: "2026-02-30", end: "2026-03-05" },
       }),
     ).toThrow(/invalid range date/);
   });

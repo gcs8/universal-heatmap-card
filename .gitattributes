@@ -1,0 +1,2 @@
+# Lit's bundled template literals contain intentional line-ending whitespace.
+dist/*.js whitespace=-blank-at-eol
