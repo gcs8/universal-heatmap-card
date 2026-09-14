@@ -210,6 +210,22 @@ describe("scale", () => {
     expect(scale.clippedHigh).toBe(true);
   });
 
+  it("keeps widened bounds and stops finite at both Number extrema", () => {
+    const fixedMin = buildScale(bucketsFor([1, 2, 3]), { min: Number.MAX_VALUE });
+    const fixedMax = buildScale(bucketsFor([-3, -2, -1]), { max: -Number.MAX_VALUE });
+
+    for (const scale of [fixedMin, fixedMax]) {
+      expect(scale.min).toBeLessThan(scale.max);
+      expect([scale.min, scale.max, ...scale.stops.map((stop) => stop.value)]).toSatisfy(
+        (values: number[]) => values.every(Number.isFinite),
+      );
+      expect(formatValue(scale.min, scale, "en-US")).not.toBe("missing");
+      expect(formatValue(scale.max, scale, "en-US")).not.toBe("missing");
+      const legendColors = new Set(legendGradient(scale).match(/rgb\([^)]*\)/g) ?? []);
+      expect(legendColors.size).toBeGreaterThan(2);
+    }
+  });
+
   it("keeps near-zero fixed bounds from collapsing on one-step widening", () => {
     const scale = buildScale(bucketsFor([1e-30, 2e-30, 3e-30]), { min: 1e-30 });
 
