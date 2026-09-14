@@ -17,13 +17,19 @@ const DEFAULT_REFRESH_INTERVAL = 300;
 export function normalizeConfig(
   config: HeatmapCardConfig,
   hass?: HomeAssistant,
+  activeIndex = 0,
 ): NormalizedConfig {
   const entities = normalizeEntities(config, hass);
   if (entities.length === 0) {
     throw new Error("Universal Heatmap Card requires entity or entities.");
   }
 
-  const activeEntity = entities[0];
+  // Preset inference (stops, unit, bucket and range defaults) follows the
+  // entity actually being shown; an out-of-range index falls back to the
+  // first entity rather than leaving the card without a preset.
+  const activeEntity =
+    (Number.isInteger(activeIndex) && activeIndex >= 0 ? entities[activeIndex] : undefined) ??
+    entities[0];
   const stateObj = activeEntity ? hass?.states[activeEntity.entity] : undefined;
   const inferredPreset = inferPresetFromEntity(stateObj);
   const scalePresetName = config.scale?.preset ?? inferredPreset;

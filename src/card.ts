@@ -95,8 +95,15 @@ export class UniversalHeatmapCard extends LitElement {
     this._cache.clear();
     this._inFlightKey = undefined;
     this._loadSeq += 1;
-    this._normalized = normalizeConfig(config, this.hass);
-    this._activeIndex = this._resolveActiveIndex(previousEntity);
+    this._normalized = normalizeConfig(config, this.hass, this._activeIndex);
+    const resolvedIndex = this._resolveActiveIndex(previousEntity);
+    if (resolvedIndex !== this._activeIndex) {
+      // The active entity drives preset inference, so re-normalize once the
+      // index has moved instead of leaving the previous entity's preset in
+      // place until the next update.
+      this._activeIndex = resolvedIndex;
+      this._normalized = normalizeConfig(config, this.hass, resolvedIndex);
+    }
     this._tileValuesOverride = undefined;
     this._tooltip = undefined;
     debugLog(this._debug, "config applied", {
@@ -179,7 +186,7 @@ export class UniversalHeatmapCard extends LitElement {
       this._config &&
       (changed.has("hass") || changed.has("_activeIndex"))
     ) {
-      this._normalized = normalizeConfig(this._config, this.hass);
+      this._normalized = normalizeConfig(this._config, this.hass, this._activeIndex);
       this._requestActiveSeriesLoad();
     }
 
