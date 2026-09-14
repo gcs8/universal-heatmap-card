@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.4
+
+- Kept native 5-minute buckets while fixing their axis ticks, row-start labels, and minute-precision tooltips. (#19, #29)
+- Parsed exact `YYYY-MM-DD` range boundaries at local midnight instead of UTC midnight. (#29)
+- Matched hourly height estimates to rendered local calendar-day rows, including rolling windows and 25-hour DST fallback days. (#36)
+- Preserved useful statistics failure and missing-data details when `provider: auto` falls back to raw history. (#26)
+- Prevented very large fixed scale bounds from collapsing to a zero-width color range. (#37)
+- Updated the development build toolchain to Vite 8.0.16. Card data and configuration formats are unchanged.
+
 ## 0.1.3
 
 - Made tile value labels degrade to compact whole-number labels on narrower cards instead of disappearing while the `123` toggle is active.
