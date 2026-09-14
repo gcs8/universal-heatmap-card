@@ -9,6 +9,7 @@ import type {
   StatisticsRow,
 } from "../types";
 import {
+  applyMissingMode,
   emptyBuckets,
   generateBucketWindows,
   historyRowsToBuckets,
@@ -39,13 +40,20 @@ export async function fetchHeatmapBuckets(
 
   const provider = config.data.provider;
   const canUseStatistics = statisticsTypeForValue(config.bucket.value) !== null;
+  let statisticsFallbackReason: string | undefined;
 
   if ((provider === "auto" || provider === "statistics") && canUseStatistics) {
     try {
-      const buckets = await fetchStatisticsBuckets(hass, config, entity, windows);
-      if (buckets.some((bucket) => bucket.value !== null) || provider === "statistics") {
-        return { source: "statistics", buckets };
+      const unfilledBuckets = await fetchStatisticsBuckets(hass, config, entity, windows);
+      const hasUsableStatistics = unfilledBuckets.some((bucket) => bucket.value !== null);
+      if (hasUsableStatistics || provider === "statistics") {
+        return {
+          source: "statistics",
+          buckets: applyMissingMode(unfilledBuckets, config.missing.mode),
+        };
       }
+      statisticsFallbackReason =
+        `No ${config.bucket.value} statistics were available for ${entity.entity}.`;
     } catch (error) {
       if (provider === "statistics") {
         return {
@@ -54,11 +62,27 @@ export async function fetchHeatmapBuckets(
           warning: messageFromError(error, "Statistics query failed."),
         };
       }
+      statisticsFallbackReason = "Statistics query failed.";
     }
   }
 
   if (provider === "auto" || provider === "history") {
-    return fetchHistoryBuckets(hass, config, entity, windows);
+    const history = await fetchHistoryBuckets(
+      hass,
+      config,
+      entity,
+      windows,
+      statisticsFallbackReason !== undefined,
+    );
+    if (statisticsFallbackReason) {
+      return {
+        ...history,
+        warning: history.warning
+          ? `${statisticsFallbackReason} ${history.warning}`
+          : `${statisticsFallbackReason} Showing raw history instead.`,
+      };
+    }
+    return history;
   }
 
   return {
@@ -89,7 +113,7 @@ async function fetchStatisticsBuckets(
     types: [statType],
   });
   const rows = response[entity.entity] ?? [];
-  return statisticsRowsToBuckets(windows, rows, config.bucket.value, config.missing.mode);
+  return statisticsRowsToBuckets(windows, rows, config.bucket.value, "empty");
 }
 
 async function fetchHistoryBuckets(
@@ -97,6 +121,7 @@ async function fetchHistoryBuckets(
   config: NormalizedConfig,
   entity: NormalizedEntityConfig,
   windows: Array<{ start: Date; end: Date }>,
+  hideFailureDetails = false,
 ): Promise<ProviderResult> {
   const range = calculateRange(config.range);
   const hours = (range.end.getTime() - range.start.getTime()) / 3_600_000;
@@ -138,7 +163,9 @@ async function fetchHistoryBuckets(
     return {
       source: "history",
       buckets: emptyBuckets(windows, "history"),
-      warning: messageFromError(error, "History fallback failed."),
+      warning: hideFailureDetails
+        ? "History fallback failed."
+        : messageFromError(error, "History fallback failed."),
     };
   }
 }

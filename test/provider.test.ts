@@ -24,6 +24,26 @@ function historyHass(
   };
 }
 
+function autoHass(
+  statistics: () => Promise<unknown>,
+  history: () => Promise<HistoryStateRow[][]> = async () => [[]],
+): HomeAssistant {
+  return {
+    states: {},
+    callWS: async <T>(): Promise<T> => (await statistics()) as T,
+    callApi: async <T>(): Promise<T> => (await history()) as T,
+  };
+}
+
+function autoConfig(hours = 2, rawHistoryHours = 24) {
+  return normalizeConfig({
+    entity: "sensor.example_power",
+    range: { hours, align: "rolling" },
+    bucket: { interval: "hour", value: "mean" },
+    data: { provider: "auto", raw_history_hours: rawHistoryHours },
+  });
+}
+
 describe("fetchHeatmapBuckets history fallback", () => {
   afterEach(() => {
     vi.useRealTimers();
@@ -84,5 +104,148 @@ describe("fetchHeatmapBuckets history fallback", () => {
 
     expect(result.source).toBe("history");
     expect(result.buckets.some((bucket) => bucket.value === 3)).toBe(true);
+  });
+});
+
+describe("fetchHeatmapBuckets automatic provider diagnostics", () => {
+  it("warns when a statistics failure falls back to successful raw history", async () => {
+    const hass = autoHass(async () => {
+      throw new Error("statistics unavailable; token=do-not-expose");
+    });
+    const config = autoConfig();
+
+    const result = await fetchHeatmapBuckets(hass, config, config.entities[0]!);
+
+    expect(result.source).toBe("history");
+    expect(result.warning).toBe("Statistics query failed. Showing raw history instead.");
+    expect(result.warning).not.toContain("do-not-expose");
+  });
+
+  it("warns when the statistics response has no requested entity", async () => {
+    const hass = autoHass(async () => ({}));
+    const config = autoConfig();
+
+    const result = await fetchHeatmapBuckets(hass, config, config.entities[0]!);
+
+    expect(result.source).toBe("history");
+    expect(result.warning).toBe(
+      "No mean statistics were available for sensor.example_power. Showing raw history instead.",
+    );
+  });
+
+  it("checks statistics availability before filling missing values with zero", async () => {
+    const hass = autoHass(
+      async () => ({}),
+      async () => [[{ state: "7", last_changed: new Date().toISOString() }]],
+    );
+    const config = normalizeConfig({
+      entity: "sensor.example_power",
+      range: { hours: 2, align: "rolling" },
+      bucket: { interval: "hour", value: "mean" },
+      data: { provider: "auto", raw_history_hours: 24 },
+      missing: { mode: "zero" },
+    });
+
+    const result = await fetchHeatmapBuckets(hass, config, config.entities[0]!);
+
+    expect(result.source).toBe("history");
+    expect(result.buckets.some((bucket) => bucket.value === 7)).toBe(true);
+    expect(result.warning).toBe(
+      "No mean statistics were available for sensor.example_power. Showing raw history instead.",
+    );
+  });
+
+  it("checks the requested statistic type before filling missing values with zero", async () => {
+    const hass = autoHass(
+      async () => ({
+        "sensor.example_power": [{ start: new Date().toISOString(), sum: 12 }],
+      }),
+      async () => [[{ state: "7", last_changed: new Date().toISOString() }]],
+    );
+    const config = normalizeConfig({
+      entity: "sensor.example_power",
+      range: { hours: 2, align: "rolling" },
+      bucket: { interval: "hour", value: "mean" },
+      data: { provider: "auto", raw_history_hours: 24 },
+      missing: { mode: "zero" },
+    });
+
+    const result = await fetchHeatmapBuckets(hass, config, config.entities[0]!);
+
+    expect(result.source).toBe("history");
+    expect(result.buckets.some((bucket) => bucket.value === 7)).toBe(true);
+    expect(result.warning).toBe(
+      "No mean statistics were available for sensor.example_power. Showing raw history instead.",
+    );
+  });
+
+  it("preserves missing-value fill for the explicit statistics provider", async () => {
+    const hass = autoHass(async () => ({}));
+    const config = normalizeConfig({
+      entity: "sensor.example_power",
+      range: { hours: 2, align: "rolling" },
+      bucket: { interval: "hour", value: "mean" },
+      data: { provider: "statistics" },
+      missing: { mode: "zero" },
+    });
+
+    const result = await fetchHeatmapBuckets(hass, config, config.entities[0]!);
+
+    expect(result.source).toBe("statistics");
+    expect(result.warning).toBeUndefined();
+    expect(result.buckets.length).toBeGreaterThan(0);
+    expect(result.buckets.every((bucket) => bucket.value === 0)).toBe(true);
+  });
+
+  it("warns when statistics rows do not contain the requested type", async () => {
+    const hass = autoHass(async () => ({
+      "sensor.example_power": [{ start: new Date().toISOString(), sum: 12 }],
+    }));
+    const config = autoConfig();
+
+    const result = await fetchHeatmapBuckets(hass, config, config.entities[0]!);
+
+    expect(result.source).toBe("history");
+    expect(result.warning).toBe(
+      "No mean statistics were available for sensor.example_power. Showing raw history instead.",
+    );
+  });
+
+  it("reports the statistics failure before the raw-history cap", async () => {
+    let historyCalls = 0;
+    const hass = autoHass(
+      async () => {
+        throw new Error("statistics unavailable");
+      },
+      async () => {
+        historyCalls += 1;
+        return [[]];
+      },
+    );
+    const config = autoConfig(48, 24);
+
+    const result = await fetchHeatmapBuckets(hass, config, config.entities[0]!);
+
+    expect(historyCalls).toBe(0);
+    expect(result.warning).toBe(
+      "Statistics query failed. Raw history fallback is capped at 24 hours by default. Use recorder statistics or reduce range.",
+    );
+  });
+
+  it("reports missing statistics before a raw-history request failure", async () => {
+    const hass = autoHass(
+      async () => ({}),
+      async () => {
+        throw new Error("history request failed; token=do-not-expose");
+      },
+    );
+    const config = autoConfig();
+
+    const result = await fetchHeatmapBuckets(hass, config, config.entities[0]!);
+
+    expect(result.warning).toBe(
+      "No mean statistics were available for sensor.example_power. History fallback failed.",
+    );
+    expect(result.warning).not.toContain("do-not-expose");
   });
 });
