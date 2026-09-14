@@ -59,11 +59,16 @@ describe("fetchHeatmapBuckets history fallback", () => {
 
   it("returns aggregated buckets from the history response", async () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-01-15T15:21:00.000Z"));
+    const now = new Date("2026-01-15T15:21:00.000Z");
+    vi.setSystemTime(now);
+    const bucketStart = new Date(now);
+    bucketStart.setHours(bucketStart.getHours() - 1, 0, 0, 0);
+    const sampleAt = (minute: number) =>
+      new Date(bucketStart.getTime() + minute * 60 * 1000).toISOString();
     const rows: HistoryStateRow[][] = [
       [
-        { state: "2", last_changed: "2026-01-15T14:10:00.000Z" },
-        { state: "4", last_changed: "2026-01-15T14:20:00.000Z" },
+        { state: "2", last_changed: sampleAt(10) },
+        { state: "4", last_changed: sampleAt(20) },
       ],
     ];
     const hass = historyHass(() => undefined, rows);
