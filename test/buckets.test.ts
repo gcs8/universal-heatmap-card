@@ -82,7 +82,41 @@ describe("DST hour buckets (America/New_York)", () => {
   afterAll(() => {
     process.env.TZ = originalTz;
   });
+it("keeps every 5-minute bucket across the fall-back transition", () => {
+  const windows = generateBucketWindows(
+    {
+      start: new Date("2026-11-01T04:00:00Z"),
+      end: new Date("2026-11-02T05:00:00Z"),
+    },
+    "5minute",
+  );
 
+  expect(windows).toHaveLength(300);
+
+  for (const window of windows) {
+    expect(
+      window.end.getTime() - window.start.getTime(),
+    ).toBe(300_000);
+  }
+
+  const repeatedOneAm = windows.filter(
+    (window) => window.start.getHours() === 1,
+  );
+
+  expect(repeatedOneAm).toHaveLength(24);
+
+  expect(
+    repeatedOneAm
+      .slice(0, 12)
+      .every((window) => window.start.getTimezoneOffset() === 240),
+  ).toBe(true);
+
+  expect(
+    repeatedOneAm
+      .slice(12)
+      .every((window) => window.start.getTimezoneOffset() === 300),
+  ).toBe(true);
+});
   it("keeps 23 elapsed hours across the spring-forward day", () => {
     const windows = generateBucketWindows(
       { start: new Date("2026-03-08T05:00:00Z"), end: new Date("2026-03-09T04:00:00Z") },
