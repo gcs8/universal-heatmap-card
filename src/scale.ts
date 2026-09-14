@@ -24,8 +24,7 @@ export function buildScale(buckets: BucketValue[], config: ScaleConfig): ScaleMo
   const clippedRange = calculateDataRange(values, config.outlier_clip);
   const dataMin = clippedRange.min;
   const dataMax = clippedRange.max;
-  const min = typeof config.min === "number" ? config.min : dataMin;
-  const max = typeof config.max === "number" ? config.max : dataMax === min ? min + 1 : dataMax;
+  const { min, max } = resolveBounds(config, dataMin, dataMax);
   const rawStops = config.stops?.length ? config.stops : DEFAULT_STOPS;
   const stops = normalizeStops(rawStops, min, max, config.invert ?? false);
   const sensitivity = normalizeSensitivity(config.sensitivity);
@@ -97,6 +96,37 @@ export function formatValue(value: number | null, scale: ScaleModel, locale?: st
   }).format(value);
 
   return scale.unit ? `${formatted} ${scale.unit}` : formatted;
+}
+
+// A fixed bound can sit entirely on the wrong side of the observed data
+// (scale.min above every value, or scale.max below every value). Taking the
+// free bound straight from the data would then give max <= min, which makes
+// normalizeStops re-sort relative stops across a negative span (reversing the
+// palette), collapses every cell to one color, and prints the legend
+// high-to-low. Keep the operator's fixed bound and widen the free one instead;
+// clippedLow/clippedHigh then reports the data that falls outside.
+function resolveBounds(
+  config: ScaleConfig,
+  dataMin: number,
+  dataMax: number,
+): { min: number; max: number } {
+  const minFixed = typeof config.min === "number";
+  const maxFixed = typeof config.max === "number";
+  const min = minFixed ? (config.min as number) : dataMin;
+  const max = maxFixed ? (config.max as number) : dataMax;
+
+  if (max > min) {
+    return { min, max };
+  }
+  if (!maxFixed) {
+    return { min, max: min + 1 };
+  }
+  if (!minFixed) {
+    return { min: max - 1, max };
+  }
+  // Both bounds fixed and not ascending: widen upward rather than render an
+  // inverted scale.
+  return { min, max: min + 1 };
 }
 
 function normalizeStops(
