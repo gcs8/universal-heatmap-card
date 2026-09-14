@@ -1,5 +1,5 @@
-import { estimateCellCount } from "./config";
-import type { BucketInterval, NormalizedConfig } from "./types";
+import { calculateRange, estimateCellCount } from "./config";
+import type { BucketInterval, DateRange, NormalizedConfig } from "./types";
 
 export const SECTION_GRID_ROW_HEIGHT = 56;
 export const SECTION_GRID_GAP = 8;
@@ -10,12 +10,17 @@ export const SECTION_MIN_ROWS = 4;
 const SECTION_MAX_ROWS = 12;
 const REFERENCE_CARD_WIDTH = 560;
 const CANVAS_GAP = 3;
+const CANVAS_FIVE_MINUTE_GAP = 2;
 const CANVAS_MIN_CELL = 7;
 const CANVAS_MAX_CELL = 22;
 const CANVAS_VALUE_MIN_CELL = 14;
 const CANVAS_VALUE_MAX_CELL = 28;
 const CANVAS_LABEL_WIDTH = 58;
+const CANVAS_FIVE_MINUTE_LABEL_WIDTH = 120;
 const CANVAS_LABEL_HEIGHT = 18;
+const DAY_MS = 86_400_000;
+const HOUR_MS = 3_600_000;
+const MAX_EXACT_HOURLY_ROW_SCAN = 50_000;
 
 interface CardChromeState {
   loading?: boolean;
@@ -123,9 +128,10 @@ export function sectionRowsForHeight(height: number): number {
 export function estimateSectionGridRows(
   config: NormalizedConfig,
   state: CardChromeState = {},
+  now = new Date(),
 ): number {
   return clamp(
-    sectionRowsForHeight(estimateCardHeight(config, state)),
+    sectionRowsForHeight(estimateCardHeight(config, state, now)),
     SECTION_MIN_ROWS,
     SECTION_MAX_ROWS,
   );
@@ -134,15 +140,17 @@ export function estimateSectionGridRows(
 export function estimateMasonryCardSize(
   config: NormalizedConfig,
   state: CardChromeState = {},
+  now = new Date(),
 ): number {
-  return Math.max(1, Math.ceil(estimateCardHeight(config, state) / 50));
+  return Math.max(1, Math.ceil(estimateCardHeight(config, state, now) / 50));
 }
 
 export function estimateCardHeight(
   config: NormalizedConfig,
   state: CardChromeState = {},
+  now = new Date(),
 ): number {
-  return estimateCardChromeHeight(config, state) + estimateCanvasHeight(config);
+  return estimateCardChromeHeight(config, state) + estimateCanvasHeight(config, REFERENCE_CARD_WIDTH, now);
 }
 
 export function estimateCardChromeHeight(
@@ -170,11 +178,18 @@ export function estimateCardChromeHeight(
   return height;
 }
 
-export function estimateCanvasHeight(config: NormalizedConfig, width = REFERENCE_CARD_WIDTH): number {
-  const count = Math.max(1, estimateCellCount(config));
+export function estimateCanvasHeight(
+  config: NormalizedConfig,
+  width = REFERENCE_CARD_WIDTH,
+  now = new Date(),
+): number {
+  const count = Math.max(1, estimateCellCount(config, now));
   const cols = columnsForInterval(config.bucket.interval, count);
-  const rows = Math.ceil(count / cols);
-  const labelWidth = config.axes.show && config.axes.y_labels ? CANVAS_LABEL_WIDTH : 0;
+  const rows = estimateGridRows(config, now);
+  const gap = canvasGapForInterval(config.bucket.interval);
+  const labelWidth = config.axes.show && config.axes.y_labels
+    ? rowLabelWidthForInterval(config.bucket.interval)
+    : 0;
   const labelHeight = config.axes.show && config.axes.x_labels ? CANVAS_LABEL_HEIGHT : 0;
   const gridWidth = Math.max(160, width - labelWidth);
   const reservesValues = config.tiles.show_values || config.tiles.show_value_toggle;
@@ -184,11 +199,69 @@ export function estimateCanvasHeight(config: NormalizedConfig, width = REFERENCE
     minCell,
     Math.min(
       maxCell,
-      Math.floor((gridWidth - Math.max(0, cols - 1) * CANVAS_GAP) / cols),
+      Math.floor((gridWidth - Math.max(0, cols - 1) * gap) / cols),
     ),
   );
 
-  return labelHeight + rows * cell + Math.max(0, rows - 1) * CANVAS_GAP;
+  return labelHeight + rows * cell + Math.max(0, rows - 1) * gap;
+}
+
+export function estimateGridRows(config: NormalizedConfig, now: Date): number {
+  const count = Math.max(1, estimateCellCount(config, now));
+  const cols = columnsForInterval(config.bucket.interval, count);
+  if (config.bucket.interval !== "hour") {
+    return Math.ceil(count / cols);
+  }
+
+  return countHourlyGridRows(calculateRange(config.range, now));
+}
+
+export function countHourlyGridRows(range: DateRange): number {
+  const first = range.start;
+  const last = new Date(range.end.getTime() - 1);
+  const firstDay = localCalendarDayTimestamp(first);
+  const lastDay = localCalendarDayTimestamp(last);
+  const calendarSpan = Math.max(1, Math.floor((lastDay - firstDay) / DAY_MS) + 1);
+  const estimatedHours = Math.ceil((range.end.getTime() - range.start.getTime()) / HOUR_MS) + 1;
+  if (estimatedHours > MAX_EXACT_HOURLY_ROW_SCAN) {
+    return calendarSpan;
+  }
+
+  const cursor = new Date(range.start);
+  cursor.setMilliseconds(0);
+  cursor.setSeconds(0);
+  cursor.setMinutes(0);
+  let previousDay = "";
+  let rows = 0;
+
+  while (cursor < range.end) {
+    const next = cursor.getTime() + HOUR_MS;
+    if (next > range.start.getTime()) {
+      const day = `${cursor.getFullYear()}-${cursor.getMonth()}-${cursor.getDate()}`;
+      if (day !== previousDay) {
+        previousDay = day;
+        rows += 1;
+      }
+    }
+    cursor.setTime(next);
+  }
+
+  return Math.max(1, rows);
+}
+
+function localCalendarDayTimestamp(date: Date): number {
+  const day = new Date(0);
+  day.setUTCFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+  day.setUTCHours(0, 0, 0, 0);
+  return day.getTime();
+}
+
+export function rowLabelWidthForInterval(interval: BucketInterval): number {
+  return interval === "5minute" ? CANVAS_FIVE_MINUTE_LABEL_WIDTH : CANVAS_LABEL_WIDTH;
+}
+
+export function canvasGapForInterval(interval: BucketInterval): number {
+  return interval === "5minute" ? CANVAS_FIVE_MINUTE_GAP : CANVAS_GAP;
 }
 
 function estimateNavigationHeight(config: NormalizedConfig): number {

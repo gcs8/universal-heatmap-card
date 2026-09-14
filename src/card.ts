@@ -11,10 +11,12 @@ import {
   updateEditorEntityName,
 } from "./editor-form";
 import {
+  canvasGapForInterval,
   columnsForInterval,
   estimateCardChromeHeight,
   estimateMasonryCardSize,
   placeBucketsOnGrid,
+  rowLabelWidthForInterval,
   utcOffsetLabel,
   type GridPlacement,
   estimateSectionGridRows,
@@ -24,6 +26,12 @@ import {
   SECTION_MIN_ROWS,
 } from "./layout";
 import { buildScale, colorForValue, formatValue, legendGradient } from "./scale";
+import {
+  axisLabelsForInterval,
+  fiveMinuteElapsedTicks,
+  formatBucketDate,
+  formatRowStart,
+} from "./time-labels";
 import {
   CARD_NAME,
   CARD_TAG,
@@ -358,7 +366,7 @@ export class UniversalHeatmapCard extends LitElement {
       return 6;
     }
 
-    return estimateSectionGridRows(config, this._layoutState());
+    return estimateSectionGridRows(config, this._layoutState(), new Date());
   }
 
   private _estimatedMasonryRows(): number {
@@ -367,7 +375,7 @@ export class UniversalHeatmapCard extends LitElement {
       return 6;
     }
 
-    return estimateMasonryCardSize(config, this._layoutState());
+    return estimateMasonryCardSize(config, this._layoutState(), new Date());
   }
 
   private _layoutState() {
@@ -715,8 +723,8 @@ export class UniversalHeatmapCard extends LitElement {
     const cols = columnsForInterval(interval, count);
     const placement = placeBucketsOnGrid(this._buckets, interval, cols);
     this._placement = placement;
-    const gap = 3;
-    const labelWidth = this._shouldShowRowLabels() ? 58 : 0;
+    const gap = canvasGapForInterval(interval);
+    const labelWidth = this._shouldShowRowLabels() ? rowLabelWidthForInterval(interval) : 0;
     const labelHeight = this._shouldShowXAxisLabels() ? 18 : 0;
     const gridWidth = Math.max(160, width - labelWidth);
     const rows = placement.rows;
@@ -935,7 +943,12 @@ export class UniversalHeatmapCard extends LitElement {
           continue;
         }
         const y = layout.gridY + row * (layout.cell + layout.gap) + layout.cell / 2;
-        ctx.fillText(this._rowLabel(bucket.start), layout.gridX - 8, y);
+        ctx.fillText(
+          this._rowLabel(bucket.start),
+          layout.gridX - 8,
+          y,
+          Math.max(1, layout.gridX - 12),
+        );
       }
 
       ctx.beginPath();
@@ -1104,42 +1117,16 @@ export class UniversalHeatmapCard extends LitElement {
   }
 
   private _formatDate(date: Date): string {
-    return new Intl.DateTimeFormat(this.hass?.locale?.language, {
-      month: "short",
-      day: "numeric",
-      hour: this._normalized?.bucket.interval === "hour" ? "numeric" : undefined,
-    }).format(date);
+    const interval = this._normalized?.bucket.interval ?? "day";
+    return formatBucketDate(date, interval, this.hass?.locale?.language);
   }
 
   private _xAxisLabel(): string {
-    switch (this._normalized?.bucket.interval) {
-      case "5minute":
-      case "hour":
-        return "time of day";
-      case "day":
-        return "day of week";
-      case "week":
-        return "week";
-      case "month":
-        return "month";
-      default:
-        return "bucket";
-    }
+    return axisLabelsForInterval(this._normalized?.bucket.interval).x;
   }
 
   private _yAxisLabel(): string {
-    switch (this._normalized?.bucket.interval) {
-      case "5minute":
-      case "hour":
-        return "date";
-      case "day":
-        return "week row";
-      case "week":
-      case "month":
-        return "period row";
-      default:
-        return "row";
-    }
+    return axisLabelsForInterval(this._normalized?.bucket.interval).y;
   }
 
   private _colorAxisLabel(): string {
@@ -1197,7 +1184,7 @@ export class UniversalHeatmapCard extends LitElement {
       return this._timeTicks([0, 6, 12, 18, 23]);
     }
     if (interval === "5minute") {
-      return this._timeTicks([0, 12, 24, 36, 47]);
+      return fiveMinuteElapsedTicks();
     }
     if (interval === "day") {
       return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((label, col) => ({
@@ -1263,12 +1250,8 @@ export class UniversalHeatmapCard extends LitElement {
   }
 
   private _rowLabel(date: Date): string {
-    const interval = this._normalized?.bucket.interval;
-    const options: Intl.DateTimeFormatOptions =
-      interval === "month"
-        ? { year: "2-digit" }
-        : { month: "short", day: "numeric" };
-    return new Intl.DateTimeFormat(this.hass?.locale?.language, options).format(date);
+    const interval = this._normalized?.bucket.interval ?? "day";
+    return formatRowStart(date, interval, this.hass?.locale?.language);
   }
 
   static override styles = css`

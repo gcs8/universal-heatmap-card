@@ -13,6 +13,7 @@ import { normalizeMaxConcurrent } from "./data/request-queue";
 const DEFAULT_MAX_CELLS = 5000;
 const DEFAULT_RAW_HISTORY_HOURS = 24;
 const DEFAULT_REFRESH_INTERVAL = 300;
+const DATE_ONLY_RANGE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 export function normalizeConfig(
   config: HeatmapCardConfig,
@@ -169,11 +170,11 @@ function resolveEntityScale(scale: ScaleConfig | undefined): ScaleConfig | undef
 
 export function calculateRange(range: NormalizedConfig["range"], now = new Date()): DateRange {
   const dayAligned = range.align === "day" && !range.end;
-  const end = range.end ? new Date(range.end) : dayAligned ? startOfNextLocalDay(now) : now;
+  const end = range.end ? parseRangeDate(range.end) : dayAligned ? startOfNextLocalDay(now) : now;
   let start: Date;
 
   if (range.start) {
-    start = new Date(range.start);
+    start = parseRangeDate(range.start);
   } else if (typeof range.hours === "number") {
     // Day-aligned windows count local wall-clock hours (like subtractLocalDays)
     // so the window still starts at local midnight on 23- and 25-hour DST days.
@@ -193,6 +194,29 @@ export function calculateRange(range: NormalizedConfig["range"], now = new Date(
   }
 
   return { start, end };
+}
+
+function parseRangeDate(value: string): Date {
+  const dateOnly = DATE_ONLY_RANGE_PATTERN.exec(value);
+  if (!dateOnly) {
+    return new Date(value);
+  }
+
+  const [, year = "0", month = "1", day = "1"] = dateOnly;
+  const expectedYear = Number(year);
+  const expectedMonth = Number(month) - 1;
+  const expectedDay = Number(day);
+  const result = new Date(0);
+  result.setFullYear(expectedYear, expectedMonth, expectedDay);
+  result.setHours(0, 0, 0, 0);
+  if (
+    result.getFullYear() !== expectedYear ||
+    result.getMonth() !== expectedMonth ||
+    result.getDate() !== expectedDay
+  ) {
+    return new Date(Number.NaN);
+  }
+  return result;
 }
 
 function startOfNextLocalDay(date: Date): Date {

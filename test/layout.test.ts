@@ -1,16 +1,32 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { normalizeConfig } from "../src/config";
+import { calculateRange, normalizeConfig } from "../src/config";
+import { generateBucketWindows } from "../src/data/buckets";
 import {
+  canvasGapForInterval,
+  countHourlyGridRows,
   estimateCanvasHeight,
+  estimateGridRows,
   estimateMasonryCardSize,
   estimateSectionGridRows,
   placeBucketsOnGrid,
+  rowLabelWidthForInterval,
   sectionRowsForHeight,
   sectionSpanHeight,
   utcOffsetLabel,
 } from "../src/layout";
 
 describe("sections layout estimates", () => {
+  it("reserves a wider gutter for dated 5-minute row start labels", () => {
+    expect(rowLabelWidthForInterval("5minute")).toBeGreaterThanOrEqual(120);
+    expect(rowLabelWidthForInterval("hour")).toBe(58);
+    expect(canvasGapForInterval("5minute")).toBe(2);
+    expect(
+      rowLabelWidthForInterval("5minute") +
+        48 * 7 +
+        47 * canvasGapForInterval("5minute"),
+    ).toBeLessThanOrEqual(560);
+  });
+
   it("uses Home Assistant's documented section row math", () => {
     expect(sectionSpanHeight(1)).toBe(56);
     expect(sectionSpanHeight(5)).toBe(312);
@@ -108,6 +124,79 @@ describe("hour grid placement across DST transitions (America/New_York)", () => 
       start: new Date(startMs + index * 3_600_000),
     }));
   }
+
+  it("estimates the same two rows rendered by a rolling 24-hour window crossing midnight", () => {
+    const now = new Date(2026, 4, 2, 12, 0, 0, 0);
+    const config = normalizeConfig({
+      entity: "sensor.room_temperature",
+      range: { hours: 24, align: "rolling" },
+      bucket: { interval: "hour", value: "mean" },
+    });
+    const windows = generateBucketWindows(calculateRange(config.range, now), "hour");
+    const rendered = placeBucketsOnGrid(windows, "hour");
+
+    expect(rendered.rows).toBe(2);
+    expect(estimateGridRows(config, now)).toBe(rendered.rows);
+    expect(estimateCanvasHeight(config, 560, now)).toBe(57);
+  });
+
+  it("counts hourly calendar rows without materializing every bucket", () => {
+    const range = calculateRange({
+      start: "1900-01-01",
+      end: "2100-01-01",
+      align: "rolling",
+    });
+
+    expect(countHourlyGridRows(range)).toBe(73_049);
+  });
+
+  it("counts years below 100 without Date.UTC's 1900 offset", () => {
+    const range = calculateRange({
+      start: "0099-12-31",
+      end: "0100-01-02",
+      align: "rolling",
+    });
+
+    expect(countHourlyGridRows(range)).toBe(2);
+  });
+
+  it("matches rendered rows across representative local time-zone transitions", () => {
+    const previousTz = process.env.TZ;
+    const cases = [
+      { tz: "America/New_York", start: "2026-03-07T12:34:00", end: "2026-03-10T07:11:00" },
+      { tz: "Europe/Berlin", start: "2026-10-24T12:34:00", end: "2026-10-27T07:11:00" },
+      { tz: "Asia/Kathmandu", start: "2026-05-01T23:59:00", end: "2026-05-02T00:01:00" },
+      { tz: "Pacific/Apia", start: "2011-12-28T12:34:00", end: "2012-01-02T07:11:00" },
+    ];
+
+    try {
+      for (const { tz, start, end } of cases) {
+        process.env.TZ = tz;
+        const range = calculateRange({ start, end, align: "rolling" });
+        const windows = generateBucketWindows(range, "hour");
+        const rendered = placeBucketsOnGrid(windows, "hour");
+        expect(countHourlyGridRows(range), tz).toBe(rendered.rows);
+      }
+    } finally {
+      process.env.TZ = previousTz;
+    }
+  });
+
+  it("estimates the same single row rendered by a 25-hour fall-back day", () => {
+    const now = new Date(2026, 10, 1, 12, 0, 0, 0);
+    const config = normalizeConfig({
+      entity: "sensor.room_temperature",
+      range: { start: "2026-11-01", end: "2026-11-02", align: "rolling" },
+      bucket: { interval: "hour", value: "mean" },
+    });
+    const windows = generateBucketWindows(calculateRange(config.range, now), "hour");
+    const rendered = placeBucketsOnGrid(windows, "hour");
+
+    expect(windows).toHaveLength(25);
+    expect(rendered.rows).toBe(1);
+    expect(estimateGridRows(config, now)).toBe(rendered.rows);
+    expect(estimateCanvasHeight(config, 560, now)).toBe(36);
+  });
 
   it("leaves the nonexistent spring-forward 2am column blank", () => {
     const placement = placeBucketsOnGrid(hourBuckets("2026-03-08T05:00:00Z", 23), "hour");
