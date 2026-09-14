@@ -194,6 +194,109 @@ describe("normalizeConfig", () => {
     expect(config.scale.max).toBeUndefined();
   });
 
+  it("resolves a per-entity scale preset into stops, unit and bounds", () => {
+    const config = normalizeConfig(
+      {
+        scale: { preset: "temperature" },
+        entities: [
+          { entity: "sensor.room_temperature" },
+          { entity: "sensor.room_humidity", scale: { preset: "humidity" } },
+        ],
+      },
+      hass,
+    );
+
+    // card.ts merges the card scale under the active entity's scale.
+    const merged = { ...config.scale, ...config.entities[1]?.scale };
+
+    expect(merged.preset).toBe("humidity");
+    expect(merged.unit).toBe("%");
+    expect(merged.min).toBe(0);
+    expect(merged.max).toBe(100);
+    expect(merged.stops?.map((stop) => stop.value)).toEqual([0, 50, 75, 100]);
+  });
+
+  it("does not leak the card preset's bounds into an entity preset without them", () => {
+    const config = normalizeConfig(
+      {
+        scale: { preset: "humidity" },
+        entities: [
+          { entity: "sensor.room_humidity" },
+          { entity: "sensor.room_temperature", scale: { preset: "temperature" } },
+        ],
+      },
+      hass,
+    );
+
+    const merged = { ...config.scale, ...config.entities[1]?.scale };
+
+    expect(merged.preset).toBe("temperature");
+    expect(merged.unit).toBe("°");
+    expect(merged.min).toBeUndefined();
+    expect(merged.max).toBeUndefined();
+  });
+
+  it("keeps explicit per-entity scale keys ahead of the entity preset", () => {
+    const config = normalizeConfig(
+      {
+        entities: [
+          {
+            entity: "sensor.room_humidity",
+            scale: { preset: "humidity", max: 80, unit: "rh" },
+          },
+        ],
+      },
+      hass,
+    );
+
+    expect(config.entities[0]?.scale?.max).toBe(80);
+    expect(config.entities[0]?.scale?.unit).toBe("rh");
+    expect(config.entities[0]?.scale?.min).toBe(0);
+  });
+
+  it("infers the preset from the active entity rather than the first", () => {
+    const card = {
+      entities: ["sensor.room_temperature", "sensor.example_power"],
+    };
+
+    const first = normalizeConfig(card, hass, 0);
+    const second = normalizeConfig(card, hass, 1);
+
+    expect(first.scale.preset).toBe("temperature");
+    expect(first.bucket.interval).toBe("day");
+    expect(first.range.days).toBe(30);
+
+    expect(second.scale.preset).toBe("power");
+    expect(second.bucket.interval).toBe("hour");
+    expect(second.bucket.value).toBe("mean");
+    expect(second.range.days).toBe(14);
+    expect(second.scale.unit).toBeUndefined();
+  });
+
+  it("keeps an explicit card scale preset ahead of the active entity's inferred one", () => {
+    const config = normalizeConfig(
+      {
+        scale: { preset: "humidity" },
+        entities: ["sensor.room_temperature", "sensor.example_power"],
+      },
+      hass,
+      1,
+    );
+
+    expect(config.scale.preset).toBe("humidity");
+    expect(config.scale.unit).toBe("%");
+  });
+
+  it("falls back to the first entity when the active index is out of range", () => {
+    const card = {
+      entities: ["sensor.room_temperature", "sensor.example_power"],
+    };
+
+    expect(normalizeConfig(card, hass, 7).scale.preset).toBe("temperature");
+    expect(normalizeConfig(card, hass, -1).scale.preset).toBe("temperature");
+    expect(normalizeConfig(card, hass).scale.preset).toBe("temperature");
+  });
+
   it("estimates hourly cells", () => {
     const config = normalizeConfig({
       entity: "sensor.room_temperature",
