@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { calculateRange, normalizeConfig } from "../src/config";
 import { generateBucketWindows } from "../src/data/buckets";
 import {
+  countHourlyGridRows,
   estimateCanvasHeight,
   estimateGridRows,
   estimateMasonryCardSize,
@@ -15,7 +16,7 @@ import {
 
 describe("sections layout estimates", () => {
   it("reserves a wider gutter for dated 5-minute row start labels", () => {
-    expect(rowLabelWidthForInterval("5minute")).toBe(82);
+    expect(rowLabelWidthForInterval("5minute")).toBeGreaterThanOrEqual(120);
     expect(rowLabelWidthForInterval("hour")).toBe(58);
   });
 
@@ -130,6 +131,16 @@ describe("hour grid placement across DST transitions (America/New_York)", () => 
     expect(rendered.rows).toBe(2);
     expect(estimateGridRows(config, now)).toBe(rendered.rows);
     expect(estimateCanvasHeight(config, 560, now)).toBe(57);
+  });
+
+  it("counts hourly calendar rows without materializing every bucket", () => {
+    const range = calculateRange({
+      start: "1900-01-01",
+      end: "2100-01-01",
+      align: "rolling",
+    });
+
+    expect(countHourlyGridRows(range)).toBe(73_049);
   });
 
   it("estimates the same single row rendered by a 25-hour fall-back day", () => {

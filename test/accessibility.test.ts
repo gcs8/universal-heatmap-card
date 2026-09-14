@@ -23,6 +23,7 @@ describe("card accessibility affordances", () => {
     expect(cardSource).toContain("return formatBucketDate(");
     expect(cardSource).toContain("return fiveMinuteElapsedTicks()");
     expect(cardSource).toContain("rowLabelWidthForInterval(interval)");
+    expect(cardSource).toContain("layout.gridX - 12");
     expect(cardSource).toContain("axisLabelsForInterval(this._normalized?.bucket.interval).x");
     expect(cardSource).toContain("axisLabelsForInterval(this._normalized?.bucket.interval).y");
     expect(cardSource).toContain("return formatRowStart(");
