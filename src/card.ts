@@ -11,8 +11,12 @@ import {
   updateEditorEntityName,
 } from "./editor-form";
 import {
+  columnsForInterval,
   estimateCardChromeHeight,
   estimateMasonryCardSize,
+  placeBucketsOnGrid,
+  utcOffsetLabel,
+  type GridPlacement,
   estimateSectionGridRows,
   sectionSpanHeight,
   SECTION_DEFAULT_COLUMNS,
@@ -81,6 +85,7 @@ export class UniversalHeatmapCard extends LitElement {
   private _visibilityObserver?: IntersectionObserver;
   private _loadSeq = 0;
   private _renderLayout?: HeatmapRenderLayout;
+  private _placement?: GridPlacement;
   private _cellFormatCache = new Map<string, Intl.NumberFormat>();
 
   setConfig(config: HeatmapCardConfig): void {
@@ -662,22 +667,27 @@ export class UniversalHeatmapCard extends LitElement {
     ctx.clearRect(0, 0, layout.width, layout.height);
     this._drawAxes(ctx, layout);
 
-    this._buckets.forEach((bucket, index) => {
-      const col = index % layout.cols;
-      const row = Math.floor(index / layout.cols);
-      const x = layout.gridX + col * (layout.cell + layout.gap);
-      const y = layout.gridY + row * (layout.cell + layout.gap);
+    for (const cell of this._placement?.cells ?? []) {
+      const bucket = this._buckets[cell.index];
+      if (!bucket) {
+        continue;
+      }
+      // Repeated wall-clock hours (the fall-back 01:00 pair) split their column
+      // instead of overwriting each other, so both logical cells stay visible.
+      const cellWidth = layout.cell / cell.slots;
+      const x = layout.gridX + cell.col * (layout.cell + layout.gap) + cell.slot * cellWidth;
+      const y = layout.gridY + cell.row * (layout.cell + layout.gap);
       const fill = colorForValue(bucket.value, this._scale!);
       ctx.fillStyle = fill;
-      ctx.fillRect(x, y, layout.cell, layout.cell);
+      ctx.fillRect(x, y, cellWidth, layout.cell);
 
       if (bucket.quality === "carried") {
         ctx.fillStyle = "rgba(255, 255, 255, 0.34)";
-        ctx.fillRect(x, y + layout.cell - 3, layout.cell, 3);
+        ctx.fillRect(x, y + layout.cell - 3, cellWidth, 3);
       }
 
-      this._drawCellValue(ctx, bucket, layout, x, y, fill);
-    });
+      this._drawCellValue(ctx, bucket, layout, x, y, fill, cellWidth);
+    }
 
     this._renderLayout = layout;
     debugLog(this._debug, "draw complete", {
@@ -695,21 +705,14 @@ export class UniversalHeatmapCard extends LitElement {
   private _calculateLayout(width: number, maxHeight?: number): HeatmapRenderLayout {
     const interval = this._normalized?.bucket.interval ?? "day";
     const count = Math.max(1, this._buckets.length);
-    const cols =
-      interval === "hour"
-        ? 24
-        : interval === "5minute"
-          ? 48
-          : interval === "day"
-            ? 7
-            : interval === "month"
-              ? 12
-              : Math.min(12, Math.ceil(Math.sqrt(count * 1.8)));
+    const cols = columnsForInterval(interval, count);
+    const placement = placeBucketsOnGrid(this._buckets, interval, cols);
+    this._placement = placement;
     const gap = 3;
     const labelWidth = this._shouldShowRowLabels() ? 58 : 0;
     const labelHeight = this._shouldShowXAxisLabels() ? 18 : 0;
     const gridWidth = Math.max(160, width - labelWidth);
-    const rows = Math.ceil(count / cols);
+    const rows = placement.rows;
     const showValues = this._shouldReserveForTileValues();
     const minCell = 7;
     const preferredMinCell = showValues ? 14 : minCell;
@@ -748,6 +751,7 @@ export class UniversalHeatmapCard extends LitElement {
     x: number,
     y: number,
     fill: string,
+    cellWidth = layout.cell,
   ): void {
     if (!this._showTileValues() || !this._scale || bucket.value === null) {
       return;
@@ -758,16 +762,16 @@ export class UniversalHeatmapCard extends LitElement {
       return;
     }
 
-    const label = this._formatCellValue(bucket.value, layout.cell);
+    const label = this._formatCellValue(bucket.value, cellWidth);
     if (!label) {
       return;
     }
 
     const textColor = this._cellTextColor(fill);
     const outlineColor = textColor === "#111827" ? "rgba(255, 255, 255, 0.26)" : "rgba(0, 0, 0, 0.32)";
-    const centerX = x + layout.cell / 2;
+    const centerX = x + cellWidth / 2;
     const centerY = y + layout.cell / 2 + 0.5;
-    const maxWidth = Math.max(4, layout.cell - 2);
+    const maxWidth = Math.max(4, cellWidth - 2);
 
     ctx.save();
     ctx.font = `600 ${fontSize}px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
@@ -919,7 +923,7 @@ export class UniversalHeatmapCard extends LitElement {
       ctx.textAlign = "right";
       ctx.textBaseline = "middle";
       for (let row = 0; row < layout.rows; row += 1) {
-        const bucket = this._buckets[row * layout.cols];
+        const bucket = this._firstBucketInRow(row);
         if (!bucket) {
           continue;
         }
@@ -956,15 +960,26 @@ export class UniversalHeatmapCard extends LitElement {
     }
     const col = Math.floor((x - this._renderLayout.gridX) / stride);
     const row = Math.floor((y - this._renderLayout.gridY) / stride);
-    const index = row * this._renderLayout.cols + col;
-    const bucket = this._buckets[index];
+    const columnCells = (this._placement?.cells ?? []).filter(
+      (candidate) => candidate.row === row && candidate.col === col,
+    );
+    const slots = columnCells[0]?.slots ?? 1;
+    const withinColumn = x - this._renderLayout.gridX - col * stride;
+    const slot = Math.min(
+      slots - 1,
+      Math.max(0, Math.floor((withinColumn / this._renderLayout.cell) * slots)),
+    );
+    const cell = columnCells.find((candidate) => candidate.slot === slot) ?? columnCells[0];
+    const bucket = cell ? this._buckets[cell.index] : undefined;
 
-    if (!bucket) {
+    if (!cell || !bucket) {
       this._tooltip = undefined;
       return;
     }
 
-    const label = `${this._formatDate(bucket.start)} - ${this._formatDate(bucket.end)}: ${formatValue(
+    // Repeated DST hours share a column, so name the offset that tells them apart.
+    const offset = cell.slots > 1 ? ` (${utcOffsetLabel(bucket.start)})` : "";
+    const label = `${this._formatDate(bucket.start)} - ${this._formatDate(bucket.end)}${offset}: ${formatValue(
       bucket.value,
       this._scale,
       this.hass?.locale?.language,
@@ -1205,7 +1220,7 @@ export class UniversalHeatmapCard extends LitElement {
     align: CanvasTextAlign;
   }> {
     return cols.map((col, index) => {
-      const bucket = this._buckets[col];
+      const bucket = this._firstBucketInColumn(col);
       return {
         col,
         label: bucket ? this._formatHour(bucket.start) : String(col),
@@ -1217,6 +1232,16 @@ export class UniversalHeatmapCard extends LitElement {
               : ("center" as const),
       };
     });
+  }
+
+  private _firstBucketInRow(row: number): BucketValue | undefined {
+    const cell = this._placement?.cells.find((candidate) => candidate.row === row);
+    return cell ? this._buckets[cell.index] : undefined;
+  }
+
+  private _firstBucketInColumn(col: number): BucketValue | undefined {
+    const cell = this._placement?.cells.find((candidate) => candidate.col === col);
+    return cell ? this._buckets[cell.index] : undefined;
   }
 
   private _formatHour(date: Date): string {
