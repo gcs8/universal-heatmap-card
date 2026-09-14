@@ -27,6 +27,16 @@ const signedBuckets: BucketValue[] = [-8, -3, 0, 2, 5].map((value, index) => ({
   source: "statistics" as const,
 }));
 
+function bucketsFor(values: number[]): BucketValue[] {
+  return values.map((value, index) => ({
+    start: new Date(2026, 4, 1 + index),
+    end: new Date(2026, 4, 2 + index),
+    value,
+    quality: "ok" as const,
+    source: "statistics" as const,
+  }));
+}
+
 describe("scale", () => {
   it("builds a fixed scale", () => {
     const scale = buildScale(buckets, { min: 0, max: 100, unit: "%" });
@@ -168,5 +178,32 @@ describe("scale", () => {
       expect(scale.max).toBe(5);
       expect(scale.clippedLow).toBe(false);
     }
+  });
+
+  it("keeps the scale ascending when a fixed min sits above every observed value", () => {
+    const scale = buildScale(bucketsFor([10, 12, 15, 20]), { min: 50 });
+
+    expect(scale.min).toBe(50);
+    expect(scale.max).toBeGreaterThan(scale.min);
+    expect(scale.stops.map((stop) => stop.value)).toEqual(
+      [...scale.stops.map((stop) => stop.value)].sort((a, b) => a - b),
+    );
+    expect(scale.stops[0]?.color).toBe("#3a6ea5");
+    expect(scale.clippedLow).toBe(true);
+  });
+
+  it("keeps the scale ascending when a fixed max sits below every observed value", () => {
+    const scale = buildScale(bucketsFor([300, 1200, 3000]), { max: 100 });
+
+    expect(scale.max).toBe(100);
+    expect(scale.min).toBeLessThan(scale.max);
+    expect(scale.stops[0]?.color).toBe("#3a6ea5");
+    expect(scale.clippedHigh).toBe(true);
+  });
+
+  it("keeps distinguishable colors across an inverted-bound scale", () => {
+    const scale = buildScale(bucketsFor([10, 12, 15, 20]), { min: 50 });
+
+    expect(colorForValue(scale.min, scale)).not.toBe(colorForValue(scale.max, scale));
   });
 });
