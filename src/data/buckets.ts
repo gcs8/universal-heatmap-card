@@ -9,6 +9,8 @@ import type {
   StatisticsRow,
 } from "../types";
 
+const HOUR_MS = 3_600_000;
+
 export function statisticsPeriodForInterval(interval: BucketInterval): string {
   return interval;
 }
@@ -55,7 +57,9 @@ export function addInterval(date: Date, interval: BucketInterval): Date {
       next.setMinutes(next.getMinutes() + 5);
       return next;
     case "hour":
-      next.setHours(next.getHours() + 1);
+      // Advance by an absolute elapsed hour so DST transitions keep every
+      // bucket: setHours() would repeat or skip the transition hour.
+      next.setTime(next.getTime() + HOUR_MS);
       return next;
     case "day":
       next.setDate(next.getDate() + 1);

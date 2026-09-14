@@ -1,5 +1,5 @@
 import { estimateCellCount } from "./config";
-import type { NormalizedConfig } from "./types";
+import type { BucketInterval, NormalizedConfig } from "./types";
 
 export const SECTION_GRID_ROW_HEIGHT = 56;
 export const SECTION_GRID_GAP = 8;
@@ -21,6 +21,91 @@ interface CardChromeState {
   loading?: boolean;
   warning?: boolean;
   error?: boolean;
+}
+
+export interface GridCell {
+  /** Index of the bucket this cell renders. */
+  index: number;
+  /** Grid row the cell belongs to (one local calendar day for hourly grids). */
+  row: number;
+  /** Grid column the cell belongs to (wall-clock hour for hourly grids). */
+  col: number;
+  /** Position of this cell inside a column shared by repeated wall-clock hours. */
+  slot: number;
+  /** Number of cells sharing the column, i.e. 2 for a repeated fall-back hour. */
+  slots: number;
+}
+
+export interface GridPlacement {
+  rows: number;
+  cols: number;
+  cells: GridCell[];
+}
+
+/**
+ * Maps buckets onto the render grid.
+ *
+ * Hourly grids use a fixed 24-column wall-clock layout: buckets are grouped by
+ * local calendar day (one row per day) and placed in the column of their local
+ * hour. That keeps 23-hour and 25-hour DST days intact - the nonexistent
+ * spring-forward hour simply leaves its column blank, and the two fall-back
+ * 01:00 hours stay separate logical cells sharing (splitting) one column.
+ * Every other interval keeps the sequential row-major placement.
+ */
+export function placeBucketsOnGrid(
+  buckets: ReadonlyArray<{ start: Date }>,
+  interval: BucketInterval,
+  cols = columnsForInterval(interval, Math.max(1, buckets.length)),
+): GridPlacement {
+  const safeCols = Math.max(1, Math.floor(cols));
+  const cells: GridCell[] = [];
+
+  if (interval !== "hour") {
+    buckets.forEach((_bucket, index) => {
+      cells.push({
+        index,
+        row: Math.floor(index / safeCols),
+        col: index % safeCols,
+        slot: 0,
+        slots: 1,
+      });
+    });
+    return { rows: Math.max(1, Math.ceil(buckets.length / safeCols)), cols: safeCols, cells };
+  }
+
+  const slotCounts = new Map<number, number>();
+  let row = -1;
+  let dayKey = "";
+
+  buckets.forEach((bucket, index) => {
+    const start = bucket.start;
+    const key = `${start.getFullYear()}-${start.getMonth()}-${start.getDate()}`;
+    if (key !== dayKey) {
+      dayKey = key;
+      row += 1;
+    }
+    const col = Math.min(safeCols - 1, Math.max(0, start.getHours()));
+    const slotKey = row * safeCols + col;
+    const slot = slotCounts.get(slotKey) ?? 0;
+    slotCounts.set(slotKey, slot + 1);
+    cells.push({ index, row, col, slot, slots: 1 });
+  });
+
+  for (const cell of cells) {
+    cell.slots = slotCounts.get(cell.row * safeCols + cell.col) ?? 1;
+  }
+
+  return { rows: Math.max(1, row + 1), cols: safeCols, cells };
+}
+
+/** Formats a date's local UTC offset, used to disambiguate repeated DST hours. */
+export function utcOffsetLabel(date: Date): string {
+  const offsetMinutes = -date.getTimezoneOffset();
+  const sign = offsetMinutes < 0 ? "-" : "+";
+  const absolute = Math.abs(offsetMinutes);
+  const hours = String(Math.floor(absolute / 60)).padStart(2, "0");
+  const minutes = String(absolute % 60).padStart(2, "0");
+  return `UTC${sign}${hours}:${minutes}`;
 }
 
 export function sectionSpanHeight(rows: number): number {
@@ -122,7 +207,7 @@ function estimateNavigationHeight(config: NormalizedConfig): number {
   }
 }
 
-function columnsForInterval(interval: NormalizedConfig["bucket"]["interval"], count: number): number {
+export function columnsForInterval(interval: NormalizedConfig["bucket"]["interval"], count: number): number {
   if (interval === "hour") {
     return 24;
   }
