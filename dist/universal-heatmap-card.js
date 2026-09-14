@@ -995,7 +995,7 @@ function et(e, t) {
 function tt(e, t) {
 	let n = new Date(e);
 	switch (t) {
-		case "5minute": return n.setTime(n.getTime() + 3e5), n;
+		case "5minute": return n.setTime(n.getTime() + 5 * 6e4), n;
 		case "hour": return n.setTime(n.getTime() + Qe), n;
 		case "day": return n.setDate(n.getDate() + 1), n;
 		case "week": return n.setDate(n.getDate() + 7), n;
@@ -2066,7 +2066,7 @@ var Qt = "universal-heatmap-card", $t = "Universal Heatmap Card", en = "0.1.3", 
 		});
 	}
 	_isCacheFresh(e, t) {
-		return t <= 0 || Date.now() - e.loadedAt < t * 1e3;
+		return t <= 0 ? !0 : Date.now() - e.loadedAt < t * 1e3;
 	}
 	_drawHeatmap() {
 		let e = this.renderRoot.querySelector("canvas");
@@ -2220,7 +2220,7 @@ var Qt = "universal-heatmap-card", $t = "Universal Heatmap Card", en = "0.1.3", 
 		this._openActiveEntityDetails();
 	}
 	_handleCanvasKeyDown(e) {
-		(e.key === "Enter" || e.key === " ") && (e.preventDefault(), this._openActiveEntityDetails());
+		e.key !== "Enter" && e.key !== " " || (e.preventDefault(), this._openActiveEntityDetails());
 	}
 	_openActiveEntityDetails() {
 		let e = this._normalized?.entities[this._activeIndex];
