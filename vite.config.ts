@@ -16,10 +16,4 @@ export default defineConfig({
       },
     },
   },
-  test: {
-    environment: "node",
-    coverage: {
-      reporter: ["text", "html"],
-    },
-  },
 });
