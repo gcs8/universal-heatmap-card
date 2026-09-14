@@ -1068,20 +1068,36 @@ async function di(s, e, t) {
       warning: `This heatmap would render ${i.toLocaleString()} cells. Raise data.max_cells to load it.`
     };
   const a = e.data.provider, o = ke(e.bucket.value) !== null;
+  let l;
   if ((a === "auto" || a === "statistics") && o)
     try {
-      const l = await mi(s, e, t, n);
-      if (l.some((c) => c.value !== null) || a === "statistics")
-        return { source: "statistics", buckets: l };
-    } catch (l) {
+      const c = await mi(s, e, t, n);
+      if (c.some((u) => u.value !== null) || a === "statistics")
+        return { source: "statistics", buckets: c };
+      l = `No ${e.bucket.value} statistics were available for ${t.entity}.`;
+    } catch (c) {
       if (a === "statistics")
         return {
           source: "statistics",
           buckets: k(n, "statistics"),
-          warning: ft(l, "Statistics query failed.")
+          warning: ft(c, "Statistics query failed.")
         };
+      l = "Statistics query failed.";
     }
-  return a === "auto" || a === "history" ? pi(s, e, t, n) : {
+  if (a === "auto" || a === "history") {
+    const c = await pi(
+      s,
+      e,
+      t,
+      n,
+      l !== void 0
+    );
+    return l ? {
+      ...c,
+      warning: c.warning ? `${l} ${c.warning}` : `${l} Showing raw history instead.`
+    } : c;
+  }
+  return {
     source: "current",
     buckets: k(n, "current"),
     warning: "No supported data provider is available for this bucket value yet."
@@ -1101,37 +1117,37 @@ async function mi(s, e, t, i) {
   }))[t.entity] ?? [];
   return li(i, o, e.bucket.value, e.missing.mode);
 }
-async function pi(s, e, t, i) {
-  const r = K(e.range), n = (r.end.getTime() - r.start.getTime()) / 36e5;
+async function pi(s, e, t, i, r = !1) {
+  const n = K(e.range), a = (n.end.getTime() - n.start.getTime()) / 36e5;
   if (!s.callApi)
     return {
       source: "history",
       buckets: k(i, "history"),
       warning: "This Home Assistant object does not expose callApi for history fallback."
     };
-  if (n > e.data.raw_history_hours)
+  if (a > e.data.raw_history_hours)
     return {
       source: "history",
       buckets: k(i, "history"),
       warning: `Raw history fallback is capped at ${e.data.raw_history_hours} hours by default. Use recorder statistics or reduce range.`
     };
   try {
-    const a = new URLSearchParams({
-      end_time: r.end.toISOString(),
+    const o = new URLSearchParams({
+      end_time: n.end.toISOString(),
       filter_entity_id: t.entity
-    }), l = (await s.callApi(
+    }), c = (await s.callApi(
       "GET",
-      `history/period/${r.start.toISOString()}?${a.toString()}&minimal_response&no_attributes`
+      `history/period/${n.start.toISOString()}?${o.toString()}&minimal_response&no_attributes`
     )).flat();
     return {
       source: "history",
-      buckets: ci(i, l, e.bucket.value, e.missing.mode)
+      buckets: ci(i, c, e.bucket.value, e.missing.mode)
     };
-  } catch (a) {
+  } catch (o) {
     return {
       source: "history",
       buckets: k(i, "history"),
-      warning: ft(a, "History fallback failed.")
+      warning: r ? "History fallback failed." : ft(o, "History fallback failed.")
     };
   }
 }
