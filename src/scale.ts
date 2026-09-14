@@ -118,15 +118,42 @@ function resolveBounds(
   if (max > min) {
     return { min, max };
   }
+
   if (!maxFixed) {
-    return { min, max: min + 1 };
+    return resolveWidenedBounds(min, true);
   }
   if (!minFixed) {
-    return { min: max - 1, max };
+    return resolveWidenedBounds(max, false);
   }
-  // Both bounds fixed and not ascending: widen upward rather than render an
-  // inverted scale.
-  return { min, max: min + 1 };
+
+  // Both bounds fixed and not ascending: keep min fixed, widen max upward.
+  return resolveWidenedBounds(min, true);
+}
+
+function resolveWidenedBounds(
+  bound: number,
+  preferHigher: boolean,
+): { min: number; max: number } {
+  const magnitude = Math.abs(bound);
+  const delta = magnitude * Number.EPSILON * 4;
+  // Preserve a useful gradient at zero and subnormal magnitudes. A single
+  // Number.MIN_VALUE step has no representable midpoint for relative stops.
+  const widenAmount = delta > 0 && Number.isFinite(delta) ? delta : 1;
+  const higher = bound + widenAmount;
+  const lower = bound - widenAmount;
+
+  if (preferHigher && Number.isFinite(higher) && higher > bound) {
+    return { min: bound, max: higher };
+  }
+  if (Number.isFinite(lower) && lower < bound) {
+    return { min: lower, max: bound };
+  }
+  if (Number.isFinite(higher) && higher > bound) {
+    return { min: bound, max: higher };
+  }
+
+  // A finite bound always has a finite neighbour in at least one direction.
+  return { min: bound - 1, max: bound + 1 };
 }
 
 function normalizeStops(

@@ -1,1710 +1,1843 @@
+//#region node_modules/@lit/reactive-element/css-tag.js
 /**
- * @license
- * Copyright 2019 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-const J = globalThis, we = J.ShadowRoot && (J.ShadyCSS === void 0 || J.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, $e = Symbol(), qe = /* @__PURE__ */ new WeakMap();
-let ot = class {
-  constructor(e, t, i) {
-    if (this._$cssResult$ = !0, i !== $e) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
-    this.cssText = e, this.t = t;
-  }
-  get styleSheet() {
-    let e = this.o;
-    const t = this.t;
-    if (we && e === void 0) {
-      const i = t !== void 0 && t.length === 1;
-      i && (e = qe.get(t)), e === void 0 && ((this.o = e = new CSSStyleSheet()).replaceSync(this.cssText), i && qe.set(t, e));
-    }
-    return e;
-  }
-  toString() {
-    return this.cssText;
-  }
+* @license
+* Copyright 2019 Google LLC
+* SPDX-License-Identifier: BSD-3-Clause
+*/
+var e = globalThis, t = e.ShadowRoot && (e.ShadyCSS === void 0 || e.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, n = Symbol(), r = /* @__PURE__ */ new WeakMap(), i = class {
+	constructor(e, t, r) {
+		if (this._$cssResult$ = !0, r !== n) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+		this.cssText = e, this.t = t;
+	}
+	get styleSheet() {
+		let e = this.o, n = this.t;
+		if (t && e === void 0) {
+			let t = n !== void 0 && n.length === 1;
+			t && (e = r.get(n)), e === void 0 && ((this.o = e = new CSSStyleSheet()).replaceSync(this.cssText), t && r.set(n, e));
+		}
+		return e;
+	}
+	toString() {
+		return this.cssText;
+	}
+}, a = (e) => new i(typeof e == "string" ? e : e + "", void 0, n), o = (e, ...t) => new i(e.length === 1 ? e[0] : t.reduce((t, n, r) => t + ((e) => {
+	if (!0 === e._$cssResult$) return e.cssText;
+	if (typeof e == "number") return e;
+	throw Error("Value passed to 'css' function must be a 'css' function result: " + e + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
+})(n) + e[r + 1], e[0]), e, n), s = (n, r) => {
+	if (t) n.adoptedStyleSheets = r.map((e) => e instanceof CSSStyleSheet ? e : e.styleSheet);
+	else for (let t of r) {
+		let r = document.createElement("style"), i = e.litNonce;
+		i !== void 0 && r.setAttribute("nonce", i), r.textContent = t.cssText, n.appendChild(r);
+	}
+}, c = t ? (e) => e : (e) => e instanceof CSSStyleSheet ? ((e) => {
+	let t = "";
+	for (let n of e.cssRules) t += n.cssText;
+	return a(t);
+})(e) : e, { is: l, defineProperty: u, getOwnPropertyDescriptor: d, getOwnPropertyNames: f, getOwnPropertySymbols: p, getPrototypeOf: m } = Object, h = globalThis, ee = h.trustedTypes, te = ee ? ee.emptyScript : "", ne = h.reactiveElementPolyfillSupport, g = (e, t) => e, re = {
+	toAttribute(e, t) {
+		/**
+		* @license
+		* Copyright 2017 Google LLC
+		* SPDX-License-Identifier: BSD-3-Clause
+		*/
+		switch (t) {
+			case Boolean:
+				e = e ? te : null;
+				break;
+			case Object:
+			case Array: e = e == null ? e : JSON.stringify(e);
+		}
+		return e;
+	},
+	fromAttribute(e, t) {
+		let n = e;
+		switch (t) {
+			case Boolean:
+				n = e !== null;
+				break;
+			case Number:
+				n = e === null ? null : Number(e);
+				break;
+			case Object:
+			case Array: try {
+				n = JSON.parse(e);
+			} catch {
+				n = null;
+			}
+		}
+		return n;
+	}
+}, ie = (e, t) => !l(e, t), ae = {
+	attribute: !0,
+	type: String,
+	converter: re,
+	reflect: !1,
+	useDefault: !1,
+	hasChanged: ie
 };
-const Ct = (s) => new ot(typeof s == "string" ? s : s + "", void 0, $e), lt = (s, ...e) => {
-  const t = s.length === 1 ? s[0] : e.reduce((i, r, n) => i + ((a) => {
-    if (a._$cssResult$ === !0) return a.cssText;
-    if (typeof a == "number") return a;
-    throw Error("Value passed to 'css' function must be a 'css' function result: " + a + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
-  })(r) + s[n + 1], s[0]);
-  return new ot(t, s, $e);
-}, Nt = (s, e) => {
-  if (we) s.adoptedStyleSheets = e.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
-  else for (const t of e) {
-    const i = document.createElement("style"), r = J.litNonce;
-    r !== void 0 && i.setAttribute("nonce", r), i.textContent = t.cssText, s.appendChild(i);
-  }
-}, Ve = we ? (s) => s : (s) => s instanceof CSSStyleSheet ? ((e) => {
-  let t = "";
-  for (const i of e.cssRules) t += i.cssText;
-  return Ct(t);
-})(s) : s;
+Symbol.metadata ??= Symbol("metadata"), h.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
+var _ = class extends HTMLElement {
+	static addInitializer(e) {
+		this._$Ei(), (this.l ??= []).push(e);
+	}
+	static get observedAttributes() {
+		return this.finalize(), this._$Eh && [...this._$Eh.keys()];
+	}
+	static createProperty(e, t = ae) {
+		if (t.state && (t.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((t = Object.create(t)).wrapped = !0), this.elementProperties.set(e, t), !t.noAccessor) {
+			let n = Symbol(), r = this.getPropertyDescriptor(e, n, t);
+			r !== void 0 && u(this.prototype, e, r);
+		}
+	}
+	static getPropertyDescriptor(e, t, n) {
+		let { get: r, set: i } = d(this.prototype, e) ?? {
+			get() {
+				return this[t];
+			},
+			set(e) {
+				this[t] = e;
+			}
+		};
+		return {
+			get: r,
+			set(t) {
+				let a = r?.call(this);
+				i?.call(this, t), this.requestUpdate(e, a, n);
+			},
+			configurable: !0,
+			enumerable: !0
+		};
+	}
+	static getPropertyOptions(e) {
+		return this.elementProperties.get(e) ?? ae;
+	}
+	static _$Ei() {
+		if (this.hasOwnProperty(g("elementProperties"))) return;
+		let e = m(this);
+		e.finalize(), e.l !== void 0 && (this.l = [...e.l]), this.elementProperties = new Map(e.elementProperties);
+	}
+	static finalize() {
+		if (this.hasOwnProperty(g("finalized"))) return;
+		if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(g("properties"))) {
+			let e = this.properties, t = [...f(e), ...p(e)];
+			for (let n of t) this.createProperty(n, e[n]);
+		}
+		let e = this[Symbol.metadata];
+		if (e !== null) {
+			let t = litPropertyMetadata.get(e);
+			if (t !== void 0) for (let [e, n] of t) this.elementProperties.set(e, n);
+		}
+		this._$Eh = /* @__PURE__ */ new Map();
+		for (let [e, t] of this.elementProperties) {
+			let n = this._$Eu(e, t);
+			n !== void 0 && this._$Eh.set(n, e);
+		}
+		this.elementStyles = this.finalizeStyles(this.styles);
+	}
+	static finalizeStyles(e) {
+		let t = [];
+		if (Array.isArray(e)) {
+			let n = new Set(e.flat(Infinity).reverse());
+			for (let e of n) t.unshift(c(e));
+		} else e !== void 0 && t.push(c(e));
+		return t;
+	}
+	static _$Eu(e, t) {
+		let n = t.attribute;
+		return !1 === n ? void 0 : typeof n == "string" ? n : typeof e == "string" ? e.toLowerCase() : void 0;
+	}
+	constructor() {
+		super(), this._$Ep = void 0, this.isUpdatePending = !1, this.hasUpdated = !1, this._$Em = null, this._$Ev();
+	}
+	_$Ev() {
+		this._$ES = new Promise((e) => this.enableUpdating = e), this._$AL = /* @__PURE__ */ new Map(), this._$E_(), this.requestUpdate(), this.constructor.l?.forEach((e) => e(this));
+	}
+	addController(e) {
+		(this._$EO ??= /* @__PURE__ */ new Set()).add(e), this.renderRoot !== void 0 && this.isConnected && e.hostConnected?.();
+	}
+	removeController(e) {
+		this._$EO?.delete(e);
+	}
+	_$E_() {
+		let e = /* @__PURE__ */ new Map(), t = this.constructor.elementProperties;
+		for (let n of t.keys()) this.hasOwnProperty(n) && (e.set(n, this[n]), delete this[n]);
+		e.size > 0 && (this._$Ep = e);
+	}
+	createRenderRoot() {
+		let e = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
+		return s(e, this.constructor.elementStyles), e;
+	}
+	connectedCallback() {
+		this.renderRoot ??= this.createRenderRoot(), this.enableUpdating(!0), this._$EO?.forEach((e) => e.hostConnected?.());
+	}
+	enableUpdating(e) {}
+	disconnectedCallback() {
+		this._$EO?.forEach((e) => e.hostDisconnected?.());
+	}
+	attributeChangedCallback(e, t, n) {
+		this._$AK(e, n);
+	}
+	_$ET(e, t) {
+		let n = this.constructor.elementProperties.get(e), r = this.constructor._$Eu(e, n);
+		if (r !== void 0 && !0 === n.reflect) {
+			let i = (n.converter?.toAttribute === void 0 ? re : n.converter).toAttribute(t, n.type);
+			this._$Em = e, i == null ? this.removeAttribute(r) : this.setAttribute(r, i), this._$Em = null;
+		}
+	}
+	_$AK(e, t) {
+		let n = this.constructor, r = n._$Eh.get(e);
+		if (r !== void 0 && this._$Em !== r) {
+			let e = n.getPropertyOptions(r), i = typeof e.converter == "function" ? { fromAttribute: e.converter } : e.converter?.fromAttribute === void 0 ? re : e.converter;
+			this._$Em = r;
+			let a = i.fromAttribute(t, e.type);
+			this[r] = a ?? this._$Ej?.get(r) ?? a, this._$Em = null;
+		}
+	}
+	requestUpdate(e, t, n, r = !1, i) {
+		if (e !== void 0) {
+			let a = this.constructor;
+			if (!1 === r && (i = this[e]), n ??= a.getPropertyOptions(e), !((n.hasChanged ?? ie)(i, t) || n.useDefault && n.reflect && i === this._$Ej?.get(e) && !this.hasAttribute(a._$Eu(e, n)))) return;
+			this.C(e, t, n);
+		}
+		!1 === this.isUpdatePending && (this._$ES = this._$EP());
+	}
+	C(e, t, { useDefault: n, reflect: r, wrapped: i }, a) {
+		n && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(e) && (this._$Ej.set(e, a ?? t ?? this[e]), !0 !== i || a !== void 0) || (this._$AL.has(e) || (this.hasUpdated || n || (t = void 0), this._$AL.set(e, t)), !0 === r && this._$Em !== e && (this._$Eq ??= /* @__PURE__ */ new Set()).add(e));
+	}
+	async _$EP() {
+		this.isUpdatePending = !0;
+		try {
+			await this._$ES;
+		} catch (e) {
+			Promise.reject(e);
+		}
+		let e = this.scheduleUpdate();
+		return e != null && await e, !this.isUpdatePending;
+	}
+	scheduleUpdate() {
+		return this.performUpdate();
+	}
+	performUpdate() {
+		if (!this.isUpdatePending) return;
+		if (!this.hasUpdated) {
+			if (this.renderRoot ??= this.createRenderRoot(), this._$Ep) {
+				for (let [e, t] of this._$Ep) this[e] = t;
+				this._$Ep = void 0;
+			}
+			let e = this.constructor.elementProperties;
+			if (e.size > 0) for (let [t, n] of e) {
+				let { wrapped: e } = n, r = this[t];
+				!0 !== e || this._$AL.has(t) || r === void 0 || this.C(t, void 0, n, r);
+			}
+		}
+		let e = !1, t = this._$AL;
+		try {
+			e = this.shouldUpdate(t), e ? (this.willUpdate(t), this._$EO?.forEach((e) => e.hostUpdate?.()), this.update(t)) : this._$EM();
+		} catch (t) {
+			throw e = !1, this._$EM(), t;
+		}
+		e && this._$AE(t);
+	}
+	willUpdate(e) {}
+	_$AE(e) {
+		this._$EO?.forEach((e) => e.hostUpdated?.()), this.hasUpdated || (this.hasUpdated = !0, this.firstUpdated(e)), this.updated(e);
+	}
+	_$EM() {
+		this._$AL = /* @__PURE__ */ new Map(), this.isUpdatePending = !1;
+	}
+	get updateComplete() {
+		return this.getUpdateComplete();
+	}
+	getUpdateComplete() {
+		return this._$ES;
+	}
+	shouldUpdate(e) {
+		return !0;
+	}
+	update(e) {
+		this._$Eq &&= this._$Eq.forEach((e) => this._$ET(e, this[e])), this._$EM();
+	}
+	updated(e) {}
+	firstUpdated(e) {}
+};
+_.elementStyles = [], _.shadowRootOptions = { mode: "open" }, _[g("elementProperties")] = /* @__PURE__ */ new Map(), _[g("finalized")] = /* @__PURE__ */ new Map(), ne?.({ ReactiveElement: _ }), (h.reactiveElementVersions ??= []).push("2.1.2");
+//#endregion
+//#region node_modules/lit-html/lit-html.js
 /**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-const { is: Tt, defineProperty: Lt, getOwnPropertyDescriptor: Dt, getOwnPropertyNames: It, getOwnPropertySymbols: zt, getPrototypeOf: Rt } = Object, S = globalThis, Be = S.trustedTypes, Ht = Be ? Be.emptyScript : "", le = S.reactiveElementPolyfillSupport, V = (s, e) => s, _e = { toAttribute(s, e) {
-  switch (e) {
-    case Boolean:
-      s = s ? Ht : null;
-      break;
-    case Object:
-    case Array:
-      s = s == null ? s : JSON.stringify(s);
-  }
-  return s;
-}, fromAttribute(s, e) {
-  let t = s;
-  switch (e) {
-    case Boolean:
-      t = s !== null;
-      break;
-    case Number:
-      t = s === null ? null : Number(s);
-      break;
-    case Object:
-    case Array:
-      try {
-        t = JSON.parse(s);
-      } catch {
-        t = null;
-      }
-  }
-  return t;
-} }, ct = (s, e) => !Tt(s, e), We = { attribute: !0, type: String, converter: _e, reflect: !1, useDefault: !1, hasChanged: ct };
-Symbol.metadata ?? (Symbol.metadata = Symbol("metadata")), S.litPropertyMetadata ?? (S.litPropertyMetadata = /* @__PURE__ */ new WeakMap());
-let R = class extends HTMLElement {
-  static addInitializer(e) {
-    this._$Ei(), (this.l ?? (this.l = [])).push(e);
-  }
-  static get observedAttributes() {
-    return this.finalize(), this._$Eh && [...this._$Eh.keys()];
-  }
-  static createProperty(e, t = We) {
-    if (t.state && (t.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((t = Object.create(t)).wrapped = !0), this.elementProperties.set(e, t), !t.noAccessor) {
-      const i = Symbol(), r = this.getPropertyDescriptor(e, i, t);
-      r !== void 0 && Lt(this.prototype, e, r);
-    }
-  }
-  static getPropertyDescriptor(e, t, i) {
-    const { get: r, set: n } = Dt(this.prototype, e) ?? { get() {
-      return this[t];
-    }, set(a) {
-      this[t] = a;
-    } };
-    return { get: r, set(a) {
-      const o = r == null ? void 0 : r.call(this);
-      n == null || n.call(this, a), this.requestUpdate(e, o, i);
-    }, configurable: !0, enumerable: !0 };
-  }
-  static getPropertyOptions(e) {
-    return this.elementProperties.get(e) ?? We;
-  }
-  static _$Ei() {
-    if (this.hasOwnProperty(V("elementProperties"))) return;
-    const e = Rt(this);
-    e.finalize(), e.l !== void 0 && (this.l = [...e.l]), this.elementProperties = new Map(e.elementProperties);
-  }
-  static finalize() {
-    if (this.hasOwnProperty(V("finalized"))) return;
-    if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(V("properties"))) {
-      const t = this.properties, i = [...It(t), ...zt(t)];
-      for (const r of i) this.createProperty(r, t[r]);
-    }
-    const e = this[Symbol.metadata];
-    if (e !== null) {
-      const t = litPropertyMetadata.get(e);
-      if (t !== void 0) for (const [i, r] of t) this.elementProperties.set(i, r);
-    }
-    this._$Eh = /* @__PURE__ */ new Map();
-    for (const [t, i] of this.elementProperties) {
-      const r = this._$Eu(t, i);
-      r !== void 0 && this._$Eh.set(r, t);
-    }
-    this.elementStyles = this.finalizeStyles(this.styles);
-  }
-  static finalizeStyles(e) {
-    const t = [];
-    if (Array.isArray(e)) {
-      const i = new Set(e.flat(1 / 0).reverse());
-      for (const r of i) t.unshift(Ve(r));
-    } else e !== void 0 && t.push(Ve(e));
-    return t;
-  }
-  static _$Eu(e, t) {
-    const i = t.attribute;
-    return i === !1 ? void 0 : typeof i == "string" ? i : typeof e == "string" ? e.toLowerCase() : void 0;
-  }
-  constructor() {
-    super(), this._$Ep = void 0, this.isUpdatePending = !1, this.hasUpdated = !1, this._$Em = null, this._$Ev();
-  }
-  _$Ev() {
-    var e;
-    this._$ES = new Promise((t) => this.enableUpdating = t), this._$AL = /* @__PURE__ */ new Map(), this._$E_(), this.requestUpdate(), (e = this.constructor.l) == null || e.forEach((t) => t(this));
-  }
-  addController(e) {
-    var t;
-    (this._$EO ?? (this._$EO = /* @__PURE__ */ new Set())).add(e), this.renderRoot !== void 0 && this.isConnected && ((t = e.hostConnected) == null || t.call(e));
-  }
-  removeController(e) {
-    var t;
-    (t = this._$EO) == null || t.delete(e);
-  }
-  _$E_() {
-    const e = /* @__PURE__ */ new Map(), t = this.constructor.elementProperties;
-    for (const i of t.keys()) this.hasOwnProperty(i) && (e.set(i, this[i]), delete this[i]);
-    e.size > 0 && (this._$Ep = e);
-  }
-  createRenderRoot() {
-    const e = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
-    return Nt(e, this.constructor.elementStyles), e;
-  }
-  connectedCallback() {
-    var e;
-    this.renderRoot ?? (this.renderRoot = this.createRenderRoot()), this.enableUpdating(!0), (e = this._$EO) == null || e.forEach((t) => {
-      var i;
-      return (i = t.hostConnected) == null ? void 0 : i.call(t);
-    });
-  }
-  enableUpdating(e) {
-  }
-  disconnectedCallback() {
-    var e;
-    (e = this._$EO) == null || e.forEach((t) => {
-      var i;
-      return (i = t.hostDisconnected) == null ? void 0 : i.call(t);
-    });
-  }
-  attributeChangedCallback(e, t, i) {
-    this._$AK(e, i);
-  }
-  _$ET(e, t) {
-    var n;
-    const i = this.constructor.elementProperties.get(e), r = this.constructor._$Eu(e, i);
-    if (r !== void 0 && i.reflect === !0) {
-      const a = (((n = i.converter) == null ? void 0 : n.toAttribute) !== void 0 ? i.converter : _e).toAttribute(t, i.type);
-      this._$Em = e, a == null ? this.removeAttribute(r) : this.setAttribute(r, a), this._$Em = null;
-    }
-  }
-  _$AK(e, t) {
-    var n, a;
-    const i = this.constructor, r = i._$Eh.get(e);
-    if (r !== void 0 && this._$Em !== r) {
-      const o = i.getPropertyOptions(r), l = typeof o.converter == "function" ? { fromAttribute: o.converter } : ((n = o.converter) == null ? void 0 : n.fromAttribute) !== void 0 ? o.converter : _e;
-      this._$Em = r;
-      const c = l.fromAttribute(t, o.type);
-      this[r] = c ?? ((a = this._$Ej) == null ? void 0 : a.get(r)) ?? c, this._$Em = null;
-    }
-  }
-  requestUpdate(e, t, i, r = !1, n) {
-    var a;
-    if (e !== void 0) {
-      const o = this.constructor;
-      if (r === !1 && (n = this[e]), i ?? (i = o.getPropertyOptions(e)), !((i.hasChanged ?? ct)(n, t) || i.useDefault && i.reflect && n === ((a = this._$Ej) == null ? void 0 : a.get(e)) && !this.hasAttribute(o._$Eu(e, i)))) return;
-      this.C(e, t, i);
-    }
-    this.isUpdatePending === !1 && (this._$ES = this._$EP());
-  }
-  C(e, t, { useDefault: i, reflect: r, wrapped: n }, a) {
-    i && !(this._$Ej ?? (this._$Ej = /* @__PURE__ */ new Map())).has(e) && (this._$Ej.set(e, a ?? t ?? this[e]), n !== !0 || a !== void 0) || (this._$AL.has(e) || (this.hasUpdated || i || (t = void 0), this._$AL.set(e, t)), r === !0 && this._$Em !== e && (this._$Eq ?? (this._$Eq = /* @__PURE__ */ new Set())).add(e));
-  }
-  async _$EP() {
-    this.isUpdatePending = !0;
-    try {
-      await this._$ES;
-    } catch (t) {
-      Promise.reject(t);
-    }
-    const e = this.scheduleUpdate();
-    return e != null && await e, !this.isUpdatePending;
-  }
-  scheduleUpdate() {
-    return this.performUpdate();
-  }
-  performUpdate() {
-    var i;
-    if (!this.isUpdatePending) return;
-    if (!this.hasUpdated) {
-      if (this.renderRoot ?? (this.renderRoot = this.createRenderRoot()), this._$Ep) {
-        for (const [n, a] of this._$Ep) this[n] = a;
-        this._$Ep = void 0;
-      }
-      const r = this.constructor.elementProperties;
-      if (r.size > 0) for (const [n, a] of r) {
-        const { wrapped: o } = a, l = this[n];
-        o !== !0 || this._$AL.has(n) || l === void 0 || this.C(n, void 0, a, l);
-      }
-    }
-    let e = !1;
-    const t = this._$AL;
-    try {
-      e = this.shouldUpdate(t), e ? (this.willUpdate(t), (i = this._$EO) == null || i.forEach((r) => {
-        var n;
-        return (n = r.hostUpdate) == null ? void 0 : n.call(r);
-      }), this.update(t)) : this._$EM();
-    } catch (r) {
-      throw e = !1, this._$EM(), r;
-    }
-    e && this._$AE(t);
-  }
-  willUpdate(e) {
-  }
-  _$AE(e) {
-    var t;
-    (t = this._$EO) == null || t.forEach((i) => {
-      var r;
-      return (r = i.hostUpdated) == null ? void 0 : r.call(i);
-    }), this.hasUpdated || (this.hasUpdated = !0, this.firstUpdated(e)), this.updated(e);
-  }
-  _$EM() {
-    this._$AL = /* @__PURE__ */ new Map(), this.isUpdatePending = !1;
-  }
-  get updateComplete() {
-    return this.getUpdateComplete();
-  }
-  getUpdateComplete() {
-    return this._$ES;
-  }
-  shouldUpdate(e) {
-    return !0;
-  }
-  update(e) {
-    this._$Eq && (this._$Eq = this._$Eq.forEach((t) => this._$ET(t, this[t]))), this._$EM();
-  }
-  updated(e) {
-  }
-  firstUpdated(e) {
-  }
+* @license
+* Copyright 2017 Google LLC
+* SPDX-License-Identifier: BSD-3-Clause
+*/
+var v = globalThis, oe = (e) => e, y = v.trustedTypes, se = y ? y.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, ce = "$lit$", b = `lit$${Math.random().toFixed(9).slice(2)}$`, le = "?" + b, ue = `<${le}>`, x = document, S = () => x.createComment(""), C = (e) => e === null || typeof e != "object" && typeof e != "function", w = Array.isArray, de = (e) => w(e) || typeof e?.[Symbol.iterator] == "function", T = "[ 	\n\f\r]", E = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, fe = /-->/g, pe = />/g, D = RegExp(`>|${T}(?:([^\\s"'>=/]+)(${T}*=${T}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g"), me = /'/g, he = /"/g, ge = /^(?:script|style|textarea|title)$/i, O = ((e) => (t, ...n) => ({
+	_$litType$: e,
+	strings: t,
+	values: n
+}))(1), k = Symbol.for("lit-noChange"), A = Symbol.for("lit-nothing"), _e = /* @__PURE__ */ new WeakMap(), j = x.createTreeWalker(x, 129);
+function ve(e, t) {
+	if (!w(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
+	return se === void 0 ? t : se.createHTML(t);
+}
+var ye = (e, t) => {
+	let n = e.length - 1, r = [], i, a = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = E;
+	for (let t = 0; t < n; t++) {
+		let n = e[t], s, c, l = -1, u = 0;
+		for (; u < n.length && (o.lastIndex = u, c = o.exec(n), c !== null);) u = o.lastIndex, o === E ? c[1] === "!--" ? o = fe : c[1] === void 0 ? c[2] === void 0 ? c[3] !== void 0 && (o = D) : (ge.test(c[2]) && (i = RegExp("</" + c[2], "g")), o = D) : o = pe : o === D ? c[0] === ">" ? (o = i ?? E, l = -1) : c[1] === void 0 ? l = -2 : (l = o.lastIndex - c[2].length, s = c[1], o = c[3] === void 0 ? D : c[3] === "\"" ? he : me) : o === he || o === me ? o = D : o === fe || o === pe ? o = E : (o = D, i = void 0);
+		let d = o === D && e[t + 1].startsWith("/>") ? " " : "";
+		a += o === E ? n + ue : l >= 0 ? (r.push(s), n.slice(0, l) + ce + n.slice(l) + b + d) : n + b + (l === -2 ? t : d);
+	}
+	return [ve(e, a + (e[n] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), r];
+}, be = class e {
+	constructor({ strings: t, _$litType$: n }, r) {
+		let i;
+		this.parts = [];
+		let a = 0, o = 0, s = t.length - 1, c = this.parts, [l, u] = ye(t, n);
+		if (this.el = e.createElement(l, r), j.currentNode = this.el.content, n === 2 || n === 3) {
+			let e = this.el.content.firstChild;
+			e.replaceWith(...e.childNodes);
+		}
+		for (; (i = j.nextNode()) !== null && c.length < s;) {
+			if (i.nodeType === 1) {
+				if (i.hasAttributes()) for (let e of i.getAttributeNames()) if (e.endsWith(ce)) {
+					let t = u[o++], n = i.getAttribute(e).split(b), r = /([.?@])?(.*)/.exec(t);
+					c.push({
+						type: 1,
+						index: a,
+						name: r[2],
+						strings: n,
+						ctor: r[1] === "." ? Se : r[1] === "?" ? Ce : r[1] === "@" ? we : P
+					}), i.removeAttribute(e);
+				} else e.startsWith(b) && (c.push({
+					type: 6,
+					index: a
+				}), i.removeAttribute(e));
+				if (ge.test(i.tagName)) {
+					let e = i.textContent.split(b), t = e.length - 1;
+					if (t > 0) {
+						i.textContent = y ? y.emptyScript : "";
+						for (let n = 0; n < t; n++) i.append(e[n], S()), j.nextNode(), c.push({
+							type: 2,
+							index: ++a
+						});
+						i.append(e[t], S());
+					}
+				}
+			} else if (i.nodeType === 8) if (i.data === le) c.push({
+				type: 2,
+				index: a
+			});
+			else {
+				let e = -1;
+				for (; (e = i.data.indexOf(b, e + 1)) !== -1;) c.push({
+					type: 7,
+					index: a
+				}), e += b.length - 1;
+			}
+			a++;
+		}
+	}
+	static createElement(e, t) {
+		let n = x.createElement("template");
+		return n.innerHTML = e, n;
+	}
 };
-R.elementStyles = [], R.shadowRootOptions = { mode: "open" }, R[V("elementProperties")] = /* @__PURE__ */ new Map(), R[V("finalized")] = /* @__PURE__ */ new Map(), le == null || le({ ReactiveElement: R }), (S.reactiveElementVersions ?? (S.reactiveElementVersions = [])).push("2.1.2");
+function M(e, t, n = e, r) {
+	if (t === k) return t;
+	let i = r === void 0 ? n._$Cl : n._$Co?.[r], a = C(t) ? void 0 : t._$litDirective$;
+	return i?.constructor !== a && (i?._$AO?.(!1), a === void 0 ? i = void 0 : (i = new a(e), i._$AT(e, n, r)), r === void 0 ? n._$Cl = i : (n._$Co ??= [])[r] = i), i !== void 0 && (t = M(e, i._$AS(e, t.values), i, r)), t;
+}
+var xe = class {
+	constructor(e, t) {
+		this._$AV = [], this._$AN = void 0, this._$AD = e, this._$AM = t;
+	}
+	get parentNode() {
+		return this._$AM.parentNode;
+	}
+	get _$AU() {
+		return this._$AM._$AU;
+	}
+	u(e) {
+		let { el: { content: t }, parts: n } = this._$AD, r = (e?.creationScope ?? x).importNode(t, !0);
+		j.currentNode = r;
+		let i = j.nextNode(), a = 0, o = 0, s = n[0];
+		for (; s !== void 0;) {
+			if (a === s.index) {
+				let t;
+				s.type === 2 ? t = new N(i, i.nextSibling, this, e) : s.type === 1 ? t = new s.ctor(i, s.name, s.strings, this, e) : s.type === 6 && (t = new Te(i, this, e)), this._$AV.push(t), s = n[++o];
+			}
+			a !== s?.index && (i = j.nextNode(), a++);
+		}
+		return j.currentNode = x, r;
+	}
+	p(e) {
+		let t = 0;
+		for (let n of this._$AV) n !== void 0 && (n.strings === void 0 ? n._$AI(e[t]) : (n._$AI(e, n, t), t += n.strings.length - 2)), t++;
+	}
+}, N = class e {
+	get _$AU() {
+		return this._$AM?._$AU ?? this._$Cv;
+	}
+	constructor(e, t, n, r) {
+		this.type = 2, this._$AH = A, this._$AN = void 0, this._$AA = e, this._$AB = t, this._$AM = n, this.options = r, this._$Cv = r?.isConnected ?? !0;
+	}
+	get parentNode() {
+		let e = this._$AA.parentNode, t = this._$AM;
+		return t !== void 0 && e?.nodeType === 11 && (e = t.parentNode), e;
+	}
+	get startNode() {
+		return this._$AA;
+	}
+	get endNode() {
+		return this._$AB;
+	}
+	_$AI(e, t = this) {
+		e = M(this, e, t), C(e) ? e === A || e == null || e === "" ? (this._$AH !== A && this._$AR(), this._$AH = A) : e !== this._$AH && e !== k && this._(e) : e._$litType$ === void 0 ? e.nodeType === void 0 ? de(e) ? this.k(e) : this._(e) : this.T(e) : this.$(e);
+	}
+	O(e) {
+		return this._$AA.parentNode.insertBefore(e, this._$AB);
+	}
+	T(e) {
+		this._$AH !== e && (this._$AR(), this._$AH = this.O(e));
+	}
+	_(e) {
+		this._$AH !== A && C(this._$AH) ? this._$AA.nextSibling.data = e : this.T(x.createTextNode(e)), this._$AH = e;
+	}
+	$(e) {
+		let { values: t, _$litType$: n } = e, r = typeof n == "number" ? this._$AC(e) : (n.el === void 0 && (n.el = be.createElement(ve(n.h, n.h[0]), this.options)), n);
+		if (this._$AH?._$AD === r) this._$AH.p(t);
+		else {
+			let e = new xe(r, this), n = e.u(this.options);
+			e.p(t), this.T(n), this._$AH = e;
+		}
+	}
+	_$AC(e) {
+		let t = _e.get(e.strings);
+		return t === void 0 && _e.set(e.strings, t = new be(e)), t;
+	}
+	k(t) {
+		w(this._$AH) || (this._$AH = [], this._$AR());
+		let n = this._$AH, r, i = 0;
+		for (let a of t) i === n.length ? n.push(r = new e(this.O(S()), this.O(S()), this, this.options)) : r = n[i], r._$AI(a), i++;
+		i < n.length && (this._$AR(r && r._$AB.nextSibling, i), n.length = i);
+	}
+	_$AR(e = this._$AA.nextSibling, t) {
+		for (this._$AP?.(!1, !0, t); e !== this._$AB;) {
+			let t = oe(e).nextSibling;
+			oe(e).remove(), e = t;
+		}
+	}
+	setConnected(e) {
+		this._$AM === void 0 && (this._$Cv = e, this._$AP?.(e));
+	}
+}, P = class {
+	get tagName() {
+		return this.element.tagName;
+	}
+	get _$AU() {
+		return this._$AM._$AU;
+	}
+	constructor(e, t, n, r, i) {
+		this.type = 1, this._$AH = A, this._$AN = void 0, this.element = e, this.name = t, this._$AM = r, this.options = i, n.length > 2 || n[0] !== "" || n[1] !== "" ? (this._$AH = Array(n.length - 1).fill(/* @__PURE__ */ new String()), this.strings = n) : this._$AH = A;
+	}
+	_$AI(e, t = this, n, r) {
+		let i = this.strings, a = !1;
+		if (i === void 0) e = M(this, e, t, 0), a = !C(e) || e !== this._$AH && e !== k, a && (this._$AH = e);
+		else {
+			let r = e, o, s;
+			for (e = i[0], o = 0; o < i.length - 1; o++) s = M(this, r[n + o], t, o), s === k && (s = this._$AH[o]), a ||= !C(s) || s !== this._$AH[o], s === A ? e = A : e !== A && (e += (s ?? "") + i[o + 1]), this._$AH[o] = s;
+		}
+		a && !r && this.j(e);
+	}
+	j(e) {
+		e === A ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
+	}
+}, Se = class extends P {
+	constructor() {
+		super(...arguments), this.type = 3;
+	}
+	j(e) {
+		this.element[this.name] = e === A ? void 0 : e;
+	}
+}, Ce = class extends P {
+	constructor() {
+		super(...arguments), this.type = 4;
+	}
+	j(e) {
+		this.element.toggleAttribute(this.name, !!e && e !== A);
+	}
+}, we = class extends P {
+	constructor(e, t, n, r, i) {
+		super(e, t, n, r, i), this.type = 5;
+	}
+	_$AI(e, t = this) {
+		if ((e = M(this, e, t, 0) ?? A) === k) return;
+		let n = this._$AH, r = e === A && n !== A || e.capture !== n.capture || e.once !== n.once || e.passive !== n.passive, i = e !== A && (n === A || r);
+		r && this.element.removeEventListener(this.name, this, n), i && this.element.addEventListener(this.name, this, e), this._$AH = e;
+	}
+	handleEvent(e) {
+		typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, e) : this._$AH.handleEvent(e);
+	}
+}, Te = class {
+	constructor(e, t, n) {
+		this.element = e, this.type = 6, this._$AN = void 0, this._$AM = t, this.options = n;
+	}
+	get _$AU() {
+		return this._$AM._$AU;
+	}
+	_$AI(e) {
+		M(this, e);
+	}
+}, Ee = v.litHtmlPolyfillSupport;
+Ee?.(be, N), (v.litHtmlVersions ??= []).push("3.3.3");
+var De = (e, t, n) => {
+	let r = n?.renderBefore ?? t, i = r._$litPart$;
+	if (i === void 0) {
+		let e = n?.renderBefore ?? null;
+		r._$litPart$ = i = new N(t.insertBefore(S(), e), e, void 0, n ?? {});
+	}
+	return i._$AI(e), i;
+}, F = globalThis, I = class extends _ {
+	constructor() {
+		/**
+		* @license
+		* Copyright 2017 Google LLC
+		* SPDX-License-Identifier: BSD-3-Clause
+		*/
+		super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
+	}
+	createRenderRoot() {
+		let e = super.createRenderRoot();
+		return this.renderOptions.renderBefore ??= e.firstChild, e;
+	}
+	update(e) {
+		let t = this.render();
+		this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = De(t, this.renderRoot, this.renderOptions);
+	}
+	connectedCallback() {
+		super.connectedCallback(), this._$Do?.setConnected(!0);
+	}
+	disconnectedCallback() {
+		super.disconnectedCallback(), this._$Do?.setConnected(!1);
+	}
+	render() {
+		return k;
+	}
+};
+I._$litElement$ = !0, I.finalized = !0, F.litElementHydrateSupport?.({ LitElement: I });
+var Oe = F.litElementPolyfillSupport;
+Oe?.({ LitElement: I }), (F.litElementVersions ??= []).push("4.2.2");
+//#endregion
+//#region src/presets.ts
+var ke = [
+	{
+		value: 55,
+		color: "#315f9d",
+		label: "Cool"
+	},
+	{
+		value: 68,
+		color: "#58a4b0",
+		label: "Comfort"
+	},
+	{
+		value: 76,
+		color: "#f2c14e",
+		label: "Warm"
+	},
+	{
+		value: 85,
+		color: "#d94841",
+		label: "Hot"
+	}
+], L = [
+	{
+		value: 0,
+		color: "#2f6f9f"
+	},
+	{
+		value: 50,
+		color: "#5aa469"
+	},
+	{
+		value: 75,
+		color: "#f2c14e"
+	},
+	{
+		value: 100,
+		color: "#c44536"
+	}
+], R = [
+	{
+		value: 0,
+		color: "#2f6f9f"
+	},
+	{
+		value: .5,
+		color: "#5aa469"
+	},
+	{
+		value: .75,
+		color: "#f2c14e"
+	},
+	{
+		value: 1,
+		color: "#c44536"
+	}
+], Ae = [
+	{
+		value: 0,
+		color: "#c44536",
+		label: "Low"
+	},
+	{
+		value: 35,
+		color: "#f2c14e",
+		label: "Watch"
+	},
+	{
+		value: 70,
+		color: "#5aa469",
+		label: "Good"
+	},
+	{
+		value: 100,
+		color: "#2f6f9f",
+		label: "Full"
+	}
+], je = {
+	auto: {
+		id: "auto",
+		label: "Auto",
+		range: { days: 30 },
+		bucket: {
+			interval: "day",
+			value: "mean"
+		},
+		scale: {
+			preset: "auto",
+			stops: [
+				{
+					value: 0,
+					color: "#3a6ea5"
+				},
+				{
+					value: .5,
+					color: "#6fbf73"
+				},
+				{
+					value: 1,
+					color: "#f6c85f"
+				}
+			]
+		}
+	},
+	temperature: {
+		id: "temperature",
+		label: "Temperature",
+		range: { days: 30 },
+		bucket: {
+			interval: "day",
+			value: "mean"
+		},
+		scale: {
+			preset: "temperature",
+			unit: "°",
+			stops: ke
+		}
+	},
+	humidity: {
+		id: "humidity",
+		label: "Humidity",
+		range: { days: 30 },
+		bucket: {
+			interval: "day",
+			value: "mean"
+		},
+		scale: {
+			preset: "humidity",
+			min: 0,
+			max: 100,
+			unit: "%",
+			stops: L
+		}
+	},
+	power: {
+		id: "power",
+		label: "Power",
+		range: { days: 14 },
+		bucket: {
+			interval: "hour",
+			value: "mean"
+		},
+		scale: {
+			preset: "power",
+			stops: R
+		},
+		highIsBad: !0
+	},
+	energy_delta: {
+		id: "energy_delta",
+		label: "Energy Delta",
+		range: { days: 30 },
+		bucket: {
+			interval: "day",
+			value: "change"
+		},
+		scale: {
+			preset: "energy_delta",
+			stops: R
+		}
+	},
+	percent_health: {
+		id: "percent_health",
+		label: "Percent Health",
+		range: { days: 90 },
+		bucket: {
+			interval: "day",
+			value: "min"
+		},
+		scale: {
+			preset: "percent_health",
+			min: 0,
+			max: 100,
+			unit: "%",
+			stops: Ae
+		}
+	},
+	percent_utilization: {
+		id: "percent_utilization",
+		label: "Percent Utilization",
+		range: { days: 30 },
+		bucket: {
+			interval: "day",
+			value: "mean"
+		},
+		scale: {
+			preset: "percent_utilization",
+			min: 0,
+			max: 100,
+			unit: "%",
+			stops: L
+		},
+		highIsBad: !0
+	},
+	filter_life: {
+		id: "filter_life",
+		label: "Filter Life",
+		range: { days: 90 },
+		bucket: {
+			interval: "day",
+			value: "min"
+		},
+		scale: {
+			preset: "filter_life",
+			min: 0,
+			max: 100,
+			unit: "%",
+			stops: Ae
+		}
+	},
+	filter_load: {
+		id: "filter_load",
+		label: "Filter Load",
+		range: { days: 90 },
+		bucket: {
+			interval: "day",
+			value: "max"
+		},
+		scale: {
+			preset: "filter_load",
+			min: 0,
+			max: 100,
+			unit: "%",
+			stops: L
+		},
+		highIsBad: !0
+	},
+	filter_dp: {
+		id: "filter_dp",
+		label: "Filter Differential Pressure",
+		range: { days: 30 },
+		bucket: {
+			interval: "hour",
+			value: "max"
+		},
+		scale: {
+			preset: "filter_dp",
+			stops: R
+		},
+		highIsBad: !0
+	},
+	binary_runtime: {
+		id: "binary_runtime",
+		label: "Binary Runtime",
+		range: { days: 14 },
+		bucket: {
+			interval: "hour",
+			value: "percent_on"
+		},
+		scale: {
+			preset: "binary_runtime",
+			min: 0,
+			max: 100,
+			unit: "%",
+			stops: L
+		}
+	},
+	battery: {
+		id: "battery",
+		label: "Battery",
+		range: { days: 90 },
+		bucket: {
+			interval: "day",
+			value: "min"
+		},
+		scale: {
+			preset: "battery",
+			min: 0,
+			max: 100,
+			unit: "%",
+			stops: Ae
+		}
+	},
+	signal_quality: {
+		id: "signal_quality",
+		label: "Signal Quality",
+		range: { days: 30 },
+		bucket: {
+			interval: "day",
+			value: "min"
+		},
+		scale: {
+			preset: "signal_quality",
+			stops: R
+		}
+	}
+};
+function Me(e) {
+	return !e || e === "auto" ? je.auto : je[e] ?? je.auto;
+}
+function Ne(e) {
+	if (!e) return "auto";
+	let t = e.entity_id, n = t.split(".")[0] ?? "", r = String(e.attributes.device_class ?? "").toLowerCase(), i = String(e.attributes.unit_of_measurement ?? "").toLowerCase(), a = String(e.attributes.friendly_name ?? t).toLowerCase();
+	return n === "binary_sensor" ? "binary_runtime" : r === "temperature" || i === "°f" || i === "°c" ? "temperature" : r === "humidity" || i === "%" ? a.includes("life") || a.includes("health") ? "percent_health" : a.includes("load") || a.includes("utilization") ? "percent_utilization" : "humidity" : r === "power" || i === "w" || i === "kw" ? "power" : r === "energy" || i === "wh" || i === "kwh" ? "energy_delta" : r === "battery" || a.includes("battery") ? "battery" : r === "pressure" || i.includes("pa") || i.includes("inh2o") ? a.includes("filter") ? "filter_dp" : "auto" : a.includes("filter") && a.includes("life") ? "filter_life" : a.includes("filter") && a.includes("load") ? "filter_load" : i === "dbm" || i === "lqi" || i === "db" ? "signal_quality" : "auto";
+}
+//#endregion
+//#region src/data/request-queue.ts
+var Pe = 2, Fe = 8, z = 0, B = [];
+function Ie(e, t = {}) {
+	let n = {
+		...t,
+		maxConcurrent: Re(t.maxConcurrent)
+	};
+	return new Promise((t, r) => {
+		B.push({
+			task: e,
+			resolve: t,
+			reject: r,
+			options: n
+		}), n.onQueued?.(V(n.maxConcurrent)), ze();
+	});
+}
+function Le(e = Pe) {
+	return V(Re(e));
+}
+function Re(e) {
+	return typeof e != "number" || !Number.isFinite(e) ? Pe : Math.min(Fe, Math.max(1, Math.floor(e)));
+}
+function ze() {
+	let e = B[0];
+	!e || z >= e.options.maxConcurrent || (B.shift(), z += 1, e.options.onStart?.(V(e.options.maxConcurrent)), Promise.resolve().then(e.task).then(e.resolve, e.reject).finally(() => {
+		--z, ze();
+	}));
+}
+function V(e) {
+	return {
+		active: z,
+		queued: B.length,
+		maxConcurrent: e
+	};
+}
+//#endregion
+//#region src/config.ts
+var Be = 5e3, Ve = 24, He = 300;
+function H(e, t, n = 0) {
+	let r = Ge(e, t);
+	if (r.length === 0) throw Error("Universal Heatmap Card requires entity or entities.");
+	let i = (Number.isInteger(n) && n >= 0 ? r[n] : void 0) ?? r[0], a = Ne(i ? t?.states[i.entity] : void 0), o = e.scale?.preset ?? a, s = Me(o), c = {
+		interval: e.bucket?.interval ?? s.bucket.interval,
+		value: e.bucket?.value ?? s.bucket.value
+	}, l = {
+		...s.range,
+		...e.range,
+		align: We(e.range?.align)
+	};
+	U(l);
+	let u = e.navigation?.mode ?? (r.length > 8 ? "dropdown" : "tabs");
+	return {
+		title: e.title,
+		debug: e.debug ?? !1,
+		entities: r,
+		range: l,
+		bucket: c,
+		data: {
+			provider: e.data?.provider ?? "auto",
+			prefetch: e.data?.prefetch ?? !1,
+			max_cells: e.data?.max_cells ?? Be,
+			raw_history_hours: e.data?.raw_history_hours ?? Ve,
+			refresh_interval: Ue(e.data?.refresh_interval),
+			defer_until_visible: e.data?.defer_until_visible ?? !0,
+			max_concurrent_requests: Re(e.data?.max_concurrent_requests)
+		},
+		missing: { mode: e.missing?.mode ?? "empty" },
+		scale: {
+			...s.scale,
+			...e.scale,
+			preset: o
+		},
+		layout: {
+			mode: e.layout?.mode ?? "auto",
+			bound_to_grid: e.layout?.bound_to_grid ?? "auto"
+		},
+		navigation: { mode: u },
+		axes: {
+			show: e.axes?.show ?? !0,
+			x_labels: e.axes?.x_labels ?? !0,
+			y_labels: e.axes?.y_labels ?? !0,
+			show_key: e.axes?.show_key ?? !1
+		},
+		tiles: {
+			show_values: e.tiles?.show_values ?? !1,
+			show_value_toggle: e.tiles?.show_value_toggle ?? !1
+		},
+		legend: { show: e.legend?.show ?? !0 },
+		tooltip: { show: e.tooltip?.show ?? !0 }
+	};
+}
+function Ue(e) {
+	return typeof e != "number" || !Number.isFinite(e) ? He : Math.max(0, e);
+}
+function We(e) {
+	return e === "rolling" ? "rolling" : "day";
+}
+function Ge(e, t) {
+	return (e.entities?.length ? e.entities : e.entity ? [{ entity: e.entity }] : []).map((e) => {
+		let n = typeof e == "string" ? { entity: e } : e, r = t?.states[n.entity], i = n.name ?? (r && t?.formatEntityName ? t.formatEntityName(r) : r?.attributes.friendly_name ? String(r.attributes.friendly_name) : n.entity), a = Ke(n.scale);
+		return {
+			...n,
+			...a ? { scale: a } : {},
+			name: i
+		};
+	});
+}
+function Ke(e) {
+	return e?.preset ? {
+		min: void 0,
+		max: void 0,
+		unit: void 0,
+		stops: void 0,
+		...Me(e.preset).scale,
+		...e
+	} : e;
+}
+function U(e, t = /* @__PURE__ */ new Date()) {
+	let n = e.align === "day" && !e.end, r = e.end ? new Date(e.end) : n ? qe(t) : t, i;
+	if (e.start) i = new Date(e.start);
+	else if (typeof e.hours == "number") i = n ? Ye(r, e.hours) : /* @__PURE__ */ new Date(r.getTime() - e.hours * 60 * 60 * 1e3);
+	else {
+		let t = typeof e.days == "number" ? e.days : 30;
+		i = n ? Je(r, t) : /* @__PURE__ */ new Date(r.getTime() - t * 24 * 60 * 60 * 1e3);
+	}
+	if (Number.isNaN(i.getTime()) || Number.isNaN(r.getTime())) throw Error("Universal Heatmap Card has an invalid range date.");
+	if (i >= r) throw Error("Universal Heatmap Card range start must be before end.");
+	return {
+		start: i,
+		end: r
+	};
+}
+function qe(e) {
+	let t = new Date(e);
+	return t.setHours(0, 0, 0, 0), t.setDate(t.getDate() + 1), t;
+}
+function Je(e, t) {
+	let n = new Date(e);
+	return n.setDate(n.getDate() - t), n;
+}
+function Ye(e, t) {
+	let n = Math.trunc(t), r = new Date(e);
+	return r.setHours(r.getHours() - n), /* @__PURE__ */ new Date(r.getTime() - (t - n) * 60 * 60 * 1e3);
+}
+function Xe(e, t = /* @__PURE__ */ new Date()) {
+	let n = U(e.range, t), r = (n.end.getTime() - n.start.getTime()) / 36e5;
+	switch (e.bucket.interval) {
+		case "5minute": return Math.ceil(r * 12);
+		case "hour": return Math.ceil(r);
+		case "day": return Math.ceil(r / 24);
+		case "week": return Math.ceil(r / 168);
+		case "month": return Math.ceil(r / 720);
+		default: return Math.ceil(r / 24);
+	}
+}
+//#endregion
+//#region src/cell-values.ts
+function Ze(e) {
+	return e < 9 ? 0 : e < 14 ? Math.max(6, Math.min(8, Math.floor(e * .72))) : Math.max(9, Math.min(13, Math.floor(e * .48)));
+}
+function Qe(e, t) {
+	if (t < 14) return 0;
+	let n = e < 1 ? 2 : +(e < 20);
+	return t < 18 ? Math.min(n, 0) : n;
+}
+//#endregion
+//#region src/data/buckets.ts
+var $e = 36e5;
+function et(e) {
+	return e;
+}
+function W(e) {
+	return e === "last" ? "state" : [
+		"mean",
+		"min",
+		"max",
+		"state",
+		"sum",
+		"change"
+	].includes(e) ? e : null;
+}
+function tt(e, t) {
+	let n = new Date(e);
+	if (n.setMilliseconds(0), n.setSeconds(0), t === "5minute" ? n.setMinutes(Math.floor(n.getMinutes() / 5) * 5) : n.setMinutes(0), (t === "day" || t === "week" || t === "month") && n.setHours(0, 0, 0, 0), t === "week") {
+		let e = n.getDay(), t = e === 0 ? -6 : 1 - e;
+		n.setDate(n.getDate() + t);
+	}
+	return t === "month" && n.setDate(1), n;
+}
+function nt(e, t) {
+	let n = new Date(e);
+	switch (t) {
+		case "5minute": return n.setTime(n.getTime() + 5 * 6e4), n;
+		case "hour": return n.setTime(n.getTime() + $e), n;
+		case "day": return n.setDate(n.getDate() + 1), n;
+		case "week": return n.setDate(n.getDate() + 7), n;
+		case "month": return n.setMonth(n.getMonth() + 1), n;
+		default: return n;
+	}
+}
+function rt(e, t) {
+	let n = [], r = tt(e.start, t);
+	for (; r < e.end;) {
+		let i = nt(r, t);
+		i > e.start && n.push({
+			start: new Date(r),
+			end: new Date(i)
+		}), r = i;
+	}
+	return n;
+}
+function G(e, t) {
+	return e.map((e) => ({
+		...e,
+		value: null,
+		quality: "missing",
+		source: t
+	}));
+}
+function it(e, t, n, r) {
+	let i = W(n), a = G(e, "statistics");
+	if (!i) return K(a, r);
+	for (let n of t) {
+		let t = n.start ? new Date(n.start) : void 0;
+		if (!t || Number.isNaN(t.getTime())) continue;
+		let r = st(e, t);
+		if (r < 0) continue;
+		let o = e[r];
+		if (!o) continue;
+		let s = n[i], c = typeof s == "number" ? s : null;
+		a[r] = {
+			...o,
+			value: c,
+			quality: c === null ? "missing" : "ok",
+			source: "statistics"
+		};
+	}
+	return K(a, r);
+}
+function at(e, t, n, r) {
+	let i = e.map(() => []);
+	for (let n of t) {
+		let t = Number(n.state);
+		if (!Number.isFinite(t)) continue;
+		let r = n.last_changed ?? n.last_updated;
+		if (!r) continue;
+		let a = new Date(r).getTime();
+		if (!Number.isFinite(a)) continue;
+		let o = ct(e, a);
+		o >= 0 && i[o]?.push({
+			at: a,
+			value: t
+		});
+	}
+	return K(e.map((e, t) => {
+		let r = ot(i[t] ?? [], n);
+		return {
+			...e,
+			value: r,
+			quality: r === null ? "missing" : "ok",
+			source: "history"
+		};
+	}), r);
+}
+function K(e, t) {
+	if (t === "empty") return e;
+	let n = null;
+	return e.map((e) => e.value === null ? t === "zero" ? {
+		...e,
+		value: 0,
+		quality: "ok"
+	} : t === "carry_forward" && n !== null ? {
+		...e,
+		value: n,
+		quality: "carried"
+	} : e : (n = e.value, e));
+}
+function ot(e, t) {
+	if (e.length === 0) return null;
+	switch (t) {
+		case "min": return Math.min(...e.map((e) => e.value));
+		case "max": return Math.max(...e.map((e) => e.value));
+		case "last":
+		case "state": return e.reduce((e, t) => t.at >= e.at ? t : e).value;
+		case "sum": return e.reduce((e, t) => e + t.value, 0);
+		case "delta":
+		case "change": {
+			let t = [...e].sort((e, t) => e.at - t.at), n = t[0]?.value, r = t[t.length - 1]?.value;
+			return n === void 0 || r === void 0 ? null : r - n;
+		}
+		case "count": return e.length;
+		default: return e.reduce((e, t) => e + t.value, 0) / e.length;
+	}
+}
+function st(e, t) {
+	return ct(e, t.getTime());
+}
+function ct(e, t) {
+	let n = 0, r = e.length - 1;
+	for (; n <= r;) {
+		let i = Math.floor((n + r) / 2), a = e[i];
+		if (!a) return -1;
+		if (t < a.start.getTime()) r = i - 1;
+		else if (t >= a.end.getTime()) n = i + 1;
+		else return i;
+	}
+	return -1;
+}
+//#endregion
+//#region src/data/provider.ts
+async function lt(e, t, n) {
+	let r = Xe(t), i = rt(U(t.range), t.bucket.interval);
+	if (r > t.data.max_cells) return {
+		source: "current",
+		buckets: G(i, "current"),
+		warning: `This heatmap would render ${r.toLocaleString()} cells. Raise data.max_cells to load it.`
+	};
+	let a = t.data.provider, o = W(t.bucket.value) !== null, s;
+	if ((a === "auto" || a === "statistics") && o) try {
+		let r = await ut(e, t, n, i);
+		if (r.some((e) => e.value !== null) || a === "statistics") return {
+			source: "statistics",
+			buckets: K(r, t.missing.mode)
+		};
+		s = `No ${t.bucket.value} statistics were available for ${n.entity}.`;
+	} catch (e) {
+		if (a === "statistics") return {
+			source: "statistics",
+			buckets: G(i, "statistics"),
+			warning: ft(e, "Statistics query failed.")
+		};
+		s = "Statistics query failed.";
+	}
+	if (a === "auto" || a === "history") {
+		let r = await dt(e, t, n, i, s !== void 0);
+		return s ? {
+			...r,
+			warning: r.warning ? `${s} ${r.warning}` : `${s} Showing raw history instead.`
+		} : r;
+	}
+	return {
+		source: "current",
+		buckets: G(i, "current"),
+		warning: "No supported data provider is available for this bucket value yet."
+	};
+}
+async function ut(e, t, n, r) {
+	let i = W(t.bucket.value);
+	if (!i) return G(r, "statistics");
+	let a = U(t.range);
+	return it(r, (await e.callWS({
+		type: "recorder/statistics_during_period",
+		start_time: a.start.toISOString(),
+		end_time: a.end.toISOString(),
+		statistic_ids: [n.entity],
+		period: et(t.bucket.interval),
+		types: [i]
+	}))[n.entity] ?? [], t.bucket.value, "empty");
+}
+async function dt(e, t, n, r, i = !1) {
+	let a = U(t.range), o = (a.end.getTime() - a.start.getTime()) / 36e5;
+	if (!e.callApi) return {
+		source: "history",
+		buckets: G(r, "history"),
+		warning: "This Home Assistant object does not expose callApi for history fallback."
+	};
+	if (o > t.data.raw_history_hours) return {
+		source: "history",
+		buckets: G(r, "history"),
+		warning: `Raw history fallback is capped at ${t.data.raw_history_hours} hours by default. Use recorder statistics or reduce range.`
+	};
+	try {
+		let i = new URLSearchParams({
+			end_time: a.end.toISOString(),
+			filter_entity_id: n.entity
+		});
+		return {
+			source: "history",
+			buckets: at(r, (await e.callApi("GET", `history/period/${a.start.toISOString()}?${i.toString()}&minimal_response&no_attributes`)).flat(), t.bucket.value, t.missing.mode)
+		};
+	} catch (e) {
+		return {
+			source: "history",
+			buckets: G(r, "history"),
+			warning: i ? "History fallback failed." : ft(e, "History fallback failed.")
+		};
+	}
+}
+function ft(e, t) {
+	return e instanceof Error && e.message ? e.message : t;
+}
+//#endregion
+//#region src/debug.ts
+var pt = "universal-heatmap-card:debug";
+function mt(e) {
+	if (e?.debug === !0) return !0;
+	if (e?.debug === !1 || typeof window > "u") return !1;
+	try {
+		let e = window.localStorage?.getItem(pt);
+		return e === "1" || e === "true";
+	} catch {
+		return !1;
+	}
+}
+function q() {
+	return globalThis.performance?.now?.() ?? Date.now();
+}
+function J(e) {
+	return Math.round(e * 10) / 10;
+}
+function Y(e, t, n) {
+	if (e) {
+		if (n) {
+			console.debug(`[Universal Heatmap Card] ${t}`, n);
+			return;
+		}
+		console.debug(`[Universal Heatmap Card] ${t}`);
+	}
+}
+//#endregion
+//#region src/editor-form.ts
+function ht() {
+	return {
+		schema: [
+			{
+				name: "title",
+				selector: { text: {} }
+			},
+			{
+				name: "entities",
+				required: !0,
+				selector: { entity: {
+					domain: "sensor",
+					multiple: !0,
+					reorder: !0
+				} }
+			},
+			{
+				name: "debug",
+				selector: { boolean: {} }
+			},
+			{
+				type: "expandable",
+				name: "range",
+				title: "Range",
+				schema: [
+					{
+						name: "hours",
+						selector: { number: {
+							min: 1,
+							max: 720,
+							mode: "box"
+						} }
+					},
+					{
+						name: "days",
+						selector: { number: {
+							min: 1,
+							max: 365,
+							mode: "box"
+						} }
+					},
+					{
+						name: "align",
+						selector: { select: { options: [{
+							value: "day",
+							label: "Fixed days, 00:00-23:59"
+						}, {
+							value: "rolling",
+							label: "Rolling window"
+						}] } }
+					}
+				]
+			},
+			{
+				type: "expandable",
+				name: "bucket",
+				title: "Bucket",
+				schema: [{
+					name: "interval",
+					selector: { select: { options: [
+						"5minute",
+						"hour",
+						"day",
+						"week",
+						"month"
+					] } }
+				}, {
+					name: "value",
+					selector: { select: { options: [
+						"mean",
+						"min",
+						"max",
+						"last",
+						"state",
+						"sum",
+						"delta",
+						"change",
+						"count",
+						"percent_on",
+						"duration_on"
+					] } }
+				}]
+			},
+			{
+				type: "expandable",
+				name: "scale",
+				title: "Scale",
+				schema: [
+					{
+						name: "preset",
+						selector: { select: { options: [
+							"auto",
+							"temperature",
+							"power",
+							"energy_delta",
+							"humidity",
+							"percent_health",
+							"percent_utilization",
+							"filter_dp",
+							"filter_life",
+							"filter_load",
+							"battery",
+							"signal_quality",
+							"binary_runtime"
+						] } }
+					},
+					{
+						name: "min",
+						selector: { number: { mode: "box" } }
+					},
+					{
+						name: "max",
+						selector: { number: { mode: "box" } }
+					},
+					{
+						name: "unit",
+						selector: { text: {} }
+					},
+					{
+						name: "sensitivity",
+						selector: { number: {
+							min: .2,
+							max: 4,
+							step: .1,
+							mode: "slider"
+						} }
+					},
+					{
+						name: "outlier_clip",
+						selector: { number: {
+							min: 0,
+							max: 20,
+							step: .5,
+							mode: "box"
+						} }
+					}
+				]
+			},
+			{
+				type: "expandable",
+				name: "tiles",
+				title: "Tiles",
+				schema: [{
+					name: "show_values",
+					selector: { boolean: {} }
+				}, {
+					name: "show_value_toggle",
+					selector: { boolean: {} }
+				}]
+			},
+			{
+				type: "expandable",
+				name: "data",
+				title: "Data",
+				schema: [
+					{
+						name: "provider",
+						selector: { select: { options: [
+							"auto",
+							"statistics",
+							"history"
+						] } }
+					},
+					{
+						name: "refresh_interval",
+						selector: { number: {
+							min: 0,
+							max: 86400,
+							mode: "box"
+						} }
+					},
+					{
+						name: "defer_until_visible",
+						selector: { boolean: {} }
+					},
+					{
+						name: "max_concurrent_requests",
+						selector: { number: {
+							min: 1,
+							max: 8,
+							mode: "box"
+						} }
+					},
+					{
+						name: "max_cells",
+						selector: { number: {
+							min: 1,
+							max: 5e4,
+							mode: "box"
+						} }
+					}
+				]
+			}
+		],
+		computeLabel: (e) => e.name ? {
+			title: "Title",
+			entities: "Entities",
+			debug: "Debug logging",
+			hours: "Hours",
+			days: "Days",
+			refresh_interval: "Refresh interval",
+			defer_until_visible: "Load when visible",
+			max_concurrent_requests: "Concurrent recorder requests",
+			max_cells: "Maximum cells",
+			interval: "Interval",
+			value: "Value",
+			provider: "Provider",
+			preset: "Scale preset",
+			min: "Minimum value",
+			max: "Maximum value",
+			unit: "Display unit",
+			sensitivity: "Scale tuning",
+			outlier_clip: "Outlier clip",
+			show_values: "Show values in cells",
+			show_value_toggle: "Show value toggle on card",
+			align: "Alignment"
+		}[e.name] : void 0,
+		computeHelper: (e) => e.name ? {
+			entities: "Choose one or more numeric sensor entities. Existing YAML names and per-entity options are preserved for unchanged entities.",
+			debug: "Writes cache and timing details to the browser console. Leave off unless diagnosing.",
+			title: "Optional card title. Leave blank to use the active entity name.",
+			hours: "Optional rolling or fixed-hour window. Usually leave empty when using days.",
+			days: "Number of days to show. Hourly fixed-day heatmaps use full local days.",
+			align: "Fixed days align to local midnight and render stable 00:00-23:59 columns. Rolling ends at the current time.",
+			interval: "Bucket width for the heatmap cells.",
+			value: "Recorder statistic or history value to aggregate into each bucket.",
+			provider: "Auto prefers recorder statistics and falls back to capped raw history when needed.",
+			preset: "Unit-aware color and bucket defaults. Auto infers from device class, unit, and entity name.",
+			min: "Optional fixed lower scale bound. Leave empty to auto-range from observed bucket values.",
+			max: "Optional fixed upper scale bound. Leave empty to auto-range from observed bucket values.",
+			unit: "Optional label suffix for summary and legend values.",
+			show_values: "Draw compact bucket values inside each tile. Off by default; works best when the card has enough width for larger cells.",
+			show_value_toggle: "Adds a compact 123 button beside the current value chip so values can be toggled without opening edit mode.",
+			refresh_interval: "Minimum seconds between recorder refreshes during Home Assistant updates. Set to 0 to cache until the card config changes.",
+			defer_until_visible: "Keeps off-screen cards from asking recorder for history until they scroll near the viewport.",
+			max_concurrent_requests: "Shared browser-side limit for recorder/history requests from this card type. Default is 2.",
+			sensitivity: "Higher values exaggerate close differences; lower values soften peaky data.",
+			outlier_clip: "Percentile trim for auto-range scaling. Leave empty for full observed range."
+		}[e.name] : void 0
+	};
+}
+function X(e) {
+	return gt(e).map((e) => typeof e == "string" ? e : e.entity).filter((e) => typeof e == "string" && e.length > 0);
+}
+function gt(e) {
+	return (e.entities?.length ? e.entities : e.entity ? [e.entity] : []).map((e) => typeof e == "string" ? e : { ...e });
+}
+function _t(e, t) {
+	let n = /* @__PURE__ */ new Map();
+	for (let t of gt(e)) {
+		let e = typeof t == "string" ? t : t.entity;
+		e && n.set(e, typeof t == "string" ? t : { ...t });
+	}
+	return t.map((e) => n.get(e) ?? e);
+}
+function vt(e, t, n) {
+	let r = X(e), i = n.trim(), a = _t(e, r).map((e) => {
+		let n = typeof e == "string" ? e : e.entity;
+		if (n !== t) return e;
+		let r = typeof e == "string" ? { entity: n } : { ...e };
+		return i ? r.name = i : delete r.name, Object.keys(r).length === 1 ? n : r;
+	}), o = {
+		...e,
+		entities: a
+	};
+	return delete o.entity, o;
+}
+var yt = 12, bt = 560, xt = 3, St = 7, Ct = 22, wt = 14, Tt = 28, Et = 58, Dt = 18;
 /**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-const B = globalThis, Ge = (s) => s, ee = B.trustedTypes, Xe = ee ? ee.createPolicy("lit-html", { createHTML: (s) => s }) : void 0, ut = "$lit$", A = `lit$${Math.random().toFixed(9).slice(2)}$`, ht = "?" + A, Ft = `<${ht}>`, I = document, W = () => I.createComment(""), G = (s) => s === null || typeof s != "object" && typeof s != "function", Ae = Array.isArray, Ot = (s) => Ae(s) || typeof (s == null ? void 0 : s[Symbol.iterator]) == "function", ce = `[ 	
-\f\r]`, U = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Ye = /-->/g, Ke = />/g, N = RegExp(`>|${ce}(?:([^\\s"'>=/]+)(${ce}*=${ce}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), je = /'/g, Je = /"/g, dt = /^(?:script|style|textarea|title)$/i, Pt = (s) => (e, ...t) => ({ _$litType$: s, strings: e, values: t }), g = Pt(1), F = Symbol.for("lit-noChange"), _ = Symbol.for("lit-nothing"), Ze = /* @__PURE__ */ new WeakMap(), T = I.createTreeWalker(I, 129);
-function mt(s, e) {
-  if (!Ae(s) || !s.hasOwnProperty("raw")) throw Error("invalid template strings array");
-  return Xe !== void 0 ? Xe.createHTML(e) : e;
-}
-const Ut = (s, e) => {
-  const t = s.length - 1, i = [];
-  let r, n = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", a = U;
-  for (let o = 0; o < t; o++) {
-    const l = s[o];
-    let c, u, h = -1, d = 0;
-    for (; d < l.length && (a.lastIndex = d, u = a.exec(l), u !== null); ) d = a.lastIndex, a === U ? u[1] === "!--" ? a = Ye : u[1] !== void 0 ? a = Ke : u[2] !== void 0 ? (dt.test(u[2]) && (r = RegExp("</" + u[2], "g")), a = N) : u[3] !== void 0 && (a = N) : a === N ? u[0] === ">" ? (a = r ?? U, h = -1) : u[1] === void 0 ? h = -2 : (h = a.lastIndex - u[2].length, c = u[1], a = u[3] === void 0 ? N : u[3] === '"' ? Je : je) : a === Je || a === je ? a = N : a === Ye || a === Ke ? a = U : (a = N, r = void 0);
-    const m = a === N && s[o + 1].startsWith("/>") ? " " : "";
-    n += a === U ? l + Ft : h >= 0 ? (i.push(c), l.slice(0, h) + ut + l.slice(h) + A + m) : l + A + (h === -2 ? o : m);
-  }
-  return [mt(s, n + (s[t] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), i];
-};
-class X {
-  constructor({ strings: e, _$litType$: t }, i) {
-    let r;
-    this.parts = [];
-    let n = 0, a = 0;
-    const o = e.length - 1, l = this.parts, [c, u] = Ut(e, t);
-    if (this.el = X.createElement(c, i), T.currentNode = this.el.content, t === 2 || t === 3) {
-      const h = this.el.content.firstChild;
-      h.replaceWith(...h.childNodes);
-    }
-    for (; (r = T.nextNode()) !== null && l.length < o; ) {
-      if (r.nodeType === 1) {
-        if (r.hasAttributes()) for (const h of r.getAttributeNames()) if (h.endsWith(ut)) {
-          const d = u[a++], m = r.getAttribute(h).split(A), p = /([.?@])?(.*)/.exec(d);
-          l.push({ type: 1, index: n, name: p[2], strings: m, ctor: p[1] === "." ? Vt : p[1] === "?" ? Bt : p[1] === "@" ? Wt : ae }), r.removeAttribute(h);
-        } else h.startsWith(A) && (l.push({ type: 6, index: n }), r.removeAttribute(h));
-        if (dt.test(r.tagName)) {
-          const h = r.textContent.split(A), d = h.length - 1;
-          if (d > 0) {
-            r.textContent = ee ? ee.emptyScript : "";
-            for (let m = 0; m < d; m++) r.append(h[m], W()), T.nextNode(), l.push({ type: 2, index: ++n });
-            r.append(h[d], W());
-          }
-        }
-      } else if (r.nodeType === 8) if (r.data === ht) l.push({ type: 2, index: n });
-      else {
-        let h = -1;
-        for (; (h = r.data.indexOf(A, h + 1)) !== -1; ) l.push({ type: 7, index: n }), h += A.length - 1;
-      }
-      n++;
-    }
-  }
-  static createElement(e, t) {
-    const i = I.createElement("template");
-    return i.innerHTML = e, i;
-  }
-}
-function O(s, e, t = s, i) {
-  var a, o;
-  if (e === F) return e;
-  let r = i !== void 0 ? (a = t._$Co) == null ? void 0 : a[i] : t._$Cl;
-  const n = G(e) ? void 0 : e._$litDirective$;
-  return (r == null ? void 0 : r.constructor) !== n && ((o = r == null ? void 0 : r._$AO) == null || o.call(r, !1), n === void 0 ? r = void 0 : (r = new n(s), r._$AT(s, t, i)), i !== void 0 ? (t._$Co ?? (t._$Co = []))[i] = r : t._$Cl = r), r !== void 0 && (e = O(s, r._$AS(s, e.values), r, i)), e;
-}
-class qt {
-  constructor(e, t) {
-    this._$AV = [], this._$AN = void 0, this._$AD = e, this._$AM = t;
-  }
-  get parentNode() {
-    return this._$AM.parentNode;
-  }
-  get _$AU() {
-    return this._$AM._$AU;
-  }
-  u(e) {
-    const { el: { content: t }, parts: i } = this._$AD, r = ((e == null ? void 0 : e.creationScope) ?? I).importNode(t, !0);
-    T.currentNode = r;
-    let n = T.nextNode(), a = 0, o = 0, l = i[0];
-    for (; l !== void 0; ) {
-      if (a === l.index) {
-        let c;
-        l.type === 2 ? c = new Y(n, n.nextSibling, this, e) : l.type === 1 ? c = new l.ctor(n, l.name, l.strings, this, e) : l.type === 6 && (c = new Gt(n, this, e)), this._$AV.push(c), l = i[++o];
-      }
-      a !== (l == null ? void 0 : l.index) && (n = T.nextNode(), a++);
-    }
-    return T.currentNode = I, r;
-  }
-  p(e) {
-    let t = 0;
-    for (const i of this._$AV) i !== void 0 && (i.strings !== void 0 ? (i._$AI(e, i, t), t += i.strings.length - 2) : i._$AI(e[t])), t++;
-  }
-}
-class Y {
-  get _$AU() {
-    var e;
-    return ((e = this._$AM) == null ? void 0 : e._$AU) ?? this._$Cv;
-  }
-  constructor(e, t, i, r) {
-    this.type = 2, this._$AH = _, this._$AN = void 0, this._$AA = e, this._$AB = t, this._$AM = i, this.options = r, this._$Cv = (r == null ? void 0 : r.isConnected) ?? !0;
-  }
-  get parentNode() {
-    let e = this._$AA.parentNode;
-    const t = this._$AM;
-    return t !== void 0 && (e == null ? void 0 : e.nodeType) === 11 && (e = t.parentNode), e;
-  }
-  get startNode() {
-    return this._$AA;
-  }
-  get endNode() {
-    return this._$AB;
-  }
-  _$AI(e, t = this) {
-    e = O(this, e, t), G(e) ? e === _ || e == null || e === "" ? (this._$AH !== _ && this._$AR(), this._$AH = _) : e !== this._$AH && e !== F && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : Ot(e) ? this.k(e) : this._(e);
-  }
-  O(e) {
-    return this._$AA.parentNode.insertBefore(e, this._$AB);
-  }
-  T(e) {
-    this._$AH !== e && (this._$AR(), this._$AH = this.O(e));
-  }
-  _(e) {
-    this._$AH !== _ && G(this._$AH) ? this._$AA.nextSibling.data = e : this.T(I.createTextNode(e)), this._$AH = e;
-  }
-  $(e) {
-    var n;
-    const { values: t, _$litType$: i } = e, r = typeof i == "number" ? this._$AC(e) : (i.el === void 0 && (i.el = X.createElement(mt(i.h, i.h[0]), this.options)), i);
-    if (((n = this._$AH) == null ? void 0 : n._$AD) === r) this._$AH.p(t);
-    else {
-      const a = new qt(r, this), o = a.u(this.options);
-      a.p(t), this.T(o), this._$AH = a;
-    }
-  }
-  _$AC(e) {
-    let t = Ze.get(e.strings);
-    return t === void 0 && Ze.set(e.strings, t = new X(e)), t;
-  }
-  k(e) {
-    Ae(this._$AH) || (this._$AH = [], this._$AR());
-    const t = this._$AH;
-    let i, r = 0;
-    for (const n of e) r === t.length ? t.push(i = new Y(this.O(W()), this.O(W()), this, this.options)) : i = t[r], i._$AI(n), r++;
-    r < t.length && (this._$AR(i && i._$AB.nextSibling, r), t.length = r);
-  }
-  _$AR(e = this._$AA.nextSibling, t) {
-    var i;
-    for ((i = this._$AP) == null ? void 0 : i.call(this, !1, !0, t); e !== this._$AB; ) {
-      const r = Ge(e).nextSibling;
-      Ge(e).remove(), e = r;
-    }
-  }
-  setConnected(e) {
-    var t;
-    this._$AM === void 0 && (this._$Cv = e, (t = this._$AP) == null || t.call(this, e));
-  }
-}
-class ae {
-  get tagName() {
-    return this.element.tagName;
-  }
-  get _$AU() {
-    return this._$AM._$AU;
-  }
-  constructor(e, t, i, r, n) {
-    this.type = 1, this._$AH = _, this._$AN = void 0, this.element = e, this.name = t, this._$AM = r, this.options = n, i.length > 2 || i[0] !== "" || i[1] !== "" ? (this._$AH = Array(i.length - 1).fill(new String()), this.strings = i) : this._$AH = _;
-  }
-  _$AI(e, t = this, i, r) {
-    const n = this.strings;
-    let a = !1;
-    if (n === void 0) e = O(this, e, t, 0), a = !G(e) || e !== this._$AH && e !== F, a && (this._$AH = e);
-    else {
-      const o = e;
-      let l, c;
-      for (e = n[0], l = 0; l < n.length - 1; l++) c = O(this, o[i + l], t, l), c === F && (c = this._$AH[l]), a || (a = !G(c) || c !== this._$AH[l]), c === _ ? e = _ : e !== _ && (e += (c ?? "") + n[l + 1]), this._$AH[l] = c;
-    }
-    a && !r && this.j(e);
-  }
-  j(e) {
-    e === _ ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
-  }
-}
-class Vt extends ae {
-  constructor() {
-    super(...arguments), this.type = 3;
-  }
-  j(e) {
-    this.element[this.name] = e === _ ? void 0 : e;
-  }
-}
-class Bt extends ae {
-  constructor() {
-    super(...arguments), this.type = 4;
-  }
-  j(e) {
-    this.element.toggleAttribute(this.name, !!e && e !== _);
-  }
-}
-class Wt extends ae {
-  constructor(e, t, i, r, n) {
-    super(e, t, i, r, n), this.type = 5;
-  }
-  _$AI(e, t = this) {
-    if ((e = O(this, e, t, 0) ?? _) === F) return;
-    const i = this._$AH, r = e === _ && i !== _ || e.capture !== i.capture || e.once !== i.once || e.passive !== i.passive, n = e !== _ && (i === _ || r);
-    r && this.element.removeEventListener(this.name, this, i), n && this.element.addEventListener(this.name, this, e), this._$AH = e;
-  }
-  handleEvent(e) {
-    var t;
-    typeof this._$AH == "function" ? this._$AH.call(((t = this.options) == null ? void 0 : t.host) ?? this.element, e) : this._$AH.handleEvent(e);
-  }
-}
-class Gt {
-  constructor(e, t, i) {
-    this.element = e, this.type = 6, this._$AN = void 0, this._$AM = t, this.options = i;
-  }
-  get _$AU() {
-    return this._$AM._$AU;
-  }
-  _$AI(e) {
-    O(this, e);
-  }
-}
-const ue = B.litHtmlPolyfillSupport;
-ue == null || ue(X, Y), (B.litHtmlVersions ?? (B.litHtmlVersions = [])).push("3.3.3");
-const Xt = (s, e, t) => {
-  const i = (t == null ? void 0 : t.renderBefore) ?? e;
-  let r = i._$litPart$;
-  if (r === void 0) {
-    const n = (t == null ? void 0 : t.renderBefore) ?? null;
-    i._$litPart$ = r = new Y(e.insertBefore(W(), n), n, void 0, t ?? {});
-  }
-  return r._$AI(s), r;
-};
-/**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-const L = globalThis;
-class H extends R {
-  constructor() {
-    super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
-  }
-  createRenderRoot() {
-    var t;
-    const e = super.createRenderRoot();
-    return (t = this.renderOptions).renderBefore ?? (t.renderBefore = e.firstChild), e;
-  }
-  update(e) {
-    const t = this.render();
-    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = Xt(t, this.renderRoot, this.renderOptions);
-  }
-  connectedCallback() {
-    var e;
-    super.connectedCallback(), (e = this._$Do) == null || e.setConnected(!0);
-  }
-  disconnectedCallback() {
-    var e;
-    super.disconnectedCallback(), (e = this._$Do) == null || e.setConnected(!1);
-  }
-  render() {
-    return F;
-  }
-}
-var at;
-H._$litElement$ = !0, H.finalized = !0, (at = L.litElementHydrateSupport) == null || at.call(L, { LitElement: H });
-const he = L.litElementPolyfillSupport;
-he == null || he({ LitElement: H });
-(L.litElementVersions ?? (L.litElementVersions = [])).push("4.2.2");
-const Yt = [
-  { value: 55, color: "#315f9d", label: "Cool" },
-  { value: 68, color: "#58a4b0", label: "Comfort" },
-  { value: 76, color: "#f2c14e", label: "Warm" },
-  { value: 85, color: "#d94841", label: "Hot" }
-], K = [
-  { value: 0, color: "#2f6f9f" },
-  { value: 50, color: "#5aa469" },
-  { value: 75, color: "#f2c14e" },
-  { value: 100, color: "#c44536" }
-], j = [
-  { value: 0, color: "#2f6f9f" },
-  { value: 0.5, color: "#5aa469" },
-  { value: 0.75, color: "#f2c14e" },
-  { value: 1, color: "#c44536" }
-], de = [
-  { value: 0, color: "#c44536", label: "Low" },
-  { value: 35, color: "#f2c14e", label: "Watch" },
-  { value: 70, color: "#5aa469", label: "Good" },
-  { value: 100, color: "#2f6f9f", label: "Full" }
-], me = {
-  auto: {
-    id: "auto",
-    label: "Auto",
-    range: { days: 30 },
-    bucket: { interval: "day", value: "mean" },
-    scale: {
-      preset: "auto",
-      stops: [
-        { value: 0, color: "#3a6ea5" },
-        { value: 0.5, color: "#6fbf73" },
-        { value: 1, color: "#f6c85f" }
-      ]
-    }
-  },
-  temperature: {
-    id: "temperature",
-    label: "Temperature",
-    range: { days: 30 },
-    bucket: { interval: "day", value: "mean" },
-    scale: { preset: "temperature", unit: "°", stops: Yt }
-  },
-  humidity: {
-    id: "humidity",
-    label: "Humidity",
-    range: { days: 30 },
-    bucket: { interval: "day", value: "mean" },
-    scale: {
-      preset: "humidity",
-      min: 0,
-      max: 100,
-      unit: "%",
-      stops: K
-    }
-  },
-  power: {
-    id: "power",
-    label: "Power",
-    range: { days: 14 },
-    bucket: { interval: "hour", value: "mean" },
-    scale: { preset: "power", stops: j },
-    highIsBad: !0
-  },
-  energy_delta: {
-    id: "energy_delta",
-    label: "Energy Delta",
-    range: { days: 30 },
-    bucket: { interval: "day", value: "change" },
-    scale: { preset: "energy_delta", stops: j }
-  },
-  percent_health: {
-    id: "percent_health",
-    label: "Percent Health",
-    range: { days: 90 },
-    bucket: { interval: "day", value: "min" },
-    scale: {
-      preset: "percent_health",
-      min: 0,
-      max: 100,
-      unit: "%",
-      stops: de
-    }
-  },
-  percent_utilization: {
-    id: "percent_utilization",
-    label: "Percent Utilization",
-    range: { days: 30 },
-    bucket: { interval: "day", value: "mean" },
-    scale: {
-      preset: "percent_utilization",
-      min: 0,
-      max: 100,
-      unit: "%",
-      stops: K
-    },
-    highIsBad: !0
-  },
-  filter_life: {
-    id: "filter_life",
-    label: "Filter Life",
-    range: { days: 90 },
-    bucket: { interval: "day", value: "min" },
-    scale: {
-      preset: "filter_life",
-      min: 0,
-      max: 100,
-      unit: "%",
-      stops: de
-    }
-  },
-  filter_load: {
-    id: "filter_load",
-    label: "Filter Load",
-    range: { days: 90 },
-    bucket: { interval: "day", value: "max" },
-    scale: {
-      preset: "filter_load",
-      min: 0,
-      max: 100,
-      unit: "%",
-      stops: K
-    },
-    highIsBad: !0
-  },
-  filter_dp: {
-    id: "filter_dp",
-    label: "Filter Differential Pressure",
-    range: { days: 30 },
-    bucket: { interval: "hour", value: "max" },
-    scale: { preset: "filter_dp", stops: j },
-    highIsBad: !0
-  },
-  binary_runtime: {
-    id: "binary_runtime",
-    label: "Binary Runtime",
-    range: { days: 14 },
-    bucket: { interval: "hour", value: "percent_on" },
-    scale: {
-      preset: "binary_runtime",
-      min: 0,
-      max: 100,
-      unit: "%",
-      stops: K
-    }
-  },
-  battery: {
-    id: "battery",
-    label: "Battery",
-    range: { days: 90 },
-    bucket: { interval: "day", value: "min" },
-    scale: {
-      preset: "battery",
-      min: 0,
-      max: 100,
-      unit: "%",
-      stops: de
-    }
-  },
-  signal_quality: {
-    id: "signal_quality",
-    label: "Signal Quality",
-    range: { days: 30 },
-    bucket: { interval: "day", value: "min" },
-    scale: { preset: "signal_quality", stops: j }
-  }
-};
-function pt(s) {
-  return !s || s === "auto" ? me.auto : me[s] ?? me.auto;
-}
-function Kt(s) {
-  if (!s)
-    return "auto";
-  const e = s.entity_id, t = e.split(".")[0] ?? "", i = String(s.attributes.device_class ?? "").toLowerCase(), r = String(s.attributes.unit_of_measurement ?? "").toLowerCase(), n = String(s.attributes.friendly_name ?? e).toLowerCase();
-  return t === "binary_sensor" ? "binary_runtime" : i === "temperature" || r === "°f" || r === "°c" ? "temperature" : i === "humidity" || r === "%" ? n.includes("life") || n.includes("health") ? "percent_health" : n.includes("load") || n.includes("utilization") ? "percent_utilization" : "humidity" : i === "power" || r === "w" || r === "kw" ? "power" : i === "energy" || r === "wh" || r === "kwh" ? "energy_delta" : i === "battery" || n.includes("battery") ? "battery" : i === "pressure" || r.includes("pa") || r.includes("inh2o") ? n.includes("filter") ? "filter_dp" : "auto" : n.includes("filter") && n.includes("life") ? "filter_life" : n.includes("filter") && n.includes("load") ? "filter_load" : r === "dbm" || r === "lqi" || r === "db" ? "signal_quality" : "auto";
-}
-const _t = 2, jt = 8;
-let Z = 0;
-const te = [];
-function Jt(s, e = {}) {
-  const t = {
-    ...e,
-    maxConcurrent: Se(e.maxConcurrent)
-  };
-  return new Promise((i, r) => {
-    var n;
-    te.push({
-      task: s,
-      resolve: i,
-      reject: r,
-      options: t
-    }), (n = t.onQueued) == null || n.call(t, ke(t.maxConcurrent)), ft();
-  });
-}
-function Qe(s = _t) {
-  return ke(Se(s));
-}
-function Se(s) {
-  return typeof s != "number" || !Number.isFinite(s) ? _t : Math.min(jt, Math.max(1, Math.floor(s)));
-}
-function ft() {
-  var e, t;
-  const s = te[0];
-  !s || Z >= s.options.maxConcurrent || (te.shift(), Z += 1, (t = (e = s.options).onStart) == null || t.call(e, ke(s.options.maxConcurrent)), Promise.resolve().then(s.task).then(s.resolve, s.reject).finally(() => {
-    Z -= 1, ft();
-  }));
-}
-function ke(s) {
-  return {
-    active: Z,
-    queued: te.length,
-    maxConcurrent: s
-  };
-}
-const Zt = 5e3, Qt = 24, ei = 300, ti = /^(\d{4})-(\d{2})-(\d{2})$/;
-function pe(s, e, t = 0) {
-  var d, m, p, f, b, E, w, M, $, C, y, Ne, Te, Le, De, Ie, ze, Re, He, Fe, Oe, Pe, Ue;
-  const i = ri(s, e);
-  if (i.length === 0)
-    throw new Error("Universal Heatmap Card requires entity or entities.");
-  const r = (Number.isInteger(t) && t >= 0 ? i[t] : void 0) ?? i[0], n = r ? e == null ? void 0 : e.states[r.entity] : void 0, a = Kt(n), o = ((d = s.scale) == null ? void 0 : d.preset) ?? a, l = pt(o), c = {
-    interval: ((m = s.bucket) == null ? void 0 : m.interval) ?? l.bucket.interval,
-    value: ((p = s.bucket) == null ? void 0 : p.value) ?? l.bucket.value
-  }, u = {
-    ...l.range,
-    ...s.range,
-    align: si((f = s.range) == null ? void 0 : f.align)
-  };
-  P(u);
-  const h = ((b = s.navigation) == null ? void 0 : b.mode) ?? (i.length > 8 ? "dropdown" : "tabs");
-  return {
-    title: s.title,
-    debug: s.debug ?? !1,
-    entities: i,
-    range: u,
-    bucket: c,
-    data: {
-      provider: ((E = s.data) == null ? void 0 : E.provider) ?? "auto",
-      prefetch: ((w = s.data) == null ? void 0 : w.prefetch) ?? !1,
-      max_cells: ((M = s.data) == null ? void 0 : M.max_cells) ?? Zt,
-      raw_history_hours: (($ = s.data) == null ? void 0 : $.raw_history_hours) ?? Qt,
-      refresh_interval: ii((C = s.data) == null ? void 0 : C.refresh_interval),
-      defer_until_visible: ((y = s.data) == null ? void 0 : y.defer_until_visible) ?? !0,
-      max_concurrent_requests: Se((Ne = s.data) == null ? void 0 : Ne.max_concurrent_requests)
-    },
-    missing: {
-      mode: ((Te = s.missing) == null ? void 0 : Te.mode) ?? "empty"
-    },
-    scale: {
-      ...l.scale,
-      ...s.scale,
-      preset: o
-    },
-    layout: {
-      mode: ((Le = s.layout) == null ? void 0 : Le.mode) ?? "auto",
-      bound_to_grid: ((De = s.layout) == null ? void 0 : De.bound_to_grid) ?? "auto"
-    },
-    navigation: {
-      mode: h
-    },
-    axes: {
-      show: ((Ie = s.axes) == null ? void 0 : Ie.show) ?? !0,
-      x_labels: ((ze = s.axes) == null ? void 0 : ze.x_labels) ?? !0,
-      y_labels: ((Re = s.axes) == null ? void 0 : Re.y_labels) ?? !0,
-      show_key: ((He = s.axes) == null ? void 0 : He.show_key) ?? !1
-    },
-    tiles: {
-      show_values: ((Fe = s.tiles) == null ? void 0 : Fe.show_values) ?? !1,
-      show_value_toggle: ((Oe = s.tiles) == null ? void 0 : Oe.show_value_toggle) ?? !1
-    },
-    legend: {
-      show: ((Pe = s.legend) == null ? void 0 : Pe.show) ?? !0
-    },
-    tooltip: {
-      show: ((Ue = s.tooltip) == null ? void 0 : Ue.show) ?? !0
-    }
-  };
-}
-function ii(s) {
-  return typeof s != "number" || !Number.isFinite(s) ? ei : Math.max(0, s);
-}
-function si(s) {
-  return s === "rolling" ? "rolling" : "day";
-}
-function ri(s, e) {
-  var i;
-  return ((i = s.entities) != null && i.length ? s.entities : s.entity ? [{ entity: s.entity }] : []).map((r) => {
-    const n = typeof r == "string" ? { entity: r } : r, a = e == null ? void 0 : e.states[n.entity], o = n.name ?? (a && (e != null && e.formatEntityName) ? e.formatEntityName(a) : a != null && a.attributes.friendly_name ? String(a.attributes.friendly_name) : n.entity), l = ni(n.scale);
-    return {
-      ...n,
-      ...l ? { scale: l } : {},
-      name: o
-    };
-  });
-}
-function ni(s) {
-  return s != null && s.preset ? {
-    min: void 0,
-    max: void 0,
-    unit: void 0,
-    stops: void 0,
-    ...pt(s.preset).scale,
-    ...s
-  } : s;
-}
-function P(s, e = /* @__PURE__ */ new Date()) {
-  const t = s.align === "day" && !s.end, i = s.end ? et(s.end) : t ? ai(e) : e;
-  let r;
-  if (s.start)
-    r = et(s.start);
-  else if (typeof s.hours == "number")
-    r = t ? li(i, s.hours) : new Date(i.getTime() - s.hours * 60 * 60 * 1e3);
-  else {
-    const n = typeof s.days == "number" ? s.days : 30;
-    r = t ? oi(i, n) : new Date(i.getTime() - n * 24 * 60 * 60 * 1e3);
-  }
-  if (Number.isNaN(r.getTime()) || Number.isNaN(i.getTime()))
-    throw new Error("Universal Heatmap Card has an invalid range date.");
-  if (r >= i)
-    throw new Error("Universal Heatmap Card range start must be before end.");
-  return { start: r, end: i };
-}
-function et(s) {
-  const e = ti.exec(s);
-  if (!e)
-    return new Date(s);
-  const [, t = "0", i = "1", r = "1"] = e, n = Number(t), a = Number(i) - 1, o = Number(r), l = /* @__PURE__ */ new Date(0);
-  return l.setFullYear(n, a, o), l.setHours(0, 0, 0, 0), l.getFullYear() !== n || l.getMonth() !== a || l.getDate() !== o ? new Date(Number.NaN) : l;
-}
-function ai(s) {
-  const e = new Date(s);
-  return e.setHours(0, 0, 0, 0), e.setDate(e.getDate() + 1), e;
-}
-function oi(s, e) {
-  const t = new Date(s);
-  return t.setDate(t.getDate() - e), t;
-}
-function li(s, e) {
-  const t = Math.trunc(e), i = new Date(s);
-  return i.setHours(i.getHours() - t), new Date(i.getTime() - (e - t) * 60 * 60 * 1e3);
-}
-function Ee(s, e = /* @__PURE__ */ new Date()) {
-  const t = P(s.range, e), i = (t.end.getTime() - t.start.getTime()) / 36e5;
-  switch (s.bucket.interval) {
-    case "5minute":
-      return Math.ceil(i * 12);
-    case "hour":
-      return Math.ceil(i);
-    case "day":
-      return Math.ceil(i / 24);
-    case "week":
-      return Math.ceil(i / 168);
-    case "month":
-      return Math.ceil(i / 720);
-    default:
-      return Math.ceil(i / 24);
-  }
-}
-function ci(s) {
-  return s < 9 ? 0 : s < 14 ? Math.max(6, Math.min(8, Math.floor(s * 0.72))) : Math.max(9, Math.min(13, Math.floor(s * 0.48)));
-}
-function ui(s, e) {
-  if (e < 14)
-    return 0;
-  const t = s < 1 ? 2 : s < 20 ? 1 : 0;
-  return e < 18 ? Math.min(t, 0) : t;
-}
-const hi = 36e5;
-function Me(s) {
-  return s === "last" ? "state" : ["mean", "min", "max", "state", "sum", "change"].includes(s) ? s : null;
-}
-function di(s, e) {
-  const t = new Date(s);
-  if (t.setMilliseconds(0), t.setSeconds(0), e !== "5minute" ? t.setMinutes(0) : t.setMinutes(Math.floor(t.getMinutes() / 5) * 5), (e === "day" || e === "week" || e === "month") && t.setHours(0, 0, 0, 0), e === "week") {
-    const i = t.getDay(), r = i === 0 ? -6 : 1 - i;
-    t.setDate(t.getDate() + r);
-  }
-  return e === "month" && t.setDate(1), t;
-}
-function mi(s, e) {
-  const t = new Date(s);
-  switch (e) {
-    case "5minute":
-      return t.setTime(t.getTime() + 5 * 6e4), t;
-    case "hour":
-      return t.setTime(t.getTime() + hi), t;
-    case "day":
-      return t.setDate(t.getDate() + 1), t;
-    case "week":
-      return t.setDate(t.getDate() + 7), t;
-    case "month":
-      return t.setMonth(t.getMonth() + 1), t;
-    default:
-      return t;
-  }
-}
-function gt(s, e) {
-  const t = [];
-  let i = di(s.start, e);
-  for (; i < s.end; ) {
-    const r = mi(i, e);
-    r > s.start && t.push({ start: new Date(i), end: new Date(r) }), i = r;
-  }
-  return t;
-}
-function k(s, e) {
-  return s.map((t) => ({
-    ...t,
-    value: null,
-    quality: "missing",
-    source: e
-  }));
-}
-function pi(s, e, t, i) {
-  const r = Me(t), n = k(s, "statistics");
-  if (!r)
-    return fe(n, i);
-  for (const a of e) {
-    const o = a.start ? new Date(a.start) : void 0;
-    if (!o || Number.isNaN(o.getTime()))
-      continue;
-    const l = gi(s, o);
-    if (l < 0)
-      continue;
-    const c = s[l];
-    if (!c)
-      continue;
-    const u = a[r], h = typeof u == "number" ? u : null;
-    n[l] = {
-      ...c,
-      value: h,
-      quality: h === null ? "missing" : "ok",
-      source: "statistics"
-    };
-  }
-  return fe(n, i);
-}
-function _i(s, e, t, i) {
-  var a;
-  const r = s.map(() => []);
-  for (const o of e) {
-    const l = Number(o.state);
-    if (!Number.isFinite(l))
-      continue;
-    const c = o.last_changed ?? o.last_updated;
-    if (!c)
-      continue;
-    const u = new Date(c).getTime();
-    if (!Number.isFinite(u))
-      continue;
-    const h = bt(s, u);
-    h >= 0 && ((a = r[h]) == null || a.push({ at: u, value: l }));
-  }
-  const n = s.map((o, l) => {
-    const c = r[l] ?? [], u = fi(c, t);
-    return {
-      ...o,
-      value: u,
-      quality: u === null ? "missing" : "ok",
-      source: "history"
-    };
-  });
-  return fe(n, i);
-}
-function fe(s, e) {
-  if (e === "empty")
-    return s;
-  let t = null;
-  return s.map((i) => i.value !== null ? (t = i.value, i) : e === "zero" ? { ...i, value: 0, quality: "ok" } : e === "carry_forward" && t !== null ? { ...i, value: t, quality: "carried" } : i);
-}
-function fi(s, e) {
-  var t, i;
-  if (s.length === 0)
-    return null;
-  switch (e) {
-    case "min":
-      return Math.min(...s.map((r) => r.value));
-    case "max":
-      return Math.max(...s.map((r) => r.value));
-    case "last":
-    case "state":
-      return s.reduce(
-        (n, a) => a.at >= n.at ? a : n
-      ).value;
-    case "sum":
-      return s.reduce((r, n) => r + n.value, 0);
-    case "delta":
-    case "change": {
-      const r = [...s].sort((o, l) => o.at - l.at), n = (t = r[0]) == null ? void 0 : t.value, a = (i = r[r.length - 1]) == null ? void 0 : i.value;
-      return n === void 0 || a === void 0 ? null : a - n;
-    }
-    case "count":
-      return s.length;
-    case "mean":
-    default:
-      return s.reduce((r, n) => r + n.value, 0) / s.length;
-  }
-}
-function gi(s, e) {
-  return bt(s, e.getTime());
-}
-function bt(s, e) {
-  let t = 0, i = s.length - 1;
-  for (; t <= i; ) {
-    const r = Math.floor((t + i) / 2), n = s[r];
-    if (!n)
-      return -1;
-    if (e < n.start.getTime())
-      i = r - 1;
-    else if (e >= n.end.getTime())
-      t = r + 1;
-    else
-      return r;
-  }
-  return -1;
-}
-async function bi(s, e, t) {
-  const i = Ee(e), r = P(e.range), n = gt(r, e.bucket.interval);
-  if (i > e.data.max_cells)
-    return {
-      source: "current",
-      buckets: k(n, "current"),
-      warning: `This heatmap would render ${i.toLocaleString()} cells. Raise data.max_cells to load it.`
-    };
-  const a = e.data.provider, o = Me(e.bucket.value) !== null;
-  if ((a === "auto" || a === "statistics") && o)
-    try {
-      const l = await vi(s, e, t, n);
-      if (l.some((c) => c.value !== null) || a === "statistics")
-        return { source: "statistics", buckets: l };
-    } catch (l) {
-      if (a === "statistics")
-        return {
-          source: "statistics",
-          buckets: k(n, "statistics"),
-          warning: vt(l, "Statistics query failed.")
-        };
-    }
-  return a === "auto" || a === "history" ? yi(s, e, t, n) : {
-    source: "current",
-    buckets: k(n, "current"),
-    warning: "No supported data provider is available for this bucket value yet."
-  };
-}
-async function vi(s, e, t, i) {
-  const r = Me(e.bucket.value);
-  if (!r)
-    return k(i, "statistics");
-  const n = P(e.range), o = (await s.callWS({
-    type: "recorder/statistics_during_period",
-    start_time: n.start.toISOString(),
-    end_time: n.end.toISOString(),
-    statistic_ids: [t.entity],
-    period: e.bucket.interval,
-    types: [r]
-  }))[t.entity] ?? [];
-  return pi(i, o, e.bucket.value, e.missing.mode);
-}
-async function yi(s, e, t, i) {
-  const r = P(e.range), n = (r.end.getTime() - r.start.getTime()) / 36e5;
-  if (!s.callApi)
-    return {
-      source: "history",
-      buckets: k(i, "history"),
-      warning: "This Home Assistant object does not expose callApi for history fallback."
-    };
-  if (n > e.data.raw_history_hours)
-    return {
-      source: "history",
-      buckets: k(i, "history"),
-      warning: `Raw history fallback is capped at ${e.data.raw_history_hours} hours by default. Use recorder statistics or reduce range.`
-    };
-  try {
-    const a = new URLSearchParams({
-      end_time: r.end.toISOString(),
-      filter_entity_id: t.entity
-    }), l = (await s.callApi(
-      "GET",
-      `history/period/${r.start.toISOString()}?${a.toString()}&minimal_response&no_attributes`
-    )).flat();
-    return {
-      source: "history",
-      buckets: _i(i, l, e.bucket.value, e.missing.mode)
-    };
-  } catch (a) {
-    return {
-      source: "history",
-      buckets: k(i, "history"),
-      warning: vt(a, "History fallback failed.")
-    };
-  }
-}
-function vt(s, e) {
-  return s instanceof Error && s.message ? s.message : e;
-}
-const xi = "universal-heatmap-card:debug";
-function wi(s) {
-  var e;
-  if ((s == null ? void 0 : s.debug) === !0)
-    return !0;
-  if ((s == null ? void 0 : s.debug) === !1 || typeof window > "u")
-    return !1;
-  try {
-    const t = (e = window.localStorage) == null ? void 0 : e.getItem(xi);
-    return t === "1" || t === "true";
-  } catch {
-    return !1;
-  }
-}
-function x() {
-  var s, e;
-  return ((e = (s = globalThis.performance) == null ? void 0 : s.now) == null ? void 0 : e.call(s)) ?? Date.now();
-}
-function q(s) {
-  return Math.round(s * 10) / 10;
-}
-function v(s, e, t) {
-  if (s) {
-    if (t) {
-      console.debug(`[Universal Heatmap Card] ${e}`, t);
-      return;
-    }
-    console.debug(`[Universal Heatmap Card] ${e}`);
-  }
-}
-function yt() {
-  return {
-    schema: [
-      { name: "title", selector: { text: {} } },
-      {
-        name: "entities",
-        required: !0,
-        selector: {
-          entity: {
-            domain: "sensor",
-            multiple: !0,
-            reorder: !0
-          }
-        }
-      },
-      { name: "debug", selector: { boolean: {} } },
-      {
-        type: "expandable",
-        name: "range",
-        title: "Range",
-        schema: [
-          { name: "hours", selector: { number: { min: 1, max: 720, mode: "box" } } },
-          { name: "days", selector: { number: { min: 1, max: 365, mode: "box" } } },
-          { name: "align", selector: { select: { options: [
-            { value: "day", label: "Fixed days, 00:00-23:59" },
-            { value: "rolling", label: "Rolling window" }
-          ] } } }
-        ]
-      },
-      {
-        type: "expandable",
-        name: "bucket",
-        title: "Bucket",
-        schema: [
-          { name: "interval", selector: { select: { options: ["5minute", "hour", "day", "week", "month"] } } },
-          { name: "value", selector: { select: { options: [
-            "mean",
-            "min",
-            "max",
-            "last",
-            "state",
-            "sum",
-            "delta",
-            "change",
-            "count",
-            "percent_on",
-            "duration_on"
-          ] } } }
-        ]
-      },
-      {
-        type: "expandable",
-        name: "scale",
-        title: "Scale",
-        schema: [
-          { name: "preset", selector: { select: { options: [
-            "auto",
-            "temperature",
-            "power",
-            "energy_delta",
-            "humidity",
-            "percent_health",
-            "percent_utilization",
-            "filter_dp",
-            "filter_life",
-            "filter_load",
-            "battery",
-            "signal_quality",
-            "binary_runtime"
-          ] } } },
-          { name: "min", selector: { number: { mode: "box" } } },
-          { name: "max", selector: { number: { mode: "box" } } },
-          { name: "unit", selector: { text: {} } },
-          {
-            name: "sensitivity",
-            selector: { number: { min: 0.2, max: 4, step: 0.1, mode: "slider" } }
-          },
-          {
-            name: "outlier_clip",
-            selector: { number: { min: 0, max: 20, step: 0.5, mode: "box" } }
-          }
-        ]
-      },
-      {
-        type: "expandable",
-        name: "tiles",
-        title: "Tiles",
-        schema: [
-          { name: "show_values", selector: { boolean: {} } },
-          { name: "show_value_toggle", selector: { boolean: {} } }
-        ]
-      },
-      {
-        type: "expandable",
-        name: "data",
-        title: "Data",
-        schema: [
-          { name: "provider", selector: { select: { options: ["auto", "statistics", "history"] } } },
-          { name: "refresh_interval", selector: { number: { min: 0, max: 86400, mode: "box" } } },
-          { name: "defer_until_visible", selector: { boolean: {} } },
-          { name: "max_concurrent_requests", selector: { number: { min: 1, max: 8, mode: "box" } } },
-          { name: "max_cells", selector: { number: { min: 1, max: 5e4, mode: "box" } } }
-        ]
-      }
-    ],
-    computeLabel: (r) => {
-      const n = {
-        title: "Title",
-        entities: "Entities",
-        debug: "Debug logging",
-        hours: "Hours",
-        days: "Days",
-        refresh_interval: "Refresh interval",
-        defer_until_visible: "Load when visible",
-        max_concurrent_requests: "Concurrent recorder requests",
-        max_cells: "Maximum cells",
-        interval: "Interval",
-        value: "Value",
-        provider: "Provider",
-        preset: "Scale preset",
-        min: "Minimum value",
-        max: "Maximum value",
-        unit: "Display unit",
-        sensitivity: "Scale tuning",
-        outlier_clip: "Outlier clip",
-        show_values: "Show values in cells",
-        show_value_toggle: "Show value toggle on card",
-        align: "Alignment"
-      };
-      return r.name ? n[r.name] : void 0;
-    },
-    computeHelper: (r) => {
-      const n = {
-        entities: "Choose one or more numeric sensor entities. Existing YAML names and per-entity options are preserved for unchanged entities.",
-        debug: "Writes cache and timing details to the browser console. Leave off unless diagnosing.",
-        title: "Optional card title. Leave blank to use the active entity name.",
-        hours: "Optional rolling or fixed-hour window. Usually leave empty when using days.",
-        days: "Number of days to show. Hourly fixed-day heatmaps use full local days.",
-        align: "Fixed days align to local midnight and render stable 00:00-23:59 columns. Rolling ends at the current time.",
-        interval: "Bucket width for the heatmap cells.",
-        value: "Recorder statistic or history value to aggregate into each bucket.",
-        provider: "Auto prefers recorder statistics and falls back to capped raw history when needed.",
-        preset: "Unit-aware color and bucket defaults. Auto infers from device class, unit, and entity name.",
-        min: "Optional fixed lower scale bound. Leave empty to auto-range from observed bucket values.",
-        max: "Optional fixed upper scale bound. Leave empty to auto-range from observed bucket values.",
-        unit: "Optional label suffix for summary and legend values.",
-        show_values: "Draw compact bucket values inside each tile. Off by default; works best when the card has enough width for larger cells.",
-        show_value_toggle: "Adds a compact 123 button beside the current value chip so values can be toggled without opening edit mode.",
-        refresh_interval: "Minimum seconds between recorder refreshes during Home Assistant updates. Set to 0 to cache until the card config changes.",
-        defer_until_visible: "Keeps off-screen cards from asking recorder for history until they scroll near the viewport.",
-        max_concurrent_requests: "Shared browser-side limit for recorder/history requests from this card type. Default is 2.",
-        sensitivity: "Higher values exaggerate close differences; lower values soften peaky data.",
-        outlier_clip: "Percentile trim for auto-range scaling. Leave empty for full observed range."
-      };
-      return r.name ? n[r.name] : void 0;
-    }
-  };
-}
-function Q(s) {
-  return xt(s).map((e) => typeof e == "string" ? e : e.entity).filter((e) => typeof e == "string" && e.length > 0);
-}
-function xt(s) {
-  var t;
-  return ((t = s.entities) != null && t.length ? s.entities : s.entity ? [s.entity] : []).map((i) => typeof i == "string" ? i : { ...i });
-}
-function ge(s, e) {
-  const t = /* @__PURE__ */ new Map();
-  for (const i of xt(s)) {
-    const r = typeof i == "string" ? i : i.entity;
-    r && t.set(r, typeof i == "string" ? i : { ...i });
-  }
-  return e.map((i) => t.get(i) ?? i);
-}
-function $i(s, e, t) {
-  const i = Q(s), r = t.trim(), n = ge(s, i).map((o) => {
-    const l = typeof o == "string" ? o : o.entity;
-    if (l !== e)
-      return o;
-    const c = typeof o == "string" ? { entity: l } : { ...o };
-    return r ? c.name = r : delete c.name, Object.keys(c).length === 1 ? l : c;
-  }), a = {
-    ...s,
-    entities: n
-  };
-  return delete a.entity, a;
-}
-const wt = 56, be = 8, Ai = 12, Si = 6, Ce = 4, ki = 12, $t = 560, tt = 3, Ei = 7, Mi = 22, Ci = 14, Ni = 28, Ti = 58, Li = 82, Di = 18;
-function At(s, e, t = oe(e, Math.max(1, s.length))) {
-  const i = Math.max(1, Math.floor(t)), r = [];
-  if (e !== "hour")
-    return s.forEach((l, c) => {
-      r.push({
-        index: c,
-        row: Math.floor(c / i),
-        col: c % i,
-        slot: 0,
-        slots: 1
-      });
-    }), { rows: Math.max(1, Math.ceil(s.length / i)), cols: i, cells: r };
-  const n = /* @__PURE__ */ new Map();
-  let a = -1, o = "";
-  s.forEach((l, c) => {
-    const u = l.start, h = `${u.getFullYear()}-${u.getMonth()}-${u.getDate()}`;
-    h !== o && (o = h, a += 1);
-    const d = Math.min(i - 1, Math.max(0, u.getHours())), m = a * i + d, p = n.get(m) ?? 0;
-    n.set(m, p + 1), r.push({ index: c, row: a, col: d, slot: p, slots: 1 });
-  });
-  for (const l of r)
-    l.slots = n.get(l.row * i + l.col) ?? 1;
-  return { rows: Math.max(1, a + 1), cols: i, cells: r };
-}
-function Ii(s) {
-  const e = -s.getTimezoneOffset(), t = e < 0 ? "-" : "+", i = Math.abs(e), r = String(Math.floor(i / 60)).padStart(2, "0"), n = String(i % 60).padStart(2, "0");
-  return `UTC${t}${r}:${n}`;
-}
-function zi(s) {
-  const e = Math.max(1, Math.floor(s));
-  return e * wt + Math.max(0, e - 1) * be;
-}
-function Ri(s) {
-  return !Number.isFinite(s) || s <= 0 ? Ce : Math.ceil((s + be) / (wt + be));
-}
-function Hi(s, e = {}, t = /* @__PURE__ */ new Date()) {
-  return qi(
-    Ri(St(s, e, t)),
-    Ce,
-    ki
-  );
-}
-function Fi(s, e = {}, t = /* @__PURE__ */ new Date()) {
-  return Math.max(1, Math.ceil(St(s, e, t) / 50));
-}
-function St(s, e = {}, t = /* @__PURE__ */ new Date()) {
-  return kt(s, e) + Oi(s, $t, t);
-}
-function kt(s, e = {}) {
-  let t = 58;
-  return t += 16, s.entities.length > 1 && (t += Ui(s)), (e.loading || e.warning || e.error) && (t += 33), s.axes.show_key && (t += 24), t += 25, s.legend.show && (t += 25), t;
-}
-function Oi(s, e = $t, t = /* @__PURE__ */ new Date()) {
-  const i = Math.max(1, Ee(s, t)), r = oe(s.bucket.interval, i), n = Pi(s, t), a = s.axes.show && s.axes.y_labels ? Et(s.bucket.interval) : 0, o = s.axes.show && s.axes.x_labels ? Di : 0, l = Math.max(160, e - a), c = s.tiles.show_values || s.tiles.show_value_toggle, d = Math.max(
-    c ? Ci : Ei,
-    Math.min(
-      c ? Ni : Mi,
-      Math.floor((l - Math.max(0, r - 1) * tt) / r)
-    )
-  );
-  return o + n * d + Math.max(0, n - 1) * tt;
-}
-function Pi(s, e) {
-  const t = Math.max(1, Ee(s, e)), i = oe(s.bucket.interval, t);
-  if (s.bucket.interval !== "hour")
-    return Math.ceil(t / i);
-  const r = gt(P(s.range, e), "hour");
-  return At(r, "hour", i).rows;
-}
-function Et(s) {
-  return s === "5minute" ? Li : Ti;
-}
-function Ui(s) {
-  switch (s.navigation.mode) {
-    case "dots":
-      return 24;
-    case "tabs": {
-      const t = Math.max(1, Math.ceil(s.entities.length / 3));
-      return t * 32 + Math.max(0, t - 1) * 8 + 10;
-    }
-    case "arrows":
-    case "dropdown":
-    default:
-      return 42;
-  }
-}
-function oe(s, e) {
-  return s === "hour" ? 24 : s === "5minute" ? 48 : s === "day" ? 7 : s === "month" ? 12 : Math.min(12, Math.ceil(Math.sqrt(e * 1.8)));
-}
-function qi(s, e, t) {
-  return Math.max(e, Math.min(t, s));
-}
-const Vi = [
-  { value: 0, color: "#3a6ea5" },
-  { value: 0.5, color: "#6fbf73" },
-  { value: 1, color: "#f6c85f" }
+* Maps buckets onto the render grid.
+*
+* Hourly grids use a fixed 24-column wall-clock layout: buckets are grouped by
+* local calendar day (one row per day) and placed in the column of their local
+* hour. That keeps 23-hour and 25-hour DST days intact - the nonexistent
+* spring-forward hour simply leaves its column blank, and the two fall-back
+* 01:00 hours stay separate logical cells sharing (splitting) one column.
+* Every other interval keeps the sequential row-major placement.
+*/
+function Ot(e, t, n = Rt(t, Math.max(1, e.length))) {
+	let r = Math.max(1, Math.floor(n)), i = [];
+	if (t !== "hour") return e.forEach((e, t) => {
+		i.push({
+			index: t,
+			row: Math.floor(t / r),
+			col: t % r,
+			slot: 0,
+			slots: 1
+		});
+	}), {
+		rows: Math.max(1, Math.ceil(e.length / r)),
+		cols: r,
+		cells: i
+	};
+	let a = /* @__PURE__ */ new Map(), o = -1, s = "";
+	e.forEach((e, t) => {
+		let n = e.start, c = `${n.getFullYear()}-${n.getMonth()}-${n.getDate()}`;
+		c !== s && (s = c, o += 1);
+		let l = Math.min(r - 1, Math.max(0, n.getHours())), u = o * r + l, d = a.get(u) ?? 0;
+		a.set(u, d + 1), i.push({
+			index: t,
+			row: o,
+			col: l,
+			slot: d,
+			slots: 1
+		});
+	});
+	for (let e of i) e.slots = a.get(e.row * r + e.col) ?? 1;
+	return {
+		rows: Math.max(1, o + 1),
+		cols: r,
+		cells: i
+	};
+}
+/** Formats a date's local UTC offset, used to disambiguate repeated DST hours. */
+function kt(e) {
+	let t = -e.getTimezoneOffset(), n = t < 0 ? "-" : "+", r = Math.abs(t);
+	return `UTC${n}${String(Math.floor(r / 60)).padStart(2, "0")}:${String(r % 60).padStart(2, "0")}`;
+}
+function At(e) {
+	let t = Math.max(1, Math.floor(e));
+	return t * 56 + Math.max(0, t - 1) * 8;
+}
+function jt(e) {
+	return !Number.isFinite(e) || e <= 0 ? 4 : Math.ceil((e + 8) / 64);
+}
+function Mt(e, t = {}) {
+	return zt(jt(Pt(e, t)), 4, yt);
+}
+function Nt(e, t = {}) {
+	return Math.max(1, Math.ceil(Pt(e, t) / 50));
+}
+function Pt(e, t = {}) {
+	return Ft(e, t) + It(e);
+}
+function Ft(e, t = {}) {
+	let n = 58;
+	return n += 16, e.entities.length > 1 && (n += Lt(e)), (t.loading || t.warning || t.error) && (n += 33), e.axes.show_key && (n += 24), n += 25, e.legend.show && (n += 25), n;
+}
+function It(e, t = bt) {
+	let n = Math.max(1, Xe(e)), r = Rt(e.bucket.interval, n), i = Math.ceil(n / r), a = e.axes.show && e.axes.y_labels ? Et : 0, o = e.axes.show && e.axes.x_labels ? Dt : 0, s = Math.max(160, t - a), c = e.tiles.show_values || e.tiles.show_value_toggle;
+	return o + i * Math.max(c ? wt : St, Math.min(c ? Tt : Ct, Math.floor((s - Math.max(0, r - 1) * xt) / r))) + Math.max(0, i - 1) * xt;
+}
+function Lt(e) {
+	switch (e.navigation.mode) {
+		case "dots": return 24;
+		case "tabs": {
+			let t = Math.max(1, Math.ceil(e.entities.length / 3));
+			return t * 32 + Math.max(0, t - 1) * 8 + 10;
+		}
+		default: return 42;
+	}
+}
+function Rt(e, t) {
+	return e === "hour" ? 24 : e === "5minute" ? 48 : e === "day" ? 7 : e === "month" ? 12 : Math.min(12, Math.ceil(Math.sqrt(t * 1.8)));
+}
+function zt(e, t, n) {
+	return Math.max(t, Math.min(n, e));
+}
+//#endregion
+//#region src/scale.ts
+var Bt = [
+	{
+		value: 0,
+		color: "#3a6ea5"
+	},
+	{
+		value: .5,
+		color: "#6fbf73"
+	},
+	{
+		value: 1,
+		color: "#f6c85f"
+	}
 ];
-function Bi(s, e) {
-  var p;
-  const t = s.map((f) => f.value).filter((f) => typeof f == "number" && Number.isFinite(f)), i = t.filter((f) => f !== 0), n = e.ignore_zero === !0 || e.ignore_zero !== !1 && i.length > 0 && t.some((f) => f === 0) && !t.some((f) => f < 0) ? i : t, a = Yi(n, e.outlier_clip), o = a.min, l = a.max, { min: c, max: u } = Gi(e, o, l), h = (p = e.stops) != null && p.length ? e.stops : Vi, d = Xi(h, c, u, e.invert ?? !1), m = ji(e.sensitivity);
-  return {
-    min: c,
-    max: u,
-    unit: e.unit,
-    sensitivity: m,
-    stops: d,
-    clippedLow: t.some((f) => f < c),
-    clippedHigh: t.some((f) => f > u)
-  };
+function Vt(e, t) {
+	let n = e.map((e) => e.value).filter((e) => typeof e == "number" && Number.isFinite(e)), r = n.filter((e) => e !== 0), i = qt(t.ignore_zero === !0 || t.ignore_zero !== !1 && r.length > 0 && n.some((e) => e === 0) && !n.some((e) => e < 0) ? r : n, t.outlier_clip), a = i.min, o = i.max, { min: s, max: c } = Wt(t, a, o), l = Kt(t.stops?.length ? t.stops : Bt, s, c, t.invert ?? !1), u = Xt(t.sensitivity);
+	return {
+		min: s,
+		max: c,
+		unit: t.unit,
+		sensitivity: u,
+		stops: l,
+		clippedLow: n.some((e) => e < s),
+		clippedHigh: n.some((e) => e > c)
+	};
 }
-function Mt(s, e) {
-  var r, n, a, o;
-  if (s === null || !Number.isFinite(s))
-    return "rgba(127, 127, 127, 0.22)";
-  const t = Ji(s, e), i = e.stops;
-  if (i.length === 0)
-    return "#999999";
-  if (i.length === 1)
-    return ((r = i[0]) == null ? void 0 : r.color) ?? "#999999";
-  for (let l = 0; l < i.length - 1; l += 1) {
-    const c = i[l], u = i[l + 1];
-    if (!(!c || !u) && t >= c.value && t <= u.value) {
-      const h = u.value - c.value || 1, d = (t - c.value) / h;
-      return Zi(c.color, u.color, d);
-    }
-  }
-  return t < (((n = i[0]) == null ? void 0 : n.value) ?? e.min) ? ((a = i[0]) == null ? void 0 : a.color) ?? "#999999" : ((o = i[i.length - 1]) == null ? void 0 : o.color) ?? "#999999";
+function Ht(e, t) {
+	if (e === null || !Number.isFinite(e)) return "rgba(127, 127, 127, 0.22)";
+	let n = Zt(e, t), r = t.stops;
+	if (r.length === 0) return "#999999";
+	if (r.length === 1) return r[0]?.color ?? "#999999";
+	for (let e = 0; e < r.length - 1; e += 1) {
+		let t = r[e], i = r[e + 1];
+		if (!(!t || !i) && n >= t.value && n <= i.value) {
+			let e = i.value - t.value || 1, r = (n - t.value) / e;
+			return Qt(t.color, i.color, r);
+		}
+	}
+	return n < (r[0]?.value ?? t.min) ? r[0]?.color ?? "#999999" : r[r.length - 1]?.color ?? "#999999";
 }
-function Wi(s, e = 18) {
-  const t = s.max - s.min || 1, i = Math.max(2, e);
-  return Array.from({ length: i }, (r, n) => {
-    const a = n / (i - 1), o = s.min + t * a;
-    return `${Mt(o, s)} ${a * 100}%`;
-  }).join(", ");
+function Ut(e, t = 18) {
+	let n = e.max - e.min || 1, r = Math.max(2, t);
+	return Array.from({ length: r }, (t, i) => {
+		let a = i / (r - 1);
+		return `${Ht(e.min + n * a, e)} ${a * 100}%`;
+	}).join(", ");
 }
-function z(s, e, t) {
-  if (s === null || !Number.isFinite(s))
-    return "missing";
-  const i = Math.abs(s), r = i >= 100 ? 0 : i >= 10 ? 1 : 2, n = new Intl.NumberFormat(t, {
-    maximumFractionDigits: r
-  }).format(s);
-  return e.unit ? `${n} ${e.unit}` : n;
+function Z(e, t, n) {
+	if (e === null || !Number.isFinite(e)) return "missing";
+	let r = Math.abs(e), i = r >= 100 ? 0 : r >= 10 ? 1 : 2, a = new Intl.NumberFormat(n, { maximumFractionDigits: i }).format(e);
+	return t.unit ? `${a} ${t.unit}` : a;
 }
-function Gi(s, e, t) {
-  const i = typeof s.min == "number", r = typeof s.max == "number", n = i ? s.min : e, a = r ? s.max : t;
-  return a > n ? { min: n, max: a } : r ? i ? { min: n, max: n + 1 } : { min: a - 1, max: a } : { min: n, max: n + 1 };
+function Wt(e, t, n) {
+	let r = typeof e.min == "number", i = typeof e.max == "number", a = r ? e.min : t, o = i ? e.max : n;
+	return o > a ? {
+		min: a,
+		max: o
+	} : i ? r ? Gt(a, !0) : Gt(o, !1) : Gt(a, !0);
 }
-function Xi(s, e, t, i) {
-  const r = s.every((l) => l.value >= 0 && l.value <= 1), a = s.map((l) => r ? { ...l, value: e + l.value * (t - e) } : l).sort((l, c) => l.value - c.value);
-  if (!i)
-    return a;
-  const o = a.map((l) => l.color).reverse();
-  return a.map((l, c) => ({
-    ...l,
-    color: o[c] ?? l.color
-  }));
+function Gt(e, t) {
+	let n = Math.abs(e) * 2 ** -52 * 4, r = n > 0 && Number.isFinite(n) ? n : 1, i = e + r, a = e - r;
+	return t && Number.isFinite(i) && i > e ? {
+		min: e,
+		max: i
+	} : Number.isFinite(a) && a < e ? {
+		min: a,
+		max: e
+	} : Number.isFinite(i) && i > e ? {
+		min: e,
+		max: i
+	} : {
+		min: e - 1,
+		max: e + 1
+	};
 }
-function Yi(s, e) {
-  if (s.length === 0)
-    return { min: 0, max: 1 };
-  const t = [...s].sort((a, o) => a - o), i = Ki(e);
-  if (!i)
-    return {
-      min: t[0] ?? 0,
-      max: t[t.length - 1] ?? 1
-    };
-  const r = it(t, i.low), n = it(t, i.high);
-  return n <= r ? {
-    min: t[0] ?? 0,
-    max: t[t.length - 1] ?? r + 1
-  } : { min: r, max: n };
+function Kt(e, t, n, r) {
+	let i = e.every((e) => e.value >= 0 && e.value <= 1), a = e.map((e) => i ? {
+		...e,
+		value: t + e.value * (n - t)
+	} : e).sort((e, t) => e.value - t.value);
+	if (!r) return a;
+	let o = a.map((e) => e.color).reverse();
+	return a.map((e, t) => ({
+		...e,
+		color: o[t] ?? e.color
+	}));
 }
-function Ki(s) {
-  if (typeof s == "number") {
-    if (!Number.isFinite(s) || s <= 0)
-      return null;
-    const i = D(s, 0, 49);
-    return { low: i, high: 100 - i };
-  }
-  if (!Array.isArray(s) || s.length !== 2)
-    return null;
-  const e = Number(s[0]), t = Number(s[1]);
-  return !Number.isFinite(e) || !Number.isFinite(t) || t <= e ? null : {
-    low: D(e, 0, 100),
-    high: D(t, 0, 100)
-  };
+function qt(e, t) {
+	if (e.length === 0) return {
+		min: 0,
+		max: 1
+	};
+	let n = [...e].sort((e, t) => e - t), r = Jt(t);
+	if (!r) return {
+		min: n[0] ?? 0,
+		max: n[n.length - 1] ?? 1
+	};
+	let i = Yt(n, r.low), a = Yt(n, r.high);
+	return a <= i ? {
+		min: n[0] ?? 0,
+		max: n[n.length - 1] ?? i + 1
+	} : {
+		min: i,
+		max: a
+	};
 }
-function it(s, e) {
-  if (s.length === 0)
-    return 0;
-  const t = D(
-    Math.ceil(e / 100 * s.length) - 1,
-    0,
-    s.length - 1
-  );
-  return s[t] ?? s[0] ?? 0;
+function Jt(e) {
+	if (typeof e == "number") {
+		if (!Number.isFinite(e) || e <= 0) return null;
+		let t = Q(e, 0, 49);
+		return {
+			low: t,
+			high: 100 - t
+		};
+	}
+	if (!Array.isArray(e) || e.length !== 2) return null;
+	let t = Number(e[0]), n = Number(e[1]);
+	return !Number.isFinite(t) || !Number.isFinite(n) || n <= t ? null : {
+		low: Q(t, 0, 100),
+		high: Q(n, 0, 100)
+	};
 }
-function ji(s) {
-  return typeof s != "number" || !Number.isFinite(s) || s <= 0 ? 1 : D(s, 0.1, 5);
+function Yt(e, t) {
+	return e.length === 0 ? 0 : e[Q(Math.ceil(t / 100 * e.length) - 1, 0, e.length - 1)] ?? e[0] ?? 0;
 }
-function Ji(s, e) {
-  const t = e.max - e.min || 1, r = (D(s, e.min, e.max) - e.min) / t, n = D(0.5 + (r - 0.5) * e.sensitivity, 0, 1);
-  return e.min + n * t;
+function Xt(e) {
+	return typeof e != "number" || !Number.isFinite(e) || e <= 0 ? 1 : Q(e, .1, 5);
 }
-function Zi(s, e, t) {
-  const i = st(s), r = st(e);
-  if (!i || !r)
-    return t < 0.5 ? s : e;
-  const n = Math.round(i.r + (r.r - i.r) * t), a = Math.round(i.g + (r.g - i.g) * t), o = Math.round(i.b + (r.b - i.b) * t);
-  return `rgb(${n}, ${a}, ${o})`;
+function Zt(e, t) {
+	let n = t.max - t.min || 1, r = Q(.5 + ((Q(e, t.min, t.max) - t.min) / n - .5) * t.sensitivity, 0, 1);
+	return t.min + r * n;
 }
-function st(s) {
-  const e = s.replace("#", "").trim(), t = e.length === 3 ? e.split("").map((i) => `${i}${i}`).join("") : e;
-  return /^[0-9a-fA-F]{6}$/.test(t) ? {
-    r: Number.parseInt(t.slice(0, 2), 16),
-    g: Number.parseInt(t.slice(2, 4), 16),
-    b: Number.parseInt(t.slice(4, 6), 16)
-  } : null;
+function Qt(e, t, n) {
+	let r = $t(e), i = $t(t);
+	return !r || !i ? n < .5 ? e : t : `rgb(${Math.round(r.r + (i.r - r.r) * n)}, ${Math.round(r.g + (i.g - r.g) * n)}, ${Math.round(r.b + (i.b - r.b) * n)})`;
 }
-function D(s, e, t) {
-  return s < e ? e : s > t ? t : s;
+function $t(e) {
+	let t = e.replace("#", "").trim(), n = t.length === 3 ? t.split("").map((e) => `${e}${e}`).join("") : t;
+	return /^[0-9a-fA-F]{6}$/.test(n) ? {
+		r: Number.parseInt(n.slice(0, 2), 16),
+		g: Number.parseInt(n.slice(2, 4), 16),
+		b: Number.parseInt(n.slice(4, 6), 16)
+	} : null;
 }
-function Qi(s, e, t) {
-  return new Intl.DateTimeFormat(t, {
-    month: "short",
-    day: "numeric",
-    hour: e === "hour" || e === "5minute" ? "numeric" : void 0,
-    minute: e === "5minute" ? "2-digit" : void 0
-  }).format(s);
+function Q(e, t, n) {
+	return e < t ? t : e > n ? n : e;
 }
-function es(s, e, t) {
-  const i = e === "month" ? { year: "2-digit" } : e === "5minute" ? { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" } : { month: "short", day: "numeric" };
-  return new Intl.DateTimeFormat(t, i).format(s);
-}
-function rt(s) {
-  switch (s) {
-    case "5minute":
-      return {
-        x: "elapsed time within each 4-hour row",
-        y: "local date and row start time"
-      };
-    case "hour":
-      return { x: "time of day", y: "date" };
-    case "day":
-      return { x: "day of week", y: "week row" };
-    case "week":
-      return { x: "week", y: "period row" };
-    case "month":
-      return { x: "month", y: "period row" };
-    default:
-      return { x: "bucket", y: "row" };
-  }
-}
-function ts() {
-  const s = [0, 12, 24, 36, 47];
-  return s.map((e, t) => ({
-    col: e,
-    label: is(e * 5),
-    align: t === 0 ? "left" : t === s.length - 1 ? "right" : "center"
-  }));
-}
-function is(s) {
-  if (s === 0)
-    return "0h";
-  const e = Math.floor(s / 60), t = s % 60;
-  return `+${e}h${t === 0 ? "" : `${t}m`}`;
-}
-const ie = "universal-heatmap-card", se = "Universal Heatmap Card", ss = "0.1.3", ve = `${ie}-editor`;
-class nt extends Error {
-  constructor() {
-    super("Stale heatmap load skipped.");
-  }
-}
-const re = class re extends H {
-  constructor() {
-    super(...arguments), this._activeIndex = 0, this._buckets = [], this._loading = !1, this._cache = /* @__PURE__ */ new Map(), this._debug = !1, this._deferredLoadPending = !1, this._visibleForLoad = typeof globalThis.IntersectionObserver > "u", this._loadSeq = 0, this._cellFormatCache = /* @__PURE__ */ new Map();
-  }
-  setConfig(e) {
-    var r, n;
-    const t = (n = (r = this._normalized) == null ? void 0 : r.entities[this._activeIndex]) == null ? void 0 : n.entity;
-    this._config = e, this._debug = wi(e), this._cache.clear(), this._inFlightKey = void 0, this._loadSeq += 1, this._normalized = pe(e, this.hass, this._activeIndex);
-    const i = this._resolveActiveIndex(t);
-    i !== this._activeIndex && (this._activeIndex = i, this._normalized = pe(e, this.hass, i)), this._tileValuesOverride = void 0, this._tooltip = void 0, v(this._debug, "config applied", {
-      entityCount: this._normalized.entities.length,
-      bucket: this._normalized.bucket,
-      range: this._normalized.range,
-      boundToGrid: this._normalized.layout.bound_to_grid,
-      refreshInterval: this._normalized.data.refresh_interval,
-      deferUntilVisible: this._normalized.data.defer_until_visible,
-      maxConcurrentRequests: this._normalized.data.max_concurrent_requests
-    }), this.hass && this._requestActiveSeriesLoad();
-  }
-  getCardSize() {
-    return this._estimatedMasonryRows();
-  }
-  getGridOptions() {
-    var o, l, c, u, h, d, m, p;
-    const e = (l = (o = this._config) == null ? void 0 : o.grid_options) == null ? void 0 : l.rows, t = (u = (c = this._config) == null ? void 0 : c.grid_options) == null ? void 0 : u.columns, i = typeof e == "number" && Number.isFinite(e) ? Math.max(1, e) : this._estimatedGridRows(), r = typeof t == "number" && Number.isFinite(t) ? Math.max(1, t) : Ai, n = (d = (h = this._config) == null ? void 0 : h.grid_options) == null ? void 0 : d.min_rows, a = (p = (m = this._config) == null ? void 0 : m.grid_options) == null ? void 0 : p.min_columns;
-    return {
-      rows: i,
-      columns: r,
-      min_rows: typeof n == "number" && Number.isFinite(n) ? Math.min(n, i) : Math.min(Ce, i),
-      min_columns: typeof a == "number" && Number.isFinite(a) ? Math.min(a, r) : Math.min(Si, r)
-    };
-  }
-  connectedCallback() {
-    super.connectedCallback(), this._setupVisibilityObserver(), this._requestActiveSeriesLoad();
-  }
-  disconnectedCallback() {
-    var e;
-    (e = this._visibilityObserver) == null || e.disconnect(), this._visibilityObserver = void 0, super.disconnectedCallback();
-  }
-  static getStubConfig() {
-    return {
-      entity: "sensor.example_temperature",
-      range: { days: 30 },
-      bucket: { interval: "day", value: "mean" },
-      scale: { preset: "temperature" }
-    };
-  }
-  static getConfigElement() {
-    return document.createElement(ve);
-  }
-  static getConfigForm() {
-    return yt();
-  }
-  updated(e) {
-    this._config && (e.has("hass") || e.has("_activeIndex")) && (this._normalized = pe(this._config, this.hass, this._activeIndex), this._requestActiveSeriesLoad()), (e.has("_buckets") || e.has("_loading") || e.has("_tileValuesOverride") || e.has("_warning")) && this.updateComplete.then(() => this._drawHeatmap());
-  }
-  render() {
-    var n;
-    if (!this._normalized)
-      return g`<ha-card><div class="empty">Configure ${se}</div></ha-card>`;
-    const e = this._normalized.entities[this._activeIndex], t = e ? (n = this.hass) == null ? void 0 : n.states[e.entity] : void 0, i = this._normalized.title ?? (e == null ? void 0 : e.name) ?? se, r = this._shouldBoundToGrid() ? "grid-bound" : "";
-    return g`
-      <ha-card class=${r}>
+//#endregion
+//#region src/types.ts
+var en = "universal-heatmap-card", tn = "Universal Heatmap Card", nn = "0.1.3", $ = `${en}-editor`, rn = class extends Error {
+	constructor() {
+		super("Stale heatmap load skipped.");
+	}
+}, an = class extends I {
+	constructor(...e) {
+		super(...e), this._activeIndex = 0, this._buckets = [], this._loading = !1, this._cache = /* @__PURE__ */ new Map(), this._debug = !1, this._deferredLoadPending = !1, this._visibleForLoad = globalThis.IntersectionObserver === void 0, this._loadSeq = 0, this._cellFormatCache = /* @__PURE__ */ new Map();
+	}
+	static {
+		this.properties = {
+			hass: { attribute: !1 },
+			_activeIndex: { state: !0 },
+			_buckets: { state: !0 },
+			_error: { state: !0 },
+			_loading: { state: !0 },
+			_normalized: { state: !0 },
+			_tileValuesOverride: { state: !0 },
+			_tooltip: { state: !0 },
+			_warning: { state: !0 }
+		};
+	}
+	setConfig(e) {
+		let t = this._normalized?.entities[this._activeIndex]?.entity;
+		this._config = e, this._debug = mt(e), this._cache.clear(), this._inFlightKey = void 0, this._loadSeq += 1, this._normalized = H(e, this.hass, this._activeIndex);
+		let n = this._resolveActiveIndex(t);
+		n !== this._activeIndex && (this._activeIndex = n, this._normalized = H(e, this.hass, n)), this._tileValuesOverride = void 0, this._tooltip = void 0, Y(this._debug, "config applied", {
+			entityCount: this._normalized.entities.length,
+			bucket: this._normalized.bucket,
+			range: this._normalized.range,
+			boundToGrid: this._normalized.layout.bound_to_grid,
+			refreshInterval: this._normalized.data.refresh_interval,
+			deferUntilVisible: this._normalized.data.defer_until_visible,
+			maxConcurrentRequests: this._normalized.data.max_concurrent_requests
+		}), this.hass && this._requestActiveSeriesLoad();
+	}
+	getCardSize() {
+		return this._estimatedMasonryRows();
+	}
+	getGridOptions() {
+		let e = this._config?.grid_options?.rows, t = this._config?.grid_options?.columns, n = typeof e == "number" && Number.isFinite(e) ? Math.max(1, e) : this._estimatedGridRows(), r = typeof t == "number" && Number.isFinite(t) ? Math.max(1, t) : 12, i = this._config?.grid_options?.min_rows, a = this._config?.grid_options?.min_columns;
+		return {
+			rows: n,
+			columns: r,
+			min_rows: Math.min(typeof i == "number" && Number.isFinite(i) ? i : 4, n),
+			min_columns: Math.min(typeof a == "number" && Number.isFinite(a) ? a : 6, r)
+		};
+	}
+	connectedCallback() {
+		super.connectedCallback(), this._setupVisibilityObserver(), this._requestActiveSeriesLoad();
+	}
+	disconnectedCallback() {
+		this._visibilityObserver?.disconnect(), this._visibilityObserver = void 0, super.disconnectedCallback();
+	}
+	static getStubConfig() {
+		return {
+			entity: "sensor.example_temperature",
+			range: { days: 30 },
+			bucket: {
+				interval: "day",
+				value: "mean"
+			},
+			scale: { preset: "temperature" }
+		};
+	}
+	static getConfigElement() {
+		return document.createElement($);
+	}
+	static getConfigForm() {
+		return ht();
+	}
+	updated(e) {
+		this._config && (e.has("hass") || e.has("_activeIndex")) && (this._normalized = H(this._config, this.hass, this._activeIndex), this._requestActiveSeriesLoad()), (e.has("_buckets") || e.has("_loading") || e.has("_tileValuesOverride") || e.has("_warning")) && this.updateComplete.then(() => this._drawHeatmap());
+	}
+	render() {
+		if (!this._normalized) return O`<ha-card><div class="empty">Configure ${tn}</div></ha-card>`;
+		let e = this._normalized.entities[this._activeIndex], t = e ? this.hass?.states[e.entity] : void 0, n = this._normalized.title ?? e?.name ?? "Universal Heatmap Card";
+		return O`
+      <ha-card class=${this._shouldBoundToGrid() ? "grid-bound" : ""}>
         <div class="header">
           <div>
-            <div class="title">${i}</div>
-            ${e ? g`<div class="subtitle">${e.entity}</div>` : _}
+            <div class="title">${n}</div>
+            ${e ? O`<div class="subtitle">${e.entity}</div>` : A}
           </div>
           <div class="header-actions">
-            ${this._normalized.tiles.show_value_toggle ? g`
+            ${this._normalized.tiles.show_value_toggle ? O`
                   <button
                     type="button"
                     class=${`tile-value-toggle ${this._showTileValues() ? "active" : ""}`}
@@ -1715,675 +1848,612 @@ const re = class re extends H {
                   >
                     123
                   </button>
-                ` : _}
-            ${t ? g`<div class="state-chip">${this._formatEntityState(t)}</div>` : _}
+                ` : A}
+            ${t ? O`<div class="state-chip">${this._formatEntityState(t)}</div>` : A}
           </div>
         </div>
 
         ${this._renderNavigation()}
 
         <div class="body">
-          ${this._loading ? g`<div class="status" role="status">Loading heatmap...</div>` : _}
-          ${this._error ? g`<div class="status error" role="alert" title=${this._error}>${this._error}</div>` : _}
-          ${this._warning ? g`<div class="status warning" role="status" title=${this._warning}>${this._warning}</div>` : _}
-          ${this._normalized.axes.show_key ? this._renderAxisKey() : _}
+          ${this._loading ? O`<div class="status" role="status">Loading heatmap...</div>` : A}
+          ${this._error ? O`<div class="status error" role="alert" title=${this._error}>${this._error}</div>` : A}
+          ${this._warning ? O`<div class="status warning" role="status" title=${this._warning}>${this._warning}</div>` : A}
+          ${this._normalized.axes.show_key ? this._renderAxisKey() : A}
           <div class="canvas-wrap">
             <canvas
               role="img"
               tabindex="0"
-              aria-label=${this._heatmapDescription(i)}
+              aria-label=${this._heatmapDescription(n)}
               @mousemove=${this._handleCanvasMove}
               @mouseleave=${this._clearTooltip}
               @keydown=${this._handleCanvasKeyDown}
               @click=${this._handleCanvasClick}
             ></canvas>
-            ${this._tooltip && this._normalized.tooltip.show ? g`<div
+            ${this._tooltip && this._normalized.tooltip.show ? O`<div
                   class="tooltip"
                   style=${`left:${this._tooltip.x}px;top:${this._tooltip.y}px`}
                 >
                   ${this._tooltip.label}
-                </div>` : _}
+                </div>` : A}
           </div>
           ${this._renderSummary()}
-          ${this._normalized.legend.show && this._scale ? this._renderLegend() : _}
+          ${this._normalized.legend.show && this._scale ? this._renderLegend() : A}
         </div>
       </ha-card>
     `;
-  }
-  _renderNavigation() {
-    const e = this._normalized;
-    if (!e || e.entities.length <= 1)
-      return _;
-    if (e.navigation.mode === "dropdown")
-      return g`
+	}
+	_renderNavigation() {
+		let e = this._normalized;
+		if (!e || e.entities.length <= 1) return A;
+		if (e.navigation.mode === "dropdown") return O`
         <div class="nav">
           <select @change=${this._handleSelectChange}>
-            ${e.entities.map(
-        (t, i) => g`
-                <option value=${i} ?selected=${i === this._activeIndex}>
-                  ${t.name}
+            ${e.entities.map((e, t) => O`
+                <option value=${t} ?selected=${t === this._activeIndex}>
+                  ${e.name}
                 </option>
-              `
-      )}
+              `)}
           </select>
         </div>
       `;
-    if (e.navigation.mode === "arrows") {
-      const t = e.entities[this._activeIndex];
-      return g`
+		if (e.navigation.mode === "arrows") {
+			let t = e.entities[this._activeIndex];
+			return O`
         <div class="nav arrows">
           <button type="button" @click=${this._previousEntity} aria-label="Previous entity">
             ‹
           </button>
-          <span>${t == null ? void 0 : t.name}</span>
+          <span>${t?.name}</span>
           <button type="button" @click=${this._nextEntity} aria-label="Next entity">›</button>
         </div>
       `;
-    }
-    return e.navigation.mode === "dots" ? g`
+		}
+		return e.navigation.mode === "dots" ? O`
         <div class="nav dots">
-          ${e.entities.map(
-      (t, i) => g`
+          ${e.entities.map((e, t) => O`
               <button
                 type="button"
-                class=${i === this._activeIndex ? "active" : ""}
-                title=${t.name}
-                aria-label=${t.name}
-                aria-pressed=${i === this._activeIndex ? "true" : "false"}
-                @click=${() => this._setActiveIndex(i)}
+                class=${t === this._activeIndex ? "active" : ""}
+                title=${e.name}
+                aria-label=${e.name}
+                aria-pressed=${t === this._activeIndex ? "true" : "false"}
+                @click=${() => this._setActiveIndex(t)}
               ></button>
-            `
-    )}
+            `)}
         </div>
-      ` : g`
+      ` : O`
       <div class="nav tabs">
-        ${e.entities.map(
-      (t, i) => g`
+        ${e.entities.map((e, t) => O`
             <button
               type="button"
-              class=${i === this._activeIndex ? "active" : ""}
-              title=${t.name}
-              aria-pressed=${i === this._activeIndex ? "true" : "false"}
-              @click=${() => this._setActiveIndex(i)}
+              class=${t === this._activeIndex ? "active" : ""}
+              title=${e.name}
+              aria-pressed=${t === this._activeIndex ? "true" : "false"}
+              @click=${() => this._setActiveIndex(t)}
             >
-              ${t.name}
+              ${e.name}
             </button>
-          `
-    )}
+          `)}
       </div>
     `;
-  }
-  _estimatedGridRows() {
-    const e = this._normalized;
-    return e ? Hi(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
-  }
-  _estimatedMasonryRows() {
-    const e = this._normalized;
-    return e ? Fi(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
-  }
-  _layoutState() {
-    return {
-      loading: this._loading,
-      warning: !!this._warning,
-      error: !!this._error
-    };
-  }
-  _renderSummary() {
-    var a, o, l;
-    if (!this._scale || this._buckets.length === 0)
-      return _;
-    const e = this._buckets.map((c) => c.value).filter((c) => typeof c == "number" && Number.isFinite(c));
-    if (e.length === 0)
-      return g`<div class="summary">No bucket data loaded.</div>`;
-    const t = (o = (a = this.hass) == null ? void 0 : a.locale) == null ? void 0 : o.language, i = Math.min(...e), r = Math.max(...e), n = ((l = [...this._buckets].reverse().find((c) => c.value !== null)) == null ? void 0 : l.value) ?? null;
-    return g`
+	}
+	_estimatedGridRows() {
+		let e = this._normalized;
+		return e ? Mt(e, this._layoutState()) : 6;
+	}
+	_estimatedMasonryRows() {
+		let e = this._normalized;
+		return e ? Nt(e, this._layoutState()) : 6;
+	}
+	_layoutState() {
+		return {
+			loading: this._loading,
+			warning: !!this._warning,
+			error: !!this._error
+		};
+	}
+	_renderSummary() {
+		if (!this._scale || this._buckets.length === 0) return A;
+		let e = this._buckets.map((e) => e.value).filter((e) => typeof e == "number" && Number.isFinite(e));
+		if (e.length === 0) return O`<div class="summary">No bucket data loaded.</div>`;
+		let t = this.hass?.locale?.language, n = Math.min(...e), r = Math.max(...e), i = [...this._buckets].reverse().find((e) => e.value !== null)?.value ?? null;
+		return O`
       <div class="summary" aria-live="polite">
-        <span>Low ${z(i, this._scale, t)}</span>
-        <span>High ${z(r, this._scale, t)}</span>
-        <span>Latest ${z(n, this._scale, t)}</span>
+        <span>Low ${Z(n, this._scale, t)}</span>
+        <span>High ${Z(r, this._scale, t)}</span>
+        <span>Latest ${Z(i, this._scale, t)}</span>
       </div>
     `;
-  }
-  _renderAxisKey() {
-    return this._normalized ? g`
+	}
+	_renderAxisKey() {
+		return this._normalized ? O`
       <div class="axis-key" aria-label="Heatmap encoding">
         <span><b>X</b> ${this._xAxisLabel()}</span>
         <span><b>Y</b> ${this._yAxisLabel()}</span>
         <span><b>Color</b> ${this._colorAxisLabel()}</span>
       </div>
-    ` : _;
-  }
-  _renderLegend() {
-    var i, r, n, a;
-    if (!this._scale)
-      return _;
-    const e = `${this._scale.clippedLow ? "≤ " : ""}${z(
-      this._scale.min,
-      this._scale,
-      (r = (i = this.hass) == null ? void 0 : i.locale) == null ? void 0 : r.language
-    )}`, t = `${this._scale.clippedHigh ? "≥ " : ""}${z(
-      this._scale.max,
-      this._scale,
-      (a = (n = this.hass) == null ? void 0 : n.locale) == null ? void 0 : a.language
-    )}`;
-    return g`
+    ` : A;
+	}
+	_renderLegend() {
+		if (!this._scale) return A;
+		let e = `${this._scale.clippedLow ? "≤ " : ""}${Z(this._scale.min, this._scale, this.hass?.locale?.language)}`, t = `${this._scale.clippedHigh ? "≥ " : ""}${Z(this._scale.max, this._scale, this.hass?.locale?.language)}`;
+		return O`
       <div class="legend">
         <span>${e}</span>
         <div
           class="legend-bar"
-          style=${`background: linear-gradient(90deg, ${Wi(this._scale)});`}
+          style=${`background: linear-gradient(90deg, ${Ut(this._scale)});`}
         ></div>
         <span>${t}</span>
       </div>
     `;
-  }
-  async _loadActiveSeries() {
-    const e = this._normalized, t = this.hass, i = e == null ? void 0 : e.entities[this._activeIndex];
-    if (!e || !t || !i)
-      return;
-    const r = this._seriesCacheKey(e, i), n = this._cache.get(r);
-    if (n && this._isCacheFresh(n, e.data.refresh_interval)) {
-      v(this._debug, "cache hit", {
-        entity: i.entity,
-        source: n.result.source,
-        buckets: n.result.buckets.length,
-        ageMs: Date.now() - n.loadedAt
-      }), this._buckets = n.result.buckets, this._scale = n.scale, this._warning = n.result.warning, this._error = void 0, this._loading = !1;
-      return;
-    }
-    if (this._inFlightKey === r) {
-      v(this._debug, "load already in flight", {
-        entity: i.entity,
-        queue: Qe(e.data.max_concurrent_requests)
-      });
-      return;
-    }
-    n && v(this._debug, "cache stale", {
-      entity: i.entity,
-      ageMs: Date.now() - n.loadedAt,
-      refreshInterval: e.data.refresh_interval
-    });
-    const a = ++this._loadSeq;
-    this._inFlightKey = r, this._loading = !0, this._error = void 0, this._warning = void 0;
-    const o = this._debug ? x() : 0, l = this._debug ? x() : 0;
-    v(this._debug, "load start", {
-      entity: i.entity,
-      provider: e.data.provider,
-      range: e.range,
-      bucket: e.bucket
-    });
-    try {
-      const c = await Jt(
-        async () => {
-          if (a !== this._loadSeq)
-            throw new nt();
-          return bi(t, e, i);
-        },
-        {
-          maxConcurrent: e.data.max_concurrent_requests,
-          onQueued: (p) => v(this._debug, "request queued", {
-            entity: i.entity,
-            ...p
-          }),
-          onStart: (p) => v(this._debug, "request start", {
-            entity: i.entity,
-            ...p
-          })
-        }
-      );
-      if (a !== this._loadSeq)
-        return;
-      const u = this._debug ? q(x() - l) : 0, h = this._debug ? x() : 0, d = Bi(c.buckets, {
-        ...e.scale,
-        ...i.scale
-      }), m = this._debug ? q(x() - h) : 0;
-      this._cache.set(r, { result: c, scale: d, loadedAt: Date.now() }), this._buckets = c.buckets, this._scale = d, this._warning = c.warning, v(this._debug, "load complete", {
-        entity: i.entity,
-        source: c.source,
-        buckets: c.buckets.length,
-        fetchMs: u,
-        scaleMs: m,
-        totalMs: q(x() - o),
-        scaleMin: d.min,
-        scaleMax: d.max,
-        warning: c.warning
-      });
-    } catch (c) {
-      if (c instanceof nt) {
-        v(this._debug, "stale queued load skipped", {
-          entity: i.entity
-        });
-        return;
-      }
-      if (a !== this._loadSeq)
-        return;
-      this._error = c instanceof Error ? c.message : "Could not load heatmap data.", this._buckets = [], v(this._debug, "load failed", {
-        entity: i.entity,
-        totalMs: q(x() - o),
-        error: this._error
-      });
-    } finally {
-      this._inFlightKey === r && (this._inFlightKey = void 0), a === this._loadSeq && (this._loading = !1);
-    }
-  }
-  _requestActiveSeriesLoad() {
-    if (!(!this._normalized || !this.hass)) {
-      if (this._shouldDeferLoad()) {
-        this._deferredLoadPending = !0, v(this._debug, "load deferred until visible", {
-          queue: Qe(this._normalized.data.max_concurrent_requests)
-        });
-        return;
-      }
-      this._deferredLoadPending = !1, this._loadActiveSeries();
-    }
-  }
-  _shouldDeferLoad() {
-    var e;
-    return !((e = this._normalized) != null && e.data.defer_until_visible) || typeof globalThis.IntersectionObserver > "u" ? !1 : !this._visibleForLoad;
-  }
-  _setupVisibilityObserver() {
-    var e;
-    if ((e = this._visibilityObserver) == null || e.disconnect(), typeof globalThis.IntersectionObserver > "u") {
-      this._visibleForLoad = !0;
-      return;
-    }
-    this._visibilityObserver = new IntersectionObserver(
-      (t) => {
-        const i = t.some((r) => r.isIntersecting || r.intersectionRatio > 0);
-        i !== this._visibleForLoad && (this._visibleForLoad = i, i && this._deferredLoadPending && this._requestActiveSeriesLoad());
-      },
-      { rootMargin: "320px 0px" }
-    ), this._visibilityObserver.observe(this);
-  }
-  _seriesCacheKey(e, t) {
-    return JSON.stringify({
-      entity: t.entity,
-      range: e.range,
-      bucket: e.bucket,
-      data: {
-        provider: e.data.provider,
-        max_cells: e.data.max_cells,
-        raw_history_hours: e.data.raw_history_hours
-      },
-      missing: e.missing.mode,
-      scale: { ...e.scale, ...t.scale }
-    });
-  }
-  _isCacheFresh(e, t) {
-    return t <= 0 ? !0 : Date.now() - e.loadedAt < t * 1e3;
-  }
-  _drawHeatmap() {
-    var c;
-    const e = this.renderRoot.querySelector("canvas");
-    if (!e || !this._scale)
-      return;
-    const t = e.getContext("2d");
-    if (!t)
-      return;
-    const i = this._debug ? x() : 0, r = e.parentElement, n = Math.max(260, Math.floor((r == null ? void 0 : r.clientWidth) ?? 320)), a = this._boundedCanvasHeight(), o = this._calculateLayout(n, a), l = window.devicePixelRatio || 1;
-    e.width = Math.floor(o.width * l), e.height = Math.floor(o.height * l), e.style.height = `${o.height}px`, e.style.width = `${o.width}px`, t.setTransform(l, 0, 0, l, 0, 0), t.clearRect(0, 0, o.width, o.height), this._drawAxes(t, o);
-    for (const u of ((c = this._placement) == null ? void 0 : c.cells) ?? []) {
-      const h = this._buckets[u.index];
-      if (!h)
-        continue;
-      const d = o.cell / u.slots, m = o.gridX + u.col * (o.cell + o.gap) + u.slot * d, p = o.gridY + u.row * (o.cell + o.gap), f = Mt(h.value, this._scale);
-      t.fillStyle = f, t.fillRect(m, p, d, o.cell), h.quality === "carried" && (t.fillStyle = "rgba(255, 255, 255, 0.34)", t.fillRect(m, p + o.cell - 3, d, 3)), this._drawCellValue(t, h, o, m, p, f, d);
-    }
-    this._renderLayout = o, v(this._debug, "draw complete", {
-      buckets: this._buckets.length,
-      cols: o.cols,
-      rows: o.rows,
-      cell: o.cell,
-      width: o.width,
-      height: o.height,
-      maxCanvasHeight: a,
-      ms: q(x() - i)
-    });
-  }
-  _calculateLayout(e, t) {
-    var $;
-    const i = (($ = this._normalized) == null ? void 0 : $.bucket.interval) ?? "day", r = Math.max(1, this._buckets.length), n = oe(i, r), a = At(this._buckets, i, n);
-    this._placement = a;
-    const o = 3, l = this._shouldShowRowLabels() ? Et(i) : 0, c = this._shouldShowXAxisLabels() ? 18 : 0, u = Math.max(160, e - l), h = a.rows, d = this._shouldReserveForTileValues(), m = 7, p = d ? 14 : m;
-    let b = Math.min(d ? 28 : 22, Math.floor((u - o * (n - 1)) / n));
-    if (b = Math.max(b >= p ? p : m, b), typeof t == "number") {
-      const C = Math.max(0, t - c), y = Math.floor((C - Math.max(0, h - 1) * o) / h);
-      Number.isFinite(y) && y >= m && (b = Math.min(b, y));
-    }
-    const E = n * b + Math.max(0, n - 1) * o, w = h * b + Math.max(0, h - 1) * o, M = c + w;
-    return {
-      cols: n,
-      rows: h,
-      cell: b,
-      gap: o,
-      width: e,
-      height: M,
-      gridX: l,
-      gridY: c,
-      gridWidth: E,
-      gridHeight: w
-    };
-  }
-  _drawCellValue(e, t, i, r, n, a, o = i.cell) {
-    if (!this._showTileValues() || !this._scale || t.value === null)
-      return;
-    const l = ci(i.cell);
-    if (l <= 0)
-      return;
-    const c = this._formatCellValue(t.value, o);
-    if (!c)
-      return;
-    const u = this._cellTextColor(a), h = u === "#111827" ? "rgba(255, 255, 255, 0.26)" : "rgba(0, 0, 0, 0.32)", d = r + o / 2, m = n + i.cell / 2 + 0.5, p = Math.max(4, o - 2);
-    e.save(), e.font = `600 ${l}px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`, e.textAlign = "center", e.textBaseline = "middle", e.lineJoin = "round", e.lineWidth = Math.max(1.5, l / 4), e.strokeStyle = h, e.fillStyle = u, e.strokeText(c, d, m, p), e.fillText(c, d, m, p), e.restore();
-  }
-  _formatCellValue(e, t) {
-    if (!Number.isFinite(e) || !this._scale)
-      return "";
-    if (Math.abs(e) >= 1e3 && t < 24)
-      return this._cellNumberFormat("compact:1", {
-        compactDisplay: "short",
-        maximumFractionDigits: 1,
-        notation: "compact"
-      }).format(e);
-    const r = Math.abs(this._scale.max - this._scale.min), n = ui(r, t);
-    return this._cellNumberFormat(`fixed:${n}`, {
-      maximumFractionDigits: n,
-      minimumFractionDigits: n
-    }).format(e);
-  }
-  _cellNumberFormat(e, t) {
-    var n, a, o, l;
-    const i = `${((a = (n = this.hass) == null ? void 0 : n.locale) == null ? void 0 : a.language) ?? ""}|${e}`;
-    let r = this._cellFormatCache.get(i);
-    return r || (this._cellFormatCache.size >= 8 && this._cellFormatCache.clear(), r = new Intl.NumberFormat((l = (o = this.hass) == null ? void 0 : o.locale) == null ? void 0 : l.language, t), this._cellFormatCache.set(i, r)), r;
-  }
-  _cellTextColor(e) {
-    const t = this._parseColor(e);
-    return t && (0.2126 * t.r + 0.7152 * t.g + 0.0722 * t.b) / 255 > 0.62 ? "#111827" : "#ffffff";
-  }
-  _parseColor(e) {
-    const t = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/i.exec(e);
-    if (t) {
-      const [, n = "0", a = "0", o = "0"] = t;
-      return {
-        r: Number(n),
-        g: Number(a),
-        b: Number(o)
-      };
-    }
-    const i = e.replace("#", "").trim(), r = i.length === 3 ? i.split("").map((n) => `${n}${n}`).join("") : i;
-    if (/^[0-9a-fA-F]{6}$/.test(r))
-      return {
-        r: Number.parseInt(r.slice(0, 2), 16),
-        g: Number.parseInt(r.slice(2, 4), 16),
-        b: Number.parseInt(r.slice(4, 6), 16)
-      };
-  }
-  _boundedCanvasHeight() {
-    var r, n;
-    if (!this._shouldBoundToGrid())
-      return;
-    const e = (n = (r = this._config) == null ? void 0 : r.grid_options) == null ? void 0 : n.rows;
-    if (typeof e != "number" || !Number.isFinite(e) || e <= 0)
-      return;
-    const t = this._normalized;
-    if (!t)
-      return;
-    const i = zi(e) - kt(t, this._layoutState());
-    if (!(i <= 0))
-      return Math.max(120, i);
-  }
-  _shouldBoundToGrid() {
-    var i, r, n;
-    const e = ((i = this._normalized) == null ? void 0 : i.layout.bound_to_grid) ?? "auto";
-    if (e === !0)
-      return !0;
-    if (e === !1)
-      return !1;
-    const t = (n = (r = this._config) == null ? void 0 : r.grid_options) == null ? void 0 : n.rows;
-    return typeof t == "number" && Number.isFinite(t) && t > 0;
-  }
-  _drawAxes(e, t) {
-    var a;
-    if (!((a = this._normalized) != null && a.axes.show))
-      return;
-    const i = getComputedStyle(this), r = i.getPropertyValue("--secondary-text-color").trim() || "#64748b", n = i.getPropertyValue("--divider-color").trim() || "#d8dee8";
-    if (e.save(), e.font = "11px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", e.fillStyle = r, e.strokeStyle = n, e.lineWidth = 1, this._normalized.axes.x_labels)
-      for (const o of this._xAxisTicks(t)) {
-        const l = t.gridX + o.col * (t.cell + t.gap);
-        e.textAlign = o.align, e.textBaseline = "top", e.fillText(o.label, l, 0);
-      }
-    if (this._shouldShowRowLabels()) {
-      e.textAlign = "right", e.textBaseline = "middle";
-      for (let o = 0; o < t.rows; o += 1) {
-        const l = this._firstBucketInRow(o);
-        if (!l)
-          continue;
-        const c = t.gridY + o * (t.cell + t.gap) + t.cell / 2;
-        e.fillText(this._rowLabel(l.start), t.gridX - 8, c);
-      }
-      e.beginPath(), e.moveTo(t.gridX - 3.5, t.gridY), e.lineTo(t.gridX - 3.5, t.gridY + t.gridHeight), e.stroke();
-    }
-    e.restore();
-  }
-  _handleCanvasMove(e) {
-    var E, w, M, $, C;
-    if (!this._renderLayout || !this._scale || !((E = this._normalized) != null && E.tooltip.show))
-      return;
-    const i = e.currentTarget.getBoundingClientRect(), r = e.clientX - i.left, n = e.clientY - i.top, a = this._renderLayout.cell + this._renderLayout.gap;
-    if (r < this._renderLayout.gridX || r > this._renderLayout.gridX + this._renderLayout.gridWidth || n < this._renderLayout.gridY || n > this._renderLayout.gridY + this._renderLayout.gridHeight) {
-      this._tooltip = void 0;
-      return;
-    }
-    const o = Math.floor((r - this._renderLayout.gridX) / a), l = Math.floor((n - this._renderLayout.gridY) / a), c = (((w = this._placement) == null ? void 0 : w.cells) ?? []).filter(
-      (y) => y.row === l && y.col === o
-    ), u = ((M = c[0]) == null ? void 0 : M.slots) ?? 1, h = r - this._renderLayout.gridX - o * a, d = Math.min(
-      u - 1,
-      Math.max(0, Math.floor(h / this._renderLayout.cell * u))
-    ), m = c.find((y) => y.slot === d) ?? c[0], p = m ? this._buckets[m.index] : void 0;
-    if (!m || !p) {
-      this._tooltip = void 0;
-      return;
-    }
-    const f = m.slots > 1 ? ` (${Ii(p.start)})` : "", b = `${this._formatDate(p.start)} - ${this._formatDate(p.end)}${f}: ${z(
-      p.value,
-      this._scale,
-      (C = ($ = this.hass) == null ? void 0 : $.locale) == null ? void 0 : C.language
-    )}`;
-    this._tooltip = {
-      x: Math.min(r + 12, i.width - 160),
-      y: Math.max(4, n - 28),
-      bucket: p,
-      label: b
-    };
-  }
-  _handleCanvasClick() {
-    this._openActiveEntityDetails();
-  }
-  _handleCanvasKeyDown(e) {
-    e.key !== "Enter" && e.key !== " " || (e.preventDefault(), this._openActiveEntityDetails());
-  }
-  _openActiveEntityDetails() {
-    const e = this._normalized, t = e == null ? void 0 : e.entities[this._activeIndex];
-    t && this.dispatchEvent(
-      new CustomEvent("hass-more-info", {
-        bubbles: !0,
-        composed: !0,
-        detail: { entityId: t.entity }
-      })
-    );
-  }
-  _showTileValues() {
-    var e;
-    return this._tileValuesOverride ?? ((e = this._normalized) == null ? void 0 : e.tiles.show_values) ?? !1;
-  }
-  _shouldReserveForTileValues() {
-    var e, t;
-    return !!((e = this._normalized) != null && e.tiles.show_values || (t = this._normalized) != null && t.tiles.show_value_toggle);
-  }
-  _toggleTileValues(e) {
-    e.stopPropagation(), this._tileValuesOverride = !this._showTileValues();
-  }
-  _heatmapDescription(e) {
-    return `${e} heatmap. X axis ${this._xAxisLabel()}, Y axis ${this._yAxisLabel()}, color ${this._colorAxisLabel()}. Press Enter to open entity details.`;
-  }
-  _clearTooltip() {
-    this._tooltip = void 0;
-  }
-  _setActiveIndex(e) {
-    !this._normalized || e < 0 || e >= this._normalized.entities.length || (this._activeIndex = e);
-  }
-  _resolveActiveIndex(e) {
-    if (!this._normalized)
-      return 0;
-    if (e) {
-      const t = this._normalized.entities.findIndex(
-        (i) => i.entity === e
-      );
-      return t >= 0 ? t : 0;
-    }
-    return Math.min(this._activeIndex, Math.max(0, this._normalized.entities.length - 1));
-  }
-  _previousEntity() {
-    if (!this._normalized)
-      return;
-    const e = this._normalized.entities.length;
-    this._activeIndex = (this._activeIndex + e - 1) % e;
-  }
-  _nextEntity() {
-    this._normalized && (this._activeIndex = (this._activeIndex + 1) % this._normalized.entities.length);
-  }
-  _handleSelectChange(e) {
-    const t = e.target;
-    this._setActiveIndex(Number(t.value));
-  }
-  _formatEntityState(e) {
-    var i;
-    if ((i = this.hass) != null && i.formatEntityState)
-      return this.hass.formatEntityState(e);
-    const t = e.attributes.unit_of_measurement ? ` ${String(e.attributes.unit_of_measurement)}` : "";
-    return `${e.state}${t}`;
-  }
-  _formatDate(e) {
-    var i, r, n;
-    const t = ((i = this._normalized) == null ? void 0 : i.bucket.interval) ?? "day";
-    return Qi(e, t, (n = (r = this.hass) == null ? void 0 : r.locale) == null ? void 0 : n.language);
-  }
-  _xAxisLabel() {
-    var e;
-    return rt((e = this._normalized) == null ? void 0 : e.bucket.interval).x;
-  }
-  _yAxisLabel() {
-    var e;
-    return rt((e = this._normalized) == null ? void 0 : e.bucket.interval).y;
-  }
-  _colorAxisLabel() {
-    var i, r;
-    const e = this._bucketValueLabel((i = this._normalized) == null ? void 0 : i.bucket.value), t = (r = this._scale) != null && r.unit ? ` (${this._scale.unit})` : "";
-    return `${e}${t}`;
-  }
-  _bucketValueLabel(e) {
-    switch (e) {
-      case "mean":
-        return "average value";
-      case "max":
-        return "peak value";
-      case "min":
-        return "low value";
-      case "last":
-      case "state":
-        return "last value";
-      case "sum":
-        return "total";
-      case "delta":
-      case "change":
-        return "change";
-      case "count":
-        return "sample count";
-      case "percent_on":
-        return "percent on";
-      case "duration_on":
-        return "time on";
-      default:
-        return "bucket value";
-    }
-  }
-  _shouldShowRowLabels() {
-    var e;
-    return !!((e = this._normalized) != null && e.axes.show && this._normalized.axes.y_labels && this._buckets.length > 0);
-  }
-  _shouldShowXAxisLabels() {
-    var e;
-    return !!((e = this._normalized) != null && e.axes.show && this._normalized.axes.x_labels && this._buckets.length > 0);
-  }
-  _xAxisTicks(e) {
-    var r;
-    const t = (r = this._normalized) == null ? void 0 : r.bucket.interval;
-    if (t === "hour")
-      return this._timeTicks([0, 6, 12, 18, 23]);
-    if (t === "5minute")
-      return ts();
-    if (t === "day")
-      return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((n, a) => ({
-        col: a,
-        label: n,
-        align: "center"
-      }));
-    if (t === "month")
-      return ["Jan", "Apr", "Jul", "Oct", "Dec"].map((n, a) => ({
-        col: [0, 3, 6, 9, 11][a] ?? 0,
-        label: n,
-        align: a === 0 ? "left" : a === 4 ? "right" : "center"
-      }));
-    const i = Math.max(0, e.cols - 1);
-    return [
-      { col: 0, label: "Start", align: "left" },
-      { col: i, label: "End", align: "right" }
-    ];
-  }
-  _timeTicks(e) {
-    return e.map((t, i) => {
-      const r = this._firstBucketInColumn(t);
-      return {
-        col: t,
-        label: r ? this._formatHour(r.start) : String(t),
-        align: i === 0 ? "left" : i === e.length - 1 ? "right" : "center"
-      };
-    });
-  }
-  _firstBucketInRow(e) {
-    var i;
-    const t = (i = this._placement) == null ? void 0 : i.cells.find((r) => r.row === e);
-    return t ? this._buckets[t.index] : void 0;
-  }
-  _firstBucketInColumn(e) {
-    var i;
-    const t = (i = this._placement) == null ? void 0 : i.cells.find((r) => r.col === e);
-    return t ? this._buckets[t.index] : void 0;
-  }
-  _formatHour(e) {
-    var i, r;
-    return new Intl.DateTimeFormat((r = (i = this.hass) == null ? void 0 : i.locale) == null ? void 0 : r.language, {
-      hour: "numeric"
-    }).formatToParts(e).filter((n) => n.type === "hour" || n.type === "dayPeriod").map((n) => n.value.toLowerCase()).join("").replace(/\s/g, "");
-  }
-  _rowLabel(e) {
-    var i, r, n;
-    const t = ((i = this._normalized) == null ? void 0 : i.bucket.interval) ?? "day";
-    return es(e, t, (n = (r = this.hass) == null ? void 0 : r.locale) == null ? void 0 : n.language);
-  }
-};
-re.properties = {
-  hass: { attribute: !1 },
-  _activeIndex: { state: !0 },
-  _buckets: { state: !0 },
-  _error: { state: !0 },
-  _loading: { state: !0 },
-  _normalized: { state: !0 },
-  _tileValuesOverride: { state: !0 },
-  _tooltip: { state: !0 },
-  _warning: { state: !0 }
-}, re.styles = lt`
+	}
+	async _loadActiveSeries() {
+		let e = this._normalized, t = this.hass, n = e?.entities[this._activeIndex];
+		if (!e || !t || !n) return;
+		let r = this._seriesCacheKey(e, n), i = this._cache.get(r);
+		if (i && this._isCacheFresh(i, e.data.refresh_interval)) {
+			Y(this._debug, "cache hit", {
+				entity: n.entity,
+				source: i.result.source,
+				buckets: i.result.buckets.length,
+				ageMs: Date.now() - i.loadedAt
+			}), this._buckets = i.result.buckets, this._scale = i.scale, this._warning = i.result.warning, this._error = void 0, this._loading = !1;
+			return;
+		}
+		if (this._inFlightKey === r) {
+			Y(this._debug, "load already in flight", {
+				entity: n.entity,
+				queue: Le(e.data.max_concurrent_requests)
+			});
+			return;
+		}
+		i && Y(this._debug, "cache stale", {
+			entity: n.entity,
+			ageMs: Date.now() - i.loadedAt,
+			refreshInterval: e.data.refresh_interval
+		});
+		let a = ++this._loadSeq;
+		this._inFlightKey = r, this._loading = !0, this._error = void 0, this._warning = void 0;
+		let o = this._debug ? q() : 0, s = this._debug ? q() : 0;
+		Y(this._debug, "load start", {
+			entity: n.entity,
+			provider: e.data.provider,
+			range: e.range,
+			bucket: e.bucket
+		});
+		try {
+			let i = await Ie(async () => {
+				if (a !== this._loadSeq) throw new rn();
+				return lt(t, e, n);
+			}, {
+				maxConcurrent: e.data.max_concurrent_requests,
+				onQueued: (e) => Y(this._debug, "request queued", {
+					entity: n.entity,
+					...e
+				}),
+				onStart: (e) => Y(this._debug, "request start", {
+					entity: n.entity,
+					...e
+				})
+			});
+			if (a !== this._loadSeq) return;
+			let c = this._debug ? J(q() - s) : 0, l = this._debug ? q() : 0, u = Vt(i.buckets, {
+				...e.scale,
+				...n.scale
+			}), d = this._debug ? J(q() - l) : 0;
+			this._cache.set(r, {
+				result: i,
+				scale: u,
+				loadedAt: Date.now()
+			}), this._buckets = i.buckets, this._scale = u, this._warning = i.warning, Y(this._debug, "load complete", {
+				entity: n.entity,
+				source: i.source,
+				buckets: i.buckets.length,
+				fetchMs: c,
+				scaleMs: d,
+				totalMs: J(q() - o),
+				scaleMin: u.min,
+				scaleMax: u.max,
+				warning: i.warning
+			});
+		} catch (e) {
+			if (e instanceof rn) {
+				Y(this._debug, "stale queued load skipped", { entity: n.entity });
+				return;
+			}
+			if (a !== this._loadSeq) return;
+			this._error = e instanceof Error ? e.message : "Could not load heatmap data.", this._buckets = [], Y(this._debug, "load failed", {
+				entity: n.entity,
+				totalMs: J(q() - o),
+				error: this._error
+			});
+		} finally {
+			this._inFlightKey === r && (this._inFlightKey = void 0), a === this._loadSeq && (this._loading = !1);
+		}
+	}
+	_requestActiveSeriesLoad() {
+		if (!(!this._normalized || !this.hass)) {
+			if (this._shouldDeferLoad()) {
+				this._deferredLoadPending = !0, Y(this._debug, "load deferred until visible", { queue: Le(this._normalized.data.max_concurrent_requests) });
+				return;
+			}
+			this._deferredLoadPending = !1, this._loadActiveSeries();
+		}
+	}
+	_shouldDeferLoad() {
+		return !this._normalized?.data.defer_until_visible || globalThis.IntersectionObserver === void 0 ? !1 : !this._visibleForLoad;
+	}
+	_setupVisibilityObserver() {
+		if (this._visibilityObserver?.disconnect(), globalThis.IntersectionObserver === void 0) {
+			this._visibleForLoad = !0;
+			return;
+		}
+		this._visibilityObserver = new IntersectionObserver((e) => {
+			let t = e.some((e) => e.isIntersecting || e.intersectionRatio > 0);
+			t !== this._visibleForLoad && (this._visibleForLoad = t, t && this._deferredLoadPending && this._requestActiveSeriesLoad());
+		}, { rootMargin: "320px 0px" }), this._visibilityObserver.observe(this);
+	}
+	_seriesCacheKey(e, t) {
+		return JSON.stringify({
+			entity: t.entity,
+			range: e.range,
+			bucket: e.bucket,
+			data: {
+				provider: e.data.provider,
+				max_cells: e.data.max_cells,
+				raw_history_hours: e.data.raw_history_hours
+			},
+			missing: e.missing.mode,
+			scale: {
+				...e.scale,
+				...t.scale
+			}
+		});
+	}
+	_isCacheFresh(e, t) {
+		return t <= 0 ? !0 : Date.now() - e.loadedAt < t * 1e3;
+	}
+	_drawHeatmap() {
+		let e = this.renderRoot.querySelector("canvas");
+		if (!e || !this._scale) return;
+		let t = e.getContext("2d");
+		if (!t) return;
+		let n = this._debug ? q() : 0, r = e.parentElement, i = Math.max(260, Math.floor(r?.clientWidth ?? 320)), a = this._boundedCanvasHeight(), o = this._calculateLayout(i, a), s = window.devicePixelRatio || 1;
+		e.width = Math.floor(o.width * s), e.height = Math.floor(o.height * s), e.style.height = `${o.height}px`, e.style.width = `${o.width}px`, t.setTransform(s, 0, 0, s, 0, 0), t.clearRect(0, 0, o.width, o.height), this._drawAxes(t, o);
+		for (let e of this._placement?.cells ?? []) {
+			let n = this._buckets[e.index];
+			if (!n) continue;
+			let r = o.cell / e.slots, i = o.gridX + e.col * (o.cell + o.gap) + e.slot * r, a = o.gridY + e.row * (o.cell + o.gap), s = Ht(n.value, this._scale);
+			t.fillStyle = s, t.fillRect(i, a, r, o.cell), n.quality === "carried" && (t.fillStyle = "rgba(255, 255, 255, 0.34)", t.fillRect(i, a + o.cell - 3, r, 3)), this._drawCellValue(t, n, o, i, a, s, r);
+		}
+		this._renderLayout = o, Y(this._debug, "draw complete", {
+			buckets: this._buckets.length,
+			cols: o.cols,
+			rows: o.rows,
+			cell: o.cell,
+			width: o.width,
+			height: o.height,
+			maxCanvasHeight: a,
+			ms: J(q() - n)
+		});
+	}
+	_calculateLayout(e, t) {
+		let n = this._normalized?.bucket.interval ?? "day", r = Rt(n, Math.max(1, this._buckets.length)), i = Ot(this._buckets, n, r);
+		this._placement = i;
+		let a = this._shouldShowRowLabels() ? 58 : 0, o = this._shouldShowXAxisLabels() ? 18 : 0, s = Math.max(160, e - a), c = i.rows, l = this._shouldReserveForTileValues(), u = l ? 14 : 7, d = Math.min(l ? 28 : 22, Math.floor((s - 3 * (r - 1)) / r));
+		if (d = Math.max(d >= u ? u : 7, d), typeof t == "number") {
+			let e = Math.max(0, t - o), n = Math.floor((e - Math.max(0, c - 1) * 3) / c);
+			Number.isFinite(n) && n >= 7 && (d = Math.min(d, n));
+		}
+		let f = r * d + Math.max(0, r - 1) * 3, p = c * d + Math.max(0, c - 1) * 3, m = o + p;
+		return {
+			cols: r,
+			rows: c,
+			cell: d,
+			gap: 3,
+			width: e,
+			height: m,
+			gridX: a,
+			gridY: o,
+			gridWidth: f,
+			gridHeight: p
+		};
+	}
+	_drawCellValue(e, t, n, r, i, a, o = n.cell) {
+		if (!this._showTileValues() || !this._scale || t.value === null) return;
+		let s = Ze(n.cell);
+		if (s <= 0) return;
+		let c = this._formatCellValue(t.value, o);
+		if (!c) return;
+		let l = this._cellTextColor(a), u = l === "#111827" ? "rgba(255, 255, 255, 0.26)" : "rgba(0, 0, 0, 0.32)", d = r + o / 2, f = i + n.cell / 2 + .5, p = Math.max(4, o - 2);
+		e.save(), e.font = `600 ${s}px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`, e.textAlign = "center", e.textBaseline = "middle", e.lineJoin = "round", e.lineWidth = Math.max(1.5, s / 4), e.strokeStyle = u, e.fillStyle = l, e.strokeText(c, d, f, p), e.fillText(c, d, f, p), e.restore();
+	}
+	_formatCellValue(e, t) {
+		if (!Number.isFinite(e) || !this._scale) return "";
+		if (Math.abs(e) >= 1e3 && t < 24) return this._cellNumberFormat("compact:1", {
+			compactDisplay: "short",
+			maximumFractionDigits: 1,
+			notation: "compact"
+		}).format(e);
+		let n = Qe(Math.abs(this._scale.max - this._scale.min), t);
+		return this._cellNumberFormat(`fixed:${n}`, {
+			maximumFractionDigits: n,
+			minimumFractionDigits: n
+		}).format(e);
+	}
+	_cellNumberFormat(e, t) {
+		let n = `${this.hass?.locale?.language ?? ""}|${e}`, r = this._cellFormatCache.get(n);
+		return r || (this._cellFormatCache.size >= 8 && this._cellFormatCache.clear(), r = new Intl.NumberFormat(this.hass?.locale?.language, t), this._cellFormatCache.set(n, r)), r;
+	}
+	_cellTextColor(e) {
+		let t = this._parseColor(e);
+		return t && (.2126 * t.r + .7152 * t.g + .0722 * t.b) / 255 > .62 ? "#111827" : "#ffffff";
+	}
+	_parseColor(e) {
+		let t = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/i.exec(e);
+		if (t) {
+			let [, e = "0", n = "0", r = "0"] = t;
+			return {
+				r: Number(e),
+				g: Number(n),
+				b: Number(r)
+			};
+		}
+		let n = e.replace("#", "").trim(), r = n.length === 3 ? n.split("").map((e) => `${e}${e}`).join("") : n;
+		if (/^[0-9a-fA-F]{6}$/.test(r)) return {
+			r: Number.parseInt(r.slice(0, 2), 16),
+			g: Number.parseInt(r.slice(2, 4), 16),
+			b: Number.parseInt(r.slice(4, 6), 16)
+		};
+	}
+	_boundedCanvasHeight() {
+		if (!this._shouldBoundToGrid()) return;
+		let e = this._config?.grid_options?.rows;
+		if (typeof e != "number" || !Number.isFinite(e) || e <= 0) return;
+		let t = this._normalized;
+		if (!t) return;
+		let n = At(e) - Ft(t, this._layoutState());
+		if (!(n <= 0)) return Math.max(120, n);
+	}
+	_shouldBoundToGrid() {
+		let e = this._normalized?.layout.bound_to_grid ?? "auto";
+		if (e === !0) return !0;
+		if (e === !1) return !1;
+		let t = this._config?.grid_options?.rows;
+		return typeof t == "number" && Number.isFinite(t) && t > 0;
+	}
+	_drawAxes(e, t) {
+		if (!this._normalized?.axes.show) return;
+		let n = getComputedStyle(this), r = n.getPropertyValue("--secondary-text-color").trim() || "#64748b", i = n.getPropertyValue("--divider-color").trim() || "#d8dee8";
+		if (e.save(), e.font = "11px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", e.fillStyle = r, e.strokeStyle = i, e.lineWidth = 1, this._normalized.axes.x_labels) for (let n of this._xAxisTicks(t)) {
+			let r = t.gridX + n.col * (t.cell + t.gap);
+			e.textAlign = n.align, e.textBaseline = "top", e.fillText(n.label, r, 0);
+		}
+		if (this._shouldShowRowLabels()) {
+			e.textAlign = "right", e.textBaseline = "middle";
+			for (let n = 0; n < t.rows; n += 1) {
+				let r = this._firstBucketInRow(n);
+				if (!r) continue;
+				let i = t.gridY + n * (t.cell + t.gap) + t.cell / 2;
+				e.fillText(this._rowLabel(r.start), t.gridX - 8, i);
+			}
+			e.beginPath(), e.moveTo(t.gridX - 3.5, t.gridY), e.lineTo(t.gridX - 3.5, t.gridY + t.gridHeight), e.stroke();
+		}
+		e.restore();
+	}
+	_handleCanvasMove(e) {
+		if (!this._renderLayout || !this._scale || !this._normalized?.tooltip.show) return;
+		let t = e.currentTarget.getBoundingClientRect(), n = e.clientX - t.left, r = e.clientY - t.top, i = this._renderLayout.cell + this._renderLayout.gap;
+		if (n < this._renderLayout.gridX || n > this._renderLayout.gridX + this._renderLayout.gridWidth || r < this._renderLayout.gridY || r > this._renderLayout.gridY + this._renderLayout.gridHeight) {
+			this._tooltip = void 0;
+			return;
+		}
+		let a = Math.floor((n - this._renderLayout.gridX) / i), o = Math.floor((r - this._renderLayout.gridY) / i), s = (this._placement?.cells ?? []).filter((e) => e.row === o && e.col === a), c = s[0]?.slots ?? 1, l = n - this._renderLayout.gridX - a * i, u = Math.min(c - 1, Math.max(0, Math.floor(l / this._renderLayout.cell * c))), d = s.find((e) => e.slot === u) ?? s[0], f = d ? this._buckets[d.index] : void 0;
+		if (!d || !f) {
+			this._tooltip = void 0;
+			return;
+		}
+		let p = d.slots > 1 ? ` (${kt(f.start)})` : "", m = `${this._formatDate(f.start)} - ${this._formatDate(f.end)}${p}: ${Z(f.value, this._scale, this.hass?.locale?.language)}`;
+		this._tooltip = {
+			x: Math.min(n + 12, t.width - 160),
+			y: Math.max(4, r - 28),
+			bucket: f,
+			label: m
+		};
+	}
+	_handleCanvasClick() {
+		this._openActiveEntityDetails();
+	}
+	_handleCanvasKeyDown(e) {
+		e.key !== "Enter" && e.key !== " " || (e.preventDefault(), this._openActiveEntityDetails());
+	}
+	_openActiveEntityDetails() {
+		let e = this._normalized?.entities[this._activeIndex];
+		e && this.dispatchEvent(new CustomEvent("hass-more-info", {
+			bubbles: !0,
+			composed: !0,
+			detail: { entityId: e.entity }
+		}));
+	}
+	_showTileValues() {
+		return this._tileValuesOverride ?? this._normalized?.tiles.show_values ?? !1;
+	}
+	_shouldReserveForTileValues() {
+		return !!(this._normalized?.tiles.show_values || this._normalized?.tiles.show_value_toggle);
+	}
+	_toggleTileValues(e) {
+		e.stopPropagation(), this._tileValuesOverride = !this._showTileValues();
+	}
+	_heatmapDescription(e) {
+		return `${e} heatmap. X axis ${this._xAxisLabel()}, Y axis ${this._yAxisLabel()}, color ${this._colorAxisLabel()}. Press Enter to open entity details.`;
+	}
+	_clearTooltip() {
+		this._tooltip = void 0;
+	}
+	_setActiveIndex(e) {
+		!this._normalized || e < 0 || e >= this._normalized.entities.length || (this._activeIndex = e);
+	}
+	_resolveActiveIndex(e) {
+		if (!this._normalized) return 0;
+		if (e) {
+			let t = this._normalized.entities.findIndex((t) => t.entity === e);
+			return t >= 0 ? t : 0;
+		}
+		return Math.min(this._activeIndex, Math.max(0, this._normalized.entities.length - 1));
+	}
+	_previousEntity() {
+		if (!this._normalized) return;
+		let e = this._normalized.entities.length;
+		this._activeIndex = (this._activeIndex + e - 1) % e;
+	}
+	_nextEntity() {
+		this._normalized && (this._activeIndex = (this._activeIndex + 1) % this._normalized.entities.length);
+	}
+	_handleSelectChange(e) {
+		let t = e.target;
+		this._setActiveIndex(Number(t.value));
+	}
+	_formatEntityState(e) {
+		if (this.hass?.formatEntityState) return this.hass.formatEntityState(e);
+		let t = e.attributes.unit_of_measurement ? ` ${String(e.attributes.unit_of_measurement)}` : "";
+		return `${e.state}${t}`;
+	}
+	_formatDate(e) {
+		return new Intl.DateTimeFormat(this.hass?.locale?.language, {
+			month: "short",
+			day: "numeric",
+			hour: this._normalized?.bucket.interval === "hour" ? "numeric" : void 0
+		}).format(e);
+	}
+	_xAxisLabel() {
+		switch (this._normalized?.bucket.interval) {
+			case "5minute":
+			case "hour": return "time of day";
+			case "day": return "day of week";
+			case "week": return "week";
+			case "month": return "month";
+			default: return "bucket";
+		}
+	}
+	_yAxisLabel() {
+		switch (this._normalized?.bucket.interval) {
+			case "5minute":
+			case "hour": return "date";
+			case "day": return "week row";
+			case "week":
+			case "month": return "period row";
+			default: return "row";
+		}
+	}
+	_colorAxisLabel() {
+		return `${this._bucketValueLabel(this._normalized?.bucket.value)}${this._scale?.unit ? ` (${this._scale.unit})` : ""}`;
+	}
+	_bucketValueLabel(e) {
+		switch (e) {
+			case "mean": return "average value";
+			case "max": return "peak value";
+			case "min": return "low value";
+			case "last":
+			case "state": return "last value";
+			case "sum": return "total";
+			case "delta":
+			case "change": return "change";
+			case "count": return "sample count";
+			case "percent_on": return "percent on";
+			case "duration_on": return "time on";
+			default: return "bucket value";
+		}
+	}
+	_shouldShowRowLabels() {
+		return !!(this._normalized?.axes.show && this._normalized.axes.y_labels && this._buckets.length > 0);
+	}
+	_shouldShowXAxisLabels() {
+		return !!(this._normalized?.axes.show && this._normalized.axes.x_labels && this._buckets.length > 0);
+	}
+	_xAxisTicks(e) {
+		let t = this._normalized?.bucket.interval;
+		return t === "hour" ? this._timeTicks([
+			0,
+			6,
+			12,
+			18,
+			23
+		]) : t === "5minute" ? this._timeTicks([
+			0,
+			12,
+			24,
+			36,
+			47
+		]) : t === "day" ? [
+			"Mon",
+			"Tue",
+			"Wed",
+			"Thu",
+			"Fri",
+			"Sat",
+			"Sun"
+		].map((e, t) => ({
+			col: t,
+			label: e,
+			align: "center"
+		})) : t === "month" ? [
+			"Jan",
+			"Apr",
+			"Jul",
+			"Oct",
+			"Dec"
+		].map((e, t) => ({
+			col: [
+				0,
+				3,
+				6,
+				9,
+				11
+			][t] ?? 0,
+			label: e,
+			align: t === 0 ? "left" : t === 4 ? "right" : "center"
+		})) : [{
+			col: 0,
+			label: "Start",
+			align: "left"
+		}, {
+			col: Math.max(0, e.cols - 1),
+			label: "End",
+			align: "right"
+		}];
+	}
+	_timeTicks(e) {
+		return e.map((t, n) => {
+			let r = this._firstBucketInColumn(t);
+			return {
+				col: t,
+				label: r ? this._formatHour(r.start) : String(t),
+				align: n === 0 ? "left" : n === e.length - 1 ? "right" : "center"
+			};
+		});
+	}
+	_firstBucketInRow(e) {
+		let t = this._placement?.cells.find((t) => t.row === e);
+		return t ? this._buckets[t.index] : void 0;
+	}
+	_firstBucketInColumn(e) {
+		let t = this._placement?.cells.find((t) => t.col === e);
+		return t ? this._buckets[t.index] : void 0;
+	}
+	_formatHour(e) {
+		return new Intl.DateTimeFormat(this.hass?.locale?.language, { hour: "numeric" }).formatToParts(e).filter((e) => e.type === "hour" || e.type === "dayPeriod").map((e) => e.value.toLowerCase()).join("").replace(/\s/g, "");
+	}
+	_rowLabel(e) {
+		let t = this._normalized?.bucket.interval === "month" ? { year: "2-digit" } : {
+			month: "short",
+			day: "numeric"
+		};
+		return new Intl.DateTimeFormat(this.hass?.locale?.language, t).format(e);
+	}
+	static {
+		this.styles = o`
     :host {
       box-sizing: border-box;
       display: block;
@@ -2607,16 +2677,22 @@ re.properties = {
       padding: 16px;
     }
   `;
-let ye = re;
-const ne = class ne extends H {
-  constructor() {
-    super(...arguments), this._form = yt();
-  }
-  setConfig(e) {
-    this._config = e;
-  }
-  render() {
-    return this._config ? g`
+	}
+}, on = class extends I {
+	constructor(...e) {
+		super(...e), this._form = ht();
+	}
+	static {
+		this.properties = {
+			hass: { attribute: !1 },
+			_config: { state: !0 }
+		};
+	}
+	setConfig(e) {
+		this._config = e;
+	}
+	render() {
+		return this._config ? O`
       <ha-form
         .hass=${this.hass}
         .data=${this._editorData()}
@@ -2626,82 +2702,73 @@ const ne = class ne extends H {
         @value-changed=${this._handleValueChanged}
       ></ha-form>
       ${this._renderEntityNameEditor()}
-    ` : _;
-  }
-  _editorData() {
-    const { entity: e, ...t } = this._config ?? {};
-    return {
-      ...t,
-      entities: Q(this._config ?? {})
-    };
-  }
-  _handleValueChanged(e) {
-    if (!this._config)
-      return;
-    const t = e.detail.value ?? {}, i = this._selectedEntities(t.entities), r = {
-      ...this._config,
-      ...t,
-      entities: ge(this._config, i)
-    };
-    this._applyConfig(r);
-  }
-  _selectedEntities(e) {
-    return Array.isArray(e) ? e.filter((t) => typeof t == "string" && t.length > 0) : typeof e == "string" && e.length > 0 ? [e] : Q(this._config ?? {});
-  }
-  _renderEntityNameEditor() {
-    if (!this._config)
-      return _;
-    const e = ge(this._config, Q(this._config));
-    return e.length === 0 ? _ : g`
+    ` : A;
+	}
+	_editorData() {
+		let { entity: e, ...t } = this._config ?? {};
+		return {
+			...t,
+			entities: X(this._config ?? {})
+		};
+	}
+	_handleValueChanged(e) {
+		if (!this._config) return;
+		let t = e.detail.value ?? {}, n = this._selectedEntities(t.entities), r = {
+			...this._config,
+			...t,
+			entities: _t(this._config, n)
+		};
+		this._applyConfig(r);
+	}
+	_selectedEntities(e) {
+		return Array.isArray(e) ? e.filter((e) => typeof e == "string" && e.length > 0) : typeof e == "string" && e.length > 0 ? [e] : X(this._config ?? {});
+	}
+	_renderEntityNameEditor() {
+		if (!this._config) return A;
+		let e = _t(this._config, X(this._config));
+		return e.length === 0 ? A : O`
       <section class="editor-section" aria-label="Entity labels">
         <div class="editor-title">Entity labels</div>
         <div class="editor-helper">
           Optional tab/card labels. Leave blank to use Home Assistant's entity name.
         </div>
-        ${e.map((t) => {
-      const i = typeof t == "string" ? t : t.entity, r = typeof t == "string" ? "" : t.name ?? "";
-      return g`
+        ${e.map((e) => {
+			let t = typeof e == "string" ? e : e.entity, n = typeof e == "string" ? "" : e.name ?? "";
+			return O`
             <label class="alias-row">
               <span class="alias-copy">
-                <span class="alias-entity">${i}</span>
-                <span class="alias-default">${this._defaultEntityName(i)}</span>
+                <span class="alias-entity">${t}</span>
+                <span class="alias-default">${this._defaultEntityName(t)}</span>
               </span>
               <input
-                .value=${r}
+                .value=${n}
                 placeholder="Use Home Assistant name"
-                @input=${(n) => this._handleEntityNameInput(i, n)}
+                @input=${(e) => this._handleEntityNameInput(t, e)}
               />
             </label>
           `;
-    })}
+		})}
       </section>
     `;
-  }
-  _handleEntityNameInput(e, t) {
-    if (!this._config)
-      return;
-    const i = t.target;
-    this._applyConfig($i(this._config, e, i.value));
-  }
-  _defaultEntityName(e) {
-    var i, r;
-    const t = (i = this.hass) == null ? void 0 : i.states[e];
-    return t && ((r = this.hass) != null && r.formatEntityName) ? this.hass.formatEntityName(t) : t != null && t.attributes.friendly_name ? String(t.attributes.friendly_name) : e;
-  }
-  _applyConfig(e) {
-    delete e.entity, this._config = e, this.dispatchEvent(
-      new CustomEvent("config-changed", {
-        bubbles: !0,
-        composed: !0,
-        detail: { config: e }
-      })
-    );
-  }
-};
-ne.properties = {
-  hass: { attribute: !1 },
-  _config: { state: !0 }
-}, ne.styles = lt`
+	}
+	_handleEntityNameInput(e, t) {
+		if (!this._config) return;
+		let n = t.target;
+		this._applyConfig(vt(this._config, e, n.value));
+	}
+	_defaultEntityName(e) {
+		let t = this.hass?.states[e];
+		return t && this.hass?.formatEntityName ? this.hass.formatEntityName(t) : t?.attributes.friendly_name ? String(t.attributes.friendly_name) : e;
+	}
+	_applyConfig(e) {
+		delete e.entity, this._config = e, this.dispatchEvent(new CustomEvent("config-changed", {
+			bubbles: !0,
+			composed: !0,
+			detail: { config: e }
+		}));
+	}
+	static {
+		this.styles = o`
     .editor-section {
       border-top: 1px solid var(--divider-color);
       margin-top: 16px;
@@ -2780,19 +2847,13 @@ ne.properties = {
       }
     }
   `;
-let xe = ne;
-customElements.get(ie) || customElements.define(ie, ye);
-customElements.get(ve) || customElements.define(ve, xe);
-window.customCards = window.customCards ?? [];
-window.customCards.push({
-  type: ie,
-  name: se,
-  preview: !0,
-  description: "Canvas heatmaps for Home Assistant recorder statistics and short history ranges.",
-  documentationURL: "https://github.com/gcs8/universal-heatmap-card"
-});
-console.info(
-  `%c${se}%c ${ss}`,
-  "color: #3a6ea5; font-weight: 700;",
-  "color: inherit;"
-);
+	}
+};
+customElements.get("universal-heatmap-card") || customElements.define(en, an), customElements.get($) || customElements.define($, on), window.customCards = window.customCards ?? [], window.customCards.push({
+	type: en,
+	name: tn,
+	preview: !0,
+	description: "Canvas heatmaps for Home Assistant recorder statistics and short history ranges.",
+	documentationURL: "https://github.com/gcs8/universal-heatmap-card"
+}), console.info(`%c${tn}%c ${nn}`, "color: #3a6ea5; font-weight: 700;", "color: inherit;");
+//#endregion
