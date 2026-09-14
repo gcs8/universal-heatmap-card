@@ -1,4 +1,9 @@
 //#region node_modules/@lit/reactive-element/css-tag.js
+/**
+* @license
+* Copyright 2019 Google LLC
+* SPDX-License-Identifier: BSD-3-Clause
+*/
 var e = globalThis, t = e.ShadowRoot && (e.ShadyCSS === void 0 || e.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, n = Symbol(), r = /* @__PURE__ */ new WeakMap(), i = class {
 	constructor(e, t, r) {
 		if (this._$cssResult$ = !0, r !== n) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
@@ -31,6 +36,11 @@ var e = globalThis, t = e.ShadowRoot && (e.ShadyCSS === void 0 || e.ShadyCSS.nat
 	return a(t);
 })(e) : e, { is: l, defineProperty: u, getOwnPropertyDescriptor: d, getOwnPropertyNames: f, getOwnPropertySymbols: p, getPrototypeOf: m } = Object, h = globalThis, ee = h.trustedTypes, te = ee ? ee.emptyScript : "", ne = h.reactiveElementPolyfillSupport, g = (e, t) => e, re = {
 	toAttribute(e, t) {
+		/**
+		* @license
+		* Copyright 2017 Google LLC
+		* SPDX-License-Identifier: BSD-3-Clause
+		*/
 		switch (t) {
 			case Boolean:
 				e = e ? te : null;
@@ -254,6 +264,11 @@ var _ = class extends HTMLElement {
 _.elementStyles = [], _.shadowRootOptions = { mode: "open" }, _[g("elementProperties")] = /* @__PURE__ */ new Map(), _[g("finalized")] = /* @__PURE__ */ new Map(), ne?.({ ReactiveElement: _ }), (h.reactiveElementVersions ??= []).push("2.1.2");
 //#endregion
 //#region node_modules/lit-html/lit-html.js
+/**
+* @license
+* Copyright 2017 Google LLC
+* SPDX-License-Identifier: BSD-3-Clause
+*/
 var v = globalThis, oe = (e) => e, y = v.trustedTypes, se = y ? y.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, ce = "$lit$", b = `lit$${Math.random().toFixed(9).slice(2)}$`, le = "?" + b, ue = `<${le}>`, x = document, S = () => x.createComment(""), C = (e) => e === null || typeof e != "object" && typeof e != "function", de = Array.isArray, fe = (e) => de(e) || typeof e?.[Symbol.iterator] == "function", w = "[ 	\n\f\r]", T = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, pe = /-->/g, me = />/g, E = RegExp(`>|${w}(?:([^\\s"'>=/]+)(${w}*=${w}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g"), he = /'/g, ge = /"/g, _e = /^(?:script|style|textarea|title)$/i, D = ((e) => (t, ...n) => ({
 	_$litType$: e,
 	strings: t,
@@ -483,6 +498,11 @@ var Oe = (e, t, n) => {
 	return i._$AI(e), i;
 }, ke = globalThis, P = class extends _ {
 	constructor() {
+		/**
+		* @license
+		* Copyright 2017 Google LLC
+		* SPDX-License-Identifier: BSD-3-Clause
+		*/
 		super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
 	}
 	createRenderRoot() {
@@ -1483,6 +1503,16 @@ function _t(e, t, n) {
 	return delete o.entity, o;
 }
 var vt = 12, yt = 560, bt = 3, xt = 7, St = 22, Ct = 14, wt = 28, Tt = 58, Et = 18;
+/**
+* Maps buckets onto the render grid.
+*
+* Hourly grids use a fixed 24-column wall-clock layout: buckets are grouped by
+* local calendar day (one row per day) and placed in the column of their local
+* hour. That keeps 23-hour and 25-hour DST days intact - the nonexistent
+* spring-forward hour simply leaves its column blank, and the two fall-back
+* 01:00 hours stay separate logical cells sharing (splitting) one column.
+* Every other interval keeps the sequential row-major placement.
+*/
 function Dt(e, t, n = Lt(t, Math.max(1, e.length))) {
 	let r = Math.max(1, Math.floor(n)), i = [];
 	if (t !== "hour") return e.forEach((e, t) => {
@@ -1518,6 +1548,7 @@ function Dt(e, t, n = Lt(t, Math.max(1, e.length))) {
 		cells: i
 	};
 }
+/** Formats a date's local UTC offset, used to disambiguate repeated DST hours. */
 function Ot(e) {
 	let t = -e.getTimezoneOffset(), n = t < 0 ? "-" : "+", r = Math.abs(t);
 	return `UTC${n}${String(Math.floor(r / 60)).padStart(2, "0")}:${String(r % 60).padStart(2, "0")}`;

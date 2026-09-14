@@ -10,9 +10,12 @@ export default defineConfig({
       formats: ["es"],
       fileName: () => "universal-heatmap-card.js",
     },
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        inlineDynamicImports: true,
+        codeSplitting: false,
+        comments: {
+          legal: true,
+        },
       },
     },
   },
