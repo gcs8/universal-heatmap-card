@@ -118,15 +118,23 @@ function resolveBounds(
   if (max > min) {
     return { min, max };
   }
+
+  const widenAmount = resolveWidenAmount(min);
   if (!maxFixed) {
-    return { min, max: min + 1 };
+    return { min, max: min + widenAmount };
   }
   if (!minFixed) {
-    return { min: max - 1, max };
+    return { min: max - resolveWidenAmount(max), max };
   }
-  // Both bounds fixed and not ascending: widen upward rather than render an
-  // inverted scale.
-  return { min, max: min + 1 };
+
+  // Both bounds fixed and not ascending: keep min fixed, widen max upward.
+  return { min, max: min + widenAmount };
+}
+
+function resolveWidenAmount(bound: number): number {
+  const magnitude = Math.abs(bound);
+  const delta = magnitude * Number.EPSILON * 4;
+  return delta > 0 && Number.isFinite(delta) ? delta : Number.MIN_VALUE;
 }
 
 function normalizeStops(

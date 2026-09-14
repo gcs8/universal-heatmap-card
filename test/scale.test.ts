@@ -192,13 +192,30 @@ describe("scale", () => {
     expect(scale.clippedLow).toBe(true);
   });
 
-  it("keeps the scale ascending when a fixed max sits below every observed value", () => {
-    const scale = buildScale(bucketsFor([300, 1200, 3000]), { max: 100 });
+  it("uses a magnitude-aware widening step when fixed min is far above data", () => {
+    const scale = buildScale(bucketsFor([1, 2, 3]), { min: 1e20 });
 
-    expect(scale.max).toBe(100);
+    expect(scale.min).toBe(1e20);
+    expect(scale.max).toBeGreaterThan(scale.min);
+    expect(scale.max - scale.min).toBeLessThan(1e6);
+  });
+
+  it("keeps the scale ascending when fixed max sits below every observed value", () => {
+    const scale = buildScale(bucketsFor([300, 1200, 3000]), { max: -1e20 });
+
+    expect(scale.max).toBe(-1e20);
     expect(scale.min).toBeLessThan(scale.max);
+    expect(scale.max - scale.min).toBeLessThan(1e6);
     expect(scale.stops[0]?.color).toBe("#3a6ea5");
     expect(scale.clippedHigh).toBe(true);
+  });
+
+  it("keeps near-zero fixed bounds from collapsing on one-step widening", () => {
+    const scale = buildScale(bucketsFor([1e-30, 2e-30, 3e-30]), { min: 1e-30 });
+
+    expect(scale.min).toBe(1e-30);
+    expect(scale.max).toBeGreaterThan(scale.min);
+    expect(scale.max - scale.min).toBeLessThan(1e-20);
   });
 
   it("keeps distinguishable colors across an inverted-bound scale", () => {
