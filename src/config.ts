@@ -6,6 +6,7 @@ import type {
   HomeAssistant,
   NormalizedConfig,
   NormalizedEntityConfig,
+  ScaleConfig,
 } from "./types";
 import { normalizeMaxConcurrent } from "./data/request-queue";
 
@@ -128,11 +129,36 @@ function normalizeEntities(
         ? String(stateObj.attributes.friendly_name)
         : entityConfig.entity);
 
+    const scale = resolveEntityScale(entityConfig.scale);
+
     return {
       ...entityConfig,
+      ...(scale ? { scale } : {}),
       name: friendlyName,
     };
   });
+}
+
+// A per-entity `scale.preset` is documented and round-tripped by the editor,
+// but buildScale only reads concrete keys, so the name has to be expanded
+// here. The card merges `{ ...config.scale, ...entity.scale }`, so the
+// preset's shape-defining keys are pinned explicitly (undefined included):
+// without that, a card-level preset's unit, bounds or stops would leak into
+// an entity whose own preset leaves them open.
+function resolveEntityScale(scale: ScaleConfig | undefined): ScaleConfig | undefined {
+  if (!scale?.preset) {
+    return scale;
+  }
+
+  const presetScale = resolvePreset(scale.preset).scale;
+  return {
+    min: undefined,
+    max: undefined,
+    unit: undefined,
+    stops: undefined,
+    ...presetScale,
+    ...scale,
+  };
 }
 
 export function calculateRange(range: NormalizedConfig["range"], now = new Date()): DateRange {
