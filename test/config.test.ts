@@ -194,6 +194,66 @@ describe("normalizeConfig", () => {
     expect(config.scale.max).toBeUndefined();
   });
 
+  it("resolves a per-entity scale preset into stops, unit and bounds", () => {
+    const config = normalizeConfig(
+      {
+        scale: { preset: "temperature" },
+        entities: [
+          { entity: "sensor.room_temperature" },
+          { entity: "sensor.room_humidity", scale: { preset: "humidity" } },
+        ],
+      },
+      hass,
+    );
+
+    // card.ts merges the card scale under the active entity's scale.
+    const merged = { ...config.scale, ...config.entities[1]?.scale };
+
+    expect(merged.preset).toBe("humidity");
+    expect(merged.unit).toBe("%");
+    expect(merged.min).toBe(0);
+    expect(merged.max).toBe(100);
+    expect(merged.stops?.map((stop) => stop.value)).toEqual([0, 50, 75, 100]);
+  });
+
+  it("does not leak the card preset's bounds into an entity preset without them", () => {
+    const config = normalizeConfig(
+      {
+        scale: { preset: "humidity" },
+        entities: [
+          { entity: "sensor.room_humidity" },
+          { entity: "sensor.room_temperature", scale: { preset: "temperature" } },
+        ],
+      },
+      hass,
+    );
+
+    const merged = { ...config.scale, ...config.entities[1]?.scale };
+
+    expect(merged.preset).toBe("temperature");
+    expect(merged.unit).toBe("°");
+    expect(merged.min).toBeUndefined();
+    expect(merged.max).toBeUndefined();
+  });
+
+  it("keeps explicit per-entity scale keys ahead of the entity preset", () => {
+    const config = normalizeConfig(
+      {
+        entities: [
+          {
+            entity: "sensor.room_humidity",
+            scale: { preset: "humidity", max: 80, unit: "rh" },
+          },
+        ],
+      },
+      hass,
+    );
+
+    expect(config.entities[0]?.scale?.max).toBe(80);
+    expect(config.entities[0]?.scale?.unit).toBe("rh");
+    expect(config.entities[0]?.scale?.min).toBe(0);
+  });
+
   it("estimates hourly cells", () => {
     const config = normalizeConfig({
       entity: "sensor.room_temperature",
