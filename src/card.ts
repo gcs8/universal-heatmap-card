@@ -11,6 +11,7 @@ import {
   updateEditorEntityName,
 } from "./editor-form";
 import {
+  canvasGapForInterval,
   columnsForInterval,
   estimateCardChromeHeight,
   estimateMasonryCardSize,
@@ -722,7 +723,7 @@ export class UniversalHeatmapCard extends LitElement {
     const cols = columnsForInterval(interval, count);
     const placement = placeBucketsOnGrid(this._buckets, interval, cols);
     this._placement = placement;
-    const gap = 3;
+    const gap = canvasGapForInterval(interval);
     const labelWidth = this._shouldShowRowLabels() ? rowLabelWidthForInterval(interval) : 0;
     const labelHeight = this._shouldShowXAxisLabels() ? 18 : 0;
     const gridWidth = Math.max(160, width - labelWidth);
@@ -942,7 +943,12 @@ export class UniversalHeatmapCard extends LitElement {
           continue;
         }
         const y = layout.gridY + row * (layout.cell + layout.gap) + layout.cell / 2;
-        ctx.fillText(this._rowLabel(bucket.start), layout.gridX - 8, y);
+        ctx.fillText(
+          this._rowLabel(bucket.start),
+          layout.gridX - 8,
+          y,
+          Math.max(1, layout.gridX - 12),
+        );
       }
 
       ctx.beginPath();
