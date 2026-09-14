@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { normalizeConfig } from "../src/config";
 import { fetchHeatmapBuckets } from "../src/data/provider";
 import type { HistoryStateRow, HomeAssistant } from "../src/types";
@@ -25,6 +25,10 @@ function historyHass(
 }
 
 describe("fetchHeatmapBuckets history fallback", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("encodes the history query into the path instead of a GET body", async () => {
     const calls: Array<{ method: string; path: string; parameters?: unknown }> = [];
     const hass = historyHass((method, path, parameters) => {
@@ -54,11 +58,12 @@ describe("fetchHeatmapBuckets history fallback", () => {
   });
 
   it("returns aggregated buckets from the history response", async () => {
-    const now = Date.now();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-01-15T15:21:00.000Z"));
     const rows: HistoryStateRow[][] = [
       [
-        { state: "2", last_changed: new Date(now - 30 * 60 * 1000).toISOString() },
-        { state: "4", last_changed: new Date(now - 20 * 60 * 1000).toISOString() },
+        { state: "2", last_changed: "2026-01-15T14:10:00.000Z" },
+        { state: "4", last_changed: "2026-01-15T14:20:00.000Z" },
       ],
     ];
     const hass = historyHass(() => undefined, rows);
