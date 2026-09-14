@@ -926,7 +926,7 @@ function ai(s, e) {
   const t = new Date(s);
   switch (e) {
     case "5minute":
-      return t.setMinutes(t.getMinutes() + 5), t;
+      return t.setTime(t.getTime() + 5 * 6e4), t;
     case "hour":
       return t.setTime(t.getTime() + ri), t;
     case "day":

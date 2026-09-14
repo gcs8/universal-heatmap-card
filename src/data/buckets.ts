@@ -54,7 +54,7 @@ export function addInterval(date: Date, interval: BucketInterval): Date {
   const next = new Date(date);
   switch (interval) {
     case "5minute":
-      next.setMinutes(next.getMinutes() + 5);
+      next.setTime(next.getTime() + 5 * 60_000 )
       return next;
     case "hour":
       // Advance by an absolute elapsed hour so DST transitions keep every
