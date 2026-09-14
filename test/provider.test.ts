@@ -133,6 +133,70 @@ describe("fetchHeatmapBuckets automatic provider diagnostics", () => {
     );
   });
 
+  it("checks statistics availability before filling missing values with zero", async () => {
+    const hass = autoHass(
+      async () => ({}),
+      async () => [[{ state: "7", last_changed: new Date().toISOString() }]],
+    );
+    const config = normalizeConfig({
+      entity: "sensor.example_power",
+      range: { hours: 2, align: "rolling" },
+      bucket: { interval: "hour", value: "mean" },
+      data: { provider: "auto", raw_history_hours: 24 },
+      missing: { mode: "zero" },
+    });
+
+    const result = await fetchHeatmapBuckets(hass, config, config.entities[0]!);
+
+    expect(result.source).toBe("history");
+    expect(result.buckets.some((bucket) => bucket.value === 7)).toBe(true);
+    expect(result.warning).toBe(
+      "No mean statistics were available for sensor.example_power. Showing raw history instead.",
+    );
+  });
+
+  it("checks the requested statistic type before filling missing values with zero", async () => {
+    const hass = autoHass(
+      async () => ({
+        "sensor.example_power": [{ start: new Date().toISOString(), sum: 12 }],
+      }),
+      async () => [[{ state: "7", last_changed: new Date().toISOString() }]],
+    );
+    const config = normalizeConfig({
+      entity: "sensor.example_power",
+      range: { hours: 2, align: "rolling" },
+      bucket: { interval: "hour", value: "mean" },
+      data: { provider: "auto", raw_history_hours: 24 },
+      missing: { mode: "zero" },
+    });
+
+    const result = await fetchHeatmapBuckets(hass, config, config.entities[0]!);
+
+    expect(result.source).toBe("history");
+    expect(result.buckets.some((bucket) => bucket.value === 7)).toBe(true);
+    expect(result.warning).toBe(
+      "No mean statistics were available for sensor.example_power. Showing raw history instead.",
+    );
+  });
+
+  it("preserves missing-value fill for the explicit statistics provider", async () => {
+    const hass = autoHass(async () => ({}));
+    const config = normalizeConfig({
+      entity: "sensor.example_power",
+      range: { hours: 2, align: "rolling" },
+      bucket: { interval: "hour", value: "mean" },
+      data: { provider: "statistics" },
+      missing: { mode: "zero" },
+    });
+
+    const result = await fetchHeatmapBuckets(hass, config, config.entities[0]!);
+
+    expect(result.source).toBe("statistics");
+    expect(result.warning).toBeUndefined();
+    expect(result.buckets.length).toBeGreaterThan(0);
+    expect(result.buckets.every((bucket) => bucket.value === 0)).toBe(true);
+  });
+
   it("warns when statistics rows do not contain the requested type", async () => {
     const hass = autoHass(async () => ({
       "sensor.example_power": [{ start: new Date().toISOString(), sum: 12 }],

@@ -9,6 +9,7 @@ import type {
   StatisticsRow,
 } from "../types";
 import {
+  applyMissingMode,
   emptyBuckets,
   generateBucketWindows,
   historyRowsToBuckets,
@@ -43,9 +44,13 @@ export async function fetchHeatmapBuckets(
 
   if ((provider === "auto" || provider === "statistics") && canUseStatistics) {
     try {
-      const buckets = await fetchStatisticsBuckets(hass, config, entity, windows);
-      if (buckets.some((bucket) => bucket.value !== null) || provider === "statistics") {
-        return { source: "statistics", buckets };
+      const unfilledBuckets = await fetchStatisticsBuckets(hass, config, entity, windows);
+      const hasUsableStatistics = unfilledBuckets.some((bucket) => bucket.value !== null);
+      if (hasUsableStatistics || provider === "statistics") {
+        return {
+          source: "statistics",
+          buckets: applyMissingMode(unfilledBuckets, config.missing.mode),
+        };
       }
       statisticsFallbackReason =
         `No ${config.bucket.value} statistics were available for ${entity.entity}.`;
@@ -108,7 +113,7 @@ async function fetchStatisticsBuckets(
     types: [statType],
   });
   const rows = response[entity.entity] ?? [];
-  return statisticsRowsToBuckets(windows, rows, config.bucket.value, config.missing.mode);
+  return statisticsRowsToBuckets(windows, rows, config.bucket.value, "empty");
 }
 
 async function fetchHistoryBuckets(
