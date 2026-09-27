@@ -254,6 +254,48 @@ describe("normalizeConfig", () => {
     expect(config.entities[0]?.scale?.min).toBe(0);
   });
 
+  it("lets the unit decide the preset before a 'battery' name match", () => {
+    const states: HomeAssistant["states"] = {
+      "sensor.battery_voltage": {
+        entity_id: "sensor.battery_voltage",
+        state: "12.6",
+        attributes: {
+          friendly_name: "Battery Voltage",
+          device_class: "voltage",
+          unit_of_measurement: "V",
+        },
+      },
+      "sensor.phone_battery_level": {
+        entity_id: "sensor.phone_battery_level",
+        state: "80",
+        attributes: {
+          friendly_name: "Phone Battery Level",
+          unit_of_measurement: "%",
+        },
+      },
+      "sensor.sensor_battery": {
+        entity_id: "sensor.sensor_battery",
+        state: "80",
+        attributes: {
+          friendly_name: "Attic Sensor",
+          device_class: "battery",
+          unit_of_measurement: "%",
+        },
+      },
+    };
+    const hassWithBatteries = { ...hass, states };
+
+    const voltage = normalizeConfig({ entity: "sensor.battery_voltage" }, hassWithBatteries);
+    const level = normalizeConfig({ entity: "sensor.phone_battery_level" }, hassWithBatteries);
+    const classed = normalizeConfig({ entity: "sensor.sensor_battery" }, hassWithBatteries);
+
+    expect(voltage.scale.preset).toBe("auto");
+    expect(voltage.scale.unit).toBeUndefined();
+    expect(voltage.scale.min).toBeUndefined();
+    expect(level.scale.preset).toBe("battery");
+    expect(classed.scale.preset).toBe("battery");
+  });
+
   it("infers the preset from the active entity rather than the first", () => {
     const card = {
       entities: ["sensor.room_temperature", "sensor.example_power"],
