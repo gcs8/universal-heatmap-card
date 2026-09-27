@@ -252,3 +252,35 @@ describe("scale", () => {
     expect(colorForValue(scale.min, scale)).not.toBe(colorForValue(scale.max, scale));
   });
 });
+
+describe("temperature preset in Celsius", () => {
+  it("produces a gradient for a Celsius room instead of one color", () => {
+    const celsiusStops = [
+      { value: 13, color: "#315f9d" },
+      { value: 20, color: "#58a4b0" },
+      { value: 24.5, color: "#f2c14e" },
+      { value: 29.5, color: "#d94841" },
+    ];
+    const fahrenheitStops = [
+      { value: 55, color: "#315f9d" },
+      { value: 68, color: "#58a4b0" },
+      { value: 76, color: "#f2c14e" },
+      { value: 85, color: "#d94841" },
+    ];
+    const buckets: BucketValue[] = [18, 19.5, 21, 22.5, 24, 25.5].map((value, index) => ({
+      start: new Date(2026, 4, 1 + index),
+      end: new Date(2026, 4, 2 + index),
+      value,
+      quality: "ok",
+      source: "statistics",
+    }));
+
+    const withFahrenheit = buildScale(buckets, { stops: fahrenheitStops });
+    const withCelsius = buildScale(buckets, { stops: celsiusStops });
+    const distinct = (scale: ReturnType<typeof buildScale>) =>
+      new Set(buckets.map((bucket) => colorForValue(bucket.value, scale))).size;
+
+    expect(distinct(withFahrenheit)).toBe(1);
+    expect(distinct(withCelsius)).toBe(buckets.length);
+  });
+});

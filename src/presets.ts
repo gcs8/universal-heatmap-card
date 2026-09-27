@@ -22,6 +22,16 @@ const comfortStops: ColorStop[] = [
   { value: 85, color: "#d94841", label: "Hot" },
 ];
 
+// The same comfort bands in Celsius (55/68/76/85 °F converted and rounded to
+// the nearest half degree). A °C sensor scored against the Fahrenheit stops
+// sits entirely below the first one and renders as a single color.
+const comfortStopsCelsius: ColorStop[] = [
+  { value: 13, color: "#315f9d", label: "Cool" },
+  { value: 20, color: "#58a4b0", label: "Comfort" },
+  { value: 24.5, color: "#f2c14e", label: "Warm" },
+  { value: 29.5, color: "#d94841", label: "Hot" },
+];
+
 const thresholdStops: ColorStop[] = [
   { value: 0, color: "#2f6f9f" },
   { value: 50, color: "#5aa469" },
@@ -195,6 +205,22 @@ export function resolvePreset(id: string | undefined): HeatmapPreset {
     return PRESETS.auto!;
   }
   return PRESETS[id] ?? PRESETS.auto!;
+}
+
+/**
+ * Returns the preset's scale adjusted for the entity it will color. Presets
+ * with absolute stops are unit-bound; the temperature preset carries
+ * Fahrenheit bands and swaps to the Celsius set when the entity reports °C.
+ */
+export function presetScaleForEntity(preset: HeatmapPreset, stateObj?: HassEntity): ScaleConfig {
+  if (preset.id !== "temperature") {
+    return preset.scale;
+  }
+  const unit = String(stateObj?.attributes.unit_of_measurement ?? "").trim().toLowerCase();
+  if (unit !== "°c") {
+    return preset.scale;
+  }
+  return { ...preset.scale, stops: comfortStopsCelsius };
 }
 
 export function inferPresetFromEntity(stateObj?: HassEntity): string {

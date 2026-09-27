@@ -549,6 +549,27 @@ var ke = [
 		color: "#d94841",
 		label: "Hot"
 	}
+], Ae = [
+	{
+		value: 13,
+		color: "#315f9d",
+		label: "Cool"
+	},
+	{
+		value: 20,
+		color: "#58a4b0",
+		label: "Comfort"
+	},
+	{
+		value: 24.5,
+		color: "#f2c14e",
+		label: "Warm"
+	},
+	{
+		value: 29.5,
+		color: "#d94841",
+		label: "Hot"
+	}
 ], L = [
 	{
 		value: 0,
@@ -583,7 +604,7 @@ var ke = [
 		value: 1,
 		color: "#c44536"
 	}
-], Ae = [
+], je = [
 	{
 		value: 0,
 		color: "#c44536",
@@ -604,7 +625,7 @@ var ke = [
 		color: "#2f6f9f",
 		label: "Full"
 	}
-], je = {
+], Me = {
 	auto: {
 		id: "auto",
 		label: "Auto",
@@ -701,7 +722,7 @@ var ke = [
 			min: 0,
 			max: 100,
 			unit: "%",
-			stops: Ae
+			stops: je
 		}
 	},
 	percent_utilization: {
@@ -734,7 +755,7 @@ var ke = [
 			min: 0,
 			max: 100,
 			unit: "%",
-			stops: Ae
+			stops: je
 		}
 	},
 	filter_load: {
@@ -797,7 +818,7 @@ var ke = [
 			min: 0,
 			max: 100,
 			unit: "%",
-			stops: Ae
+			stops: je
 		}
 	},
 	signal_quality: {
@@ -814,21 +835,32 @@ var ke = [
 		}
 	}
 };
-function Me(e) {
-	return !e || e === "auto" ? je.auto : je[e] ?? je.auto;
-}
 function Ne(e) {
+	return !e || e === "auto" ? Me.auto : Me[e] ?? Me.auto;
+}
+/**
+* Returns the preset's scale adjusted for the entity it will color. Presets
+* with absolute stops are unit-bound; the temperature preset carries
+* Fahrenheit bands and swaps to the Celsius set when the entity reports °C.
+*/
+function Pe(e, t) {
+	return e.id !== "temperature" || String(t?.attributes.unit_of_measurement ?? "").trim().toLowerCase() !== "°c" ? e.scale : {
+		...e.scale,
+		stops: Ae
+	};
+}
+function Fe(e) {
 	if (!e) return "auto";
 	let t = e.entity_id, n = t.split(".")[0] ?? "", r = String(e.attributes.device_class ?? "").toLowerCase(), i = String(e.attributes.unit_of_measurement ?? "").toLowerCase(), a = String(e.attributes.friendly_name ?? t).toLowerCase();
 	return n === "binary_sensor" ? "binary_runtime" : r === "temperature" || i === "°f" || i === "°c" ? "temperature" : r === "humidity" || i === "%" ? a.includes("life") || a.includes("health") ? "percent_health" : a.includes("load") || a.includes("utilization") ? "percent_utilization" : "humidity" : r === "power" || i === "w" || i === "kw" ? "power" : r === "energy" || i === "wh" || i === "kwh" ? "energy_delta" : r === "battery" || a.includes("battery") ? "battery" : r === "pressure" || i.includes("pa") || i.includes("inh2o") ? a.includes("filter") ? "filter_dp" : "auto" : a.includes("filter") && a.includes("life") ? "filter_life" : a.includes("filter") && a.includes("load") ? "filter_load" : i === "dbm" || i === "lqi" || i === "db" ? "signal_quality" : "auto";
 }
 //#endregion
 //#region src/data/request-queue.ts
-var Pe = 2, Fe = 8, z = 0, B = [];
-function Ie(e, t = {}) {
+var Ie = 2, Le = 8, z = 0, B = [];
+function Re(e, t = {}) {
 	let n = {
 		...t,
-		maxConcurrent: Re(t.maxConcurrent)
+		maxConcurrent: Be(t.maxConcurrent)
 	};
 	return new Promise((t, r) => {
 		B.push({
@@ -836,22 +868,22 @@ function Ie(e, t = {}) {
 			resolve: t,
 			reject: r,
 			options: n
-		}), n.onQueued?.(Be(n.maxConcurrent)), ze();
+		}), n.onQueued?.(He(n.maxConcurrent)), Ve();
 	});
 }
-function Le(e = Pe) {
-	return Be(Re(e));
-}
-function Re(e) {
-	return typeof e != "number" || !Number.isFinite(e) ? Pe : Math.min(Fe, Math.max(1, Math.floor(e)));
-}
-function ze() {
-	let e = B[0];
-	!e || z >= e.options.maxConcurrent || (B.shift(), z += 1, e.options.onStart?.(Be(e.options.maxConcurrent)), Promise.resolve().then(e.task).then(e.resolve, e.reject).finally(() => {
-		--z, ze();
-	}));
+function ze(e = Ie) {
+	return He(Be(e));
 }
 function Be(e) {
+	return typeof e != "number" || !Number.isFinite(e) ? Ie : Math.min(Le, Math.max(1, Math.floor(e)));
+}
+function Ve() {
+	let e = B[0];
+	!e || z >= e.options.maxConcurrent || (B.shift(), z += 1, e.options.onStart?.(He(e.options.maxConcurrent)), Promise.resolve().then(e.task).then(e.resolve, e.reject).finally(() => {
+		--z, Ve();
+	}));
+}
+function He(e) {
 	return {
 		active: z,
 		queued: B.length,
@@ -860,46 +892,46 @@ function Be(e) {
 }
 //#endregion
 //#region src/config.ts
-var Ve = 5e3, He = 24, Ue = 300, We = /^(\d{4})-(\d{2})-(\d{2})$/;
-function Ge(e, t, n = 0) {
-	let r = Je(e, t);
+var Ue = 5e3, We = 24, Ge = 300, Ke = /^(\d{4})-(\d{2})-(\d{2})$/;
+function qe(e, t, n = 0) {
+	let r = Xe(e, t);
 	if (r.length === 0) throw Error("Universal Heatmap Card requires entity or entities.");
-	let i = (Number.isInteger(n) && n >= 0 ? r[n] : void 0) ?? r[0], a = Ne(i ? t?.states[i.entity] : void 0), o = e.scale?.preset ?? a, s = Me(o), c = {
-		interval: e.bucket?.interval ?? s.bucket.interval,
-		value: e.bucket?.value ?? s.bucket.value
-	}, l = {
-		...s.range,
+	let i = (Number.isInteger(n) && n >= 0 ? r[n] : void 0) ?? r[0], a = i ? t?.states[i.entity] : void 0, o = Fe(a), s = e.scale?.preset ?? o, c = Ne(s), l = {
+		interval: e.bucket?.interval ?? c.bucket.interval,
+		value: e.bucket?.value ?? c.bucket.value
+	}, u = {
+		...c.range,
 		...e.range,
-		align: qe(e.range?.align)
+		align: Ye(e.range?.align)
 	};
-	V(l);
-	let u = e.navigation?.mode ?? (r.length > 8 ? "dropdown" : "tabs");
+	V(u);
+	let d = e.navigation?.mode ?? (r.length > 8 ? "dropdown" : "tabs");
 	return {
 		title: e.title,
 		debug: e.debug ?? !1,
 		entities: r,
-		range: l,
-		bucket: c,
+		range: u,
+		bucket: l,
 		data: {
 			provider: e.data?.provider ?? "auto",
 			prefetch: e.data?.prefetch ?? !1,
-			max_cells: e.data?.max_cells ?? Ve,
-			raw_history_hours: e.data?.raw_history_hours ?? He,
-			refresh_interval: Ke(e.data?.refresh_interval),
+			max_cells: e.data?.max_cells ?? Ue,
+			raw_history_hours: e.data?.raw_history_hours ?? We,
+			refresh_interval: Je(e.data?.refresh_interval),
 			defer_until_visible: e.data?.defer_until_visible ?? !0,
-			max_concurrent_requests: Re(e.data?.max_concurrent_requests)
+			max_concurrent_requests: Be(e.data?.max_concurrent_requests)
 		},
 		missing: { mode: e.missing?.mode ?? "empty" },
 		scale: {
-			...s.scale,
+			...Pe(c, a),
 			...e.scale,
-			preset: o
+			preset: s
 		},
 		layout: {
 			mode: e.layout?.mode ?? "auto",
 			bound_to_grid: e.layout?.bound_to_grid ?? "auto"
 		},
-		navigation: { mode: u },
+		navigation: { mode: d },
 		axes: {
 			show: e.axes?.show ?? !0,
 			x_labels: e.axes?.x_labels ?? !0,
@@ -914,15 +946,15 @@ function Ge(e, t, n = 0) {
 		tooltip: { show: e.tooltip?.show ?? !0 }
 	};
 }
-function Ke(e) {
-	return typeof e != "number" || !Number.isFinite(e) ? Ue : Math.max(0, e);
+function Je(e) {
+	return typeof e != "number" || !Number.isFinite(e) ? Ge : Math.max(0, e);
 }
-function qe(e) {
+function Ye(e) {
 	return e === "rolling" ? "rolling" : "day";
 }
-function Je(e, t) {
+function Xe(e, t) {
 	return (e.entities?.length ? e.entities : e.entity ? [{ entity: e.entity }] : []).map((e) => {
-		let n = typeof e == "string" ? { entity: e } : e, r = t?.states[n.entity], i = n.name ?? (r && t?.formatEntityName ? t.formatEntityName(r) : r?.attributes.friendly_name ? String(r.attributes.friendly_name) : n.entity), a = Ye(n.scale);
+		let n = typeof e == "string" ? { entity: e } : e, r = t?.states[n.entity], i = n.name ?? (r && t?.formatEntityName ? t.formatEntityName(r) : r?.attributes.friendly_name ? String(r.attributes.friendly_name) : n.entity), a = Ze(n.scale, r);
 		return {
 			...n,
 			...a ? { scale: a } : {},
@@ -930,23 +962,23 @@ function Je(e, t) {
 		};
 	});
 }
-function Ye(e) {
+function Ze(e, t) {
 	return e?.preset ? {
 		min: void 0,
 		max: void 0,
 		unit: void 0,
 		stops: void 0,
-		...Me(e.preset).scale,
+		...Pe(Ne(e.preset), t),
 		...e
 	} : e;
 }
 function V(e, t = /* @__PURE__ */ new Date()) {
-	let n = e.align === "day" && !e.end, r = e.end ? Xe(e.end) : n ? Ze(t) : t, i;
-	if (e.start) i = Xe(e.start);
-	else if (typeof e.hours == "number") i = n ? $e(r, e.hours) : /* @__PURE__ */ new Date(r.getTime() - e.hours * 60 * 60 * 1e3);
+	let n = e.align === "day" && !e.end, r = e.end ? Qe(e.end) : n ? $e(t) : t, i;
+	if (e.start) i = Qe(e.start);
+	else if (typeof e.hours == "number") i = n ? tt(r, e.hours) : /* @__PURE__ */ new Date(r.getTime() - e.hours * 60 * 60 * 1e3);
 	else {
 		let t = typeof e.days == "number" ? e.days : 30;
-		i = n ? Qe(r, t) : /* @__PURE__ */ new Date(r.getTime() - t * 24 * 60 * 60 * 1e3);
+		i = n ? et(r, t) : /* @__PURE__ */ new Date(r.getTime() - t * 24 * 60 * 60 * 1e3);
 	}
 	if (Number.isNaN(i.getTime()) || Number.isNaN(r.getTime())) throw Error("Universal Heatmap Card has an invalid range date.");
 	if (i >= r) throw Error("Universal Heatmap Card range start must be before end.");
@@ -955,21 +987,21 @@ function V(e, t = /* @__PURE__ */ new Date()) {
 		end: r
 	};
 }
-function Xe(e) {
-	let t = We.exec(e);
+function Qe(e) {
+	let t = Ke.exec(e);
 	if (!t) return new Date(e);
 	let [, n = "0", r = "1", i = "1"] = t, a = Number(n), o = Number(r) - 1, s = Number(i), c = /* @__PURE__ */ new Date(0);
 	return c.setFullYear(a, o, s), c.setHours(0, 0, 0, 0), c.getFullYear() !== a || c.getMonth() !== o || c.getDate() !== s ? /* @__PURE__ */ new Date(NaN) : c;
 }
-function Ze(e) {
+function $e(e) {
 	let t = new Date(e);
 	return t.setHours(0, 0, 0, 0), t.setDate(t.getDate() + 1), t;
 }
-function Qe(e, t) {
+function et(e, t) {
 	let n = new Date(e);
 	return n.setDate(n.getDate() - t), n;
 }
-function $e(e, t) {
+function tt(e, t) {
 	let n = Math.trunc(t), r = new Date(e);
 	return r.setHours(r.getHours() - n), /* @__PURE__ */ new Date(r.getTime() - (t - n) * 60 * 60 * 1e3);
 }
@@ -986,18 +1018,18 @@ function H(e, t = /* @__PURE__ */ new Date()) {
 }
 //#endregion
 //#region src/cell-values.ts
-function et(e) {
+function nt(e) {
 	return e < 9 ? 0 : e < 14 ? Math.max(6, Math.min(8, Math.floor(e * .72))) : Math.max(9, Math.min(13, Math.floor(e * .48)));
 }
-function tt(e, t) {
+function rt(e, t) {
 	if (t < 14) return 0;
 	let n = e < 1 ? 2 : +(e < 20);
 	return t < 18 ? Math.min(n, 0) : n;
 }
 //#endregion
 //#region src/data/buckets.ts
-var nt = 36e5;
-function rt(e) {
+var it = 36e5;
+function at(e) {
 	return e;
 }
 function U(e) {
@@ -1010,7 +1042,7 @@ function U(e) {
 		"change"
 	].includes(e) ? e : null;
 }
-function it(e, t) {
+function ot(e, t) {
 	let n = new Date(e);
 	if (n.setMilliseconds(0), n.setSeconds(0), t === "5minute" ? n.setMinutes(Math.floor(n.getMinutes() / 5) * 5) : n.setMinutes(0), (t === "day" || t === "week" || t === "month") && n.setHours(0, 0, 0, 0), t === "week") {
 		let e = n.getDay(), t = e === 0 ? -6 : 1 - e;
@@ -1018,21 +1050,21 @@ function it(e, t) {
 	}
 	return t === "month" && n.setDate(1), n;
 }
-function at(e, t) {
+function st(e, t) {
 	let n = new Date(e);
 	switch (t) {
 		case "5minute": return n.setTime(n.getTime() + 5 * 6e4), n;
-		case "hour": return n.setTime(n.getTime() + nt), n;
+		case "hour": return n.setTime(n.getTime() + it), n;
 		case "day": return n.setDate(n.getDate() + 1), n;
 		case "week": return n.setDate(n.getDate() + 7), n;
 		case "month": return n.setMonth(n.getMonth() + 1), n;
 		default: return n;
 	}
 }
-function ot(e, t) {
-	let n = [], r = it(e.start, t);
+function ct(e, t) {
+	let n = [], r = ot(e.start, t);
 	for (; r < e.end;) {
-		let i = at(r, t);
+		let i = st(r, t);
 		i > e.start && n.push({
 			start: new Date(r),
 			end: new Date(i)
@@ -1048,13 +1080,13 @@ function W(e, t) {
 		source: t
 	}));
 }
-function st(e, t, n, r) {
+function lt(e, t, n, r) {
 	let i = U(n), a = W(e, "statistics");
 	if (!i) return G(a, r);
 	for (let n of t) {
 		let t = n.start ? new Date(n.start) : void 0;
 		if (!t || Number.isNaN(t.getTime())) continue;
-		let r = ut(e, t);
+		let r = ft(e, t);
 		if (r < 0) continue;
 		let o = e[r];
 		if (!o) continue;
@@ -1068,7 +1100,7 @@ function st(e, t, n, r) {
 	}
 	return G(a, r);
 }
-function ct(e, t, n, r) {
+function ut(e, t, n, r) {
 	let i = e.map(() => []);
 	for (let n of t) {
 		let t = Number(n.state);
@@ -1077,14 +1109,14 @@ function ct(e, t, n, r) {
 		if (!r) continue;
 		let a = new Date(r).getTime();
 		if (!Number.isFinite(a)) continue;
-		let o = dt(e, a);
+		let o = pt(e, a);
 		o >= 0 && i[o]?.push({
 			at: a,
 			value: t
 		});
 	}
 	return G(e.map((e, t) => {
-		let r = lt(i[t] ?? [], n);
+		let r = dt(i[t] ?? [], n);
 		return {
 			...e,
 			value: r,
@@ -1106,7 +1138,7 @@ function G(e, t) {
 		quality: "carried"
 	} : e : (n = e.value, e));
 }
-function lt(e, t) {
+function dt(e, t) {
 	if (e.length === 0) return null;
 	switch (t) {
 		case "min": return Math.min(...e.map((e) => e.value));
@@ -1123,10 +1155,10 @@ function lt(e, t) {
 		default: return e.reduce((e, t) => e + t.value, 0) / e.length;
 	}
 }
-function ut(e, t) {
-	return dt(e, t.getTime());
+function ft(e, t) {
+	return pt(e, t.getTime());
 }
-function dt(e, t) {
+function pt(e, t) {
 	let n = 0, r = e.length - 1;
 	for (; n <= r;) {
 		let i = Math.floor((n + r) / 2), a = e[i];
@@ -1139,8 +1171,8 @@ function dt(e, t) {
 }
 //#endregion
 //#region src/data/provider.ts
-async function ft(e, t, n) {
-	let r = H(t), i = ot(V(t.range), t.bucket.interval);
+async function mt(e, t, n) {
+	let r = H(t), i = ct(V(t.range), t.bucket.interval);
 	if (r > t.data.max_cells) return {
 		source: "current",
 		buckets: W(i, "current"),
@@ -1148,7 +1180,7 @@ async function ft(e, t, n) {
 	};
 	let a = t.data.provider, o = U(t.bucket.value) !== null, s;
 	if ((a === "auto" || a === "statistics") && o) try {
-		let r = await pt(e, t, n, i);
+		let r = await ht(e, t, n, i);
 		if (r.some((e) => e.value !== null) || a === "statistics") return {
 			source: "statistics",
 			buckets: G(r, t.missing.mode)
@@ -1158,12 +1190,12 @@ async function ft(e, t, n) {
 		if (a === "statistics") return {
 			source: "statistics",
 			buckets: W(i, "statistics"),
-			warning: ht(e, "Statistics query failed.")
+			warning: _t(e, "Statistics query failed.")
 		};
 		s = "Statistics query failed.";
 	}
 	if (a === "auto" || a === "history") {
-		let r = await mt(e, t, n, i, s !== void 0);
+		let r = await gt(e, t, n, i, s !== void 0);
 		return s ? {
 			...r,
 			warning: r.warning ? `${s} ${r.warning}` : `${s} Showing raw history instead.`
@@ -1175,20 +1207,20 @@ async function ft(e, t, n) {
 		warning: "No supported data provider is available for this bucket value yet."
 	};
 }
-async function pt(e, t, n, r) {
+async function ht(e, t, n, r) {
 	let i = U(t.bucket.value);
 	if (!i) return W(r, "statistics");
 	let a = V(t.range);
-	return st(r, (await e.callWS({
+	return lt(r, (await e.callWS({
 		type: "recorder/statistics_during_period",
 		start_time: a.start.toISOString(),
 		end_time: a.end.toISOString(),
 		statistic_ids: [n.entity],
-		period: rt(t.bucket.interval),
+		period: at(t.bucket.interval),
 		types: [i]
 	}))[n.entity] ?? [], t.bucket.value, "empty");
 }
-async function mt(e, t, n, r, i = !1) {
+async function gt(e, t, n, r, i = !1) {
 	let a = V(t.range), o = (a.end.getTime() - a.start.getTime()) / 36e5;
 	if (!e.callApi) return {
 		source: "history",
@@ -1207,27 +1239,27 @@ async function mt(e, t, n, r, i = !1) {
 		});
 		return {
 			source: "history",
-			buckets: ct(r, (await e.callApi("GET", `history/period/${a.start.toISOString()}?${i.toString()}&minimal_response&no_attributes`)).flat(), t.bucket.value, t.missing.mode)
+			buckets: ut(r, (await e.callApi("GET", `history/period/${a.start.toISOString()}?${i.toString()}&minimal_response&no_attributes`)).flat(), t.bucket.value, t.missing.mode)
 		};
 	} catch (e) {
 		return {
 			source: "history",
 			buckets: W(r, "history"),
-			warning: i ? "History fallback failed." : ht(e, "History fallback failed.")
+			warning: i ? "History fallback failed." : _t(e, "History fallback failed.")
 		};
 	}
 }
-function ht(e, t) {
+function _t(e, t) {
 	return e instanceof Error && e.message ? e.message : t;
 }
 //#endregion
 //#region src/debug.ts
-var gt = "universal-heatmap-card:debug";
-function _t(e) {
+var vt = "universal-heatmap-card:debug";
+function yt(e) {
 	if (e?.debug === !0) return !0;
 	if (e?.debug === !1 || typeof window > "u") return !1;
 	try {
-		let e = window.localStorage?.getItem(gt);
+		let e = window.localStorage?.getItem(vt);
 		return e === "1" || e === "true";
 	} catch {
 		return !1;
@@ -1250,7 +1282,7 @@ function J(e, t, n) {
 }
 //#endregion
 //#region src/editor-form.ts
-function vt() {
+function bt() {
 	return {
 		schema: [
 			{
@@ -1492,21 +1524,21 @@ function vt() {
 	};
 }
 function Y(e) {
-	return yt(e).map((e) => typeof e == "string" ? e : e.entity).filter((e) => typeof e == "string" && e.length > 0);
+	return xt(e).map((e) => typeof e == "string" ? e : e.entity).filter((e) => typeof e == "string" && e.length > 0);
 }
-function yt(e) {
+function xt(e) {
 	return (e.entities?.length ? e.entities : e.entity ? [e.entity] : []).map((e) => typeof e == "string" ? e : { ...e });
 }
-function bt(e, t) {
+function St(e, t) {
 	let n = /* @__PURE__ */ new Map();
-	for (let t of yt(e)) {
+	for (let t of xt(e)) {
 		let e = typeof t == "string" ? t : t.entity;
 		e && n.set(e, typeof t == "string" ? t : { ...t });
 	}
 	return t.map((e) => n.get(e) ?? e);
 }
-function xt(e, t, n) {
-	let r = Y(e), i = n.trim(), a = bt(e, r).map((e) => {
+function Ct(e, t, n) {
+	let r = Y(e), i = n.trim(), a = St(e, r).map((e) => {
 		let n = typeof e == "string" ? e : e.entity;
 		if (n !== t) return e;
 		let r = typeof e == "string" ? { entity: n } : { ...e };
@@ -1517,7 +1549,7 @@ function xt(e, t, n) {
 	};
 	return delete o.entity, o;
 }
-var St = 12, Ct = 560, wt = 3, Tt = 2, Et = 7, Dt = 22, Ot = 14, kt = 28, At = 58, jt = 120, Mt = 18, Nt = 864e5, Pt = 36e5, Ft = 5e4;
+var wt = 12, Tt = 560, Et = 3, Dt = 2, Ot = 7, kt = 22, At = 14, jt = 28, Mt = 58, Nt = 120, Pt = 18, Ft = 864e5, It = 36e5, Lt = 5e4;
 /**
 * Maps buckets onto the render grid.
 *
@@ -1528,7 +1560,7 @@ var St = 12, Ct = 560, wt = 3, Tt = 2, Et = 7, Dt = 22, Ot = 14, kt = 28, At = 5
 * 01:00 hours stay separate logical cells sharing (splitting) one column.
 * Every other interval keeps the sequential row-major placement.
 */
-function It(e, t, n = X(t, Math.max(1, e.length))) {
+function Rt(e, t, n = X(t, Math.max(1, e.length))) {
 	let r = Math.max(1, Math.floor(n)), i = [];
 	if (t !== "hour") return e.forEach((e, t) => {
 		i.push({
@@ -1564,46 +1596,46 @@ function It(e, t, n = X(t, Math.max(1, e.length))) {
 	};
 }
 /** Formats a date's local UTC offset, used to disambiguate repeated DST hours. */
-function Lt(e) {
+function zt(e) {
 	let t = -e.getTimezoneOffset(), n = t < 0 ? "-" : "+", r = Math.abs(t);
 	return `UTC${n}${String(Math.floor(r / 60)).padStart(2, "0")}:${String(r % 60).padStart(2, "0")}`;
 }
-function Rt(e) {
+function Bt(e) {
 	let t = Math.max(1, Math.floor(e));
 	return t * 56 + Math.max(0, t - 1) * 8;
 }
-function zt(e) {
+function Vt(e) {
 	return !Number.isFinite(e) || e <= 0 ? 4 : Math.ceil((e + 8) / 64);
 }
-function Bt(e, t = {}, n = /* @__PURE__ */ new Date()) {
-	return Zt(zt(Ht(e, t, n)), 4, St);
-}
-function Vt(e, t = {}, n = /* @__PURE__ */ new Date()) {
-	return Math.max(1, Math.ceil(Ht(e, t, n) / 50));
-}
 function Ht(e, t = {}, n = /* @__PURE__ */ new Date()) {
-	return Ut(e, t) + Wt(e, Ct, n);
+	return $t(Vt(Wt(e, t, n)), 4, wt);
 }
-function Ut(e, t = {}) {
+function Ut(e, t = {}, n = /* @__PURE__ */ new Date()) {
+	return Math.max(1, Math.ceil(Wt(e, t, n) / 50));
+}
+function Wt(e, t = {}, n = /* @__PURE__ */ new Date()) {
+	return Gt(e, t) + Kt(e, Tt, n);
+}
+function Gt(e, t = {}) {
 	let n = 58;
-	return n += 16, e.entities.length > 1 && (n += Xt(e)), (t.loading || t.warning || t.error) && (n += 33), e.axes.show_key && (n += 24), n += 25, e.legend.show && (n += 25), n;
+	return n += 16, e.entities.length > 1 && (n += Qt(e)), (t.loading || t.warning || t.error) && (n += 33), e.axes.show_key && (n += 24), n += 25, e.legend.show && (n += 25), n;
 }
-function Wt(e, t = Ct, n = /* @__PURE__ */ new Date()) {
-	let r = Math.max(1, H(e, n)), i = X(e.bucket.interval, r), a = Gt(e, n), o = Yt(e.bucket.interval), s = e.axes.show && e.axes.y_labels ? Jt(e.bucket.interval) : 0, c = e.axes.show && e.axes.x_labels ? Mt : 0, l = Math.max(160, t - s), u = e.tiles.show_values || e.tiles.show_value_toggle;
-	return c + a * Math.max(u ? Ot : Et, Math.min(u ? kt : Dt, Math.floor((l - Math.max(0, i - 1) * o) / i))) + Math.max(0, a - 1) * o;
+function Kt(e, t = Tt, n = /* @__PURE__ */ new Date()) {
+	let r = Math.max(1, H(e, n)), i = X(e.bucket.interval, r), a = qt(e, n), o = Zt(e.bucket.interval), s = e.axes.show && e.axes.y_labels ? Xt(e.bucket.interval) : 0, c = e.axes.show && e.axes.x_labels ? Pt : 0, l = Math.max(160, t - s), u = e.tiles.show_values || e.tiles.show_value_toggle;
+	return c + a * Math.max(u ? At : Ot, Math.min(u ? jt : kt, Math.floor((l - Math.max(0, i - 1) * o) / i))) + Math.max(0, a - 1) * o;
 }
-function Gt(e, t) {
+function qt(e, t) {
 	let n = Math.max(1, H(e, t)), r = X(e.bucket.interval, n);
-	return e.bucket.interval === "hour" ? Kt(V(e.range, t)) : Math.ceil(n / r);
+	return e.bucket.interval === "hour" ? Jt(V(e.range, t)) : Math.ceil(n / r);
 }
-function Kt(e) {
-	let t = e.start, n = /* @__PURE__ */ new Date(e.end.getTime() - 1), r = qt(t), i = qt(n), a = Math.max(1, Math.floor((i - r) / Nt) + 1);
-	if (Math.ceil((e.end.getTime() - e.start.getTime()) / Pt) + 1 > Ft) return a;
+function Jt(e) {
+	let t = e.start, n = /* @__PURE__ */ new Date(e.end.getTime() - 1), r = Yt(t), i = Yt(n), a = Math.max(1, Math.floor((i - r) / Ft) + 1);
+	if (Math.ceil((e.end.getTime() - e.start.getTime()) / It) + 1 > Lt) return a;
 	let o = new Date(e.start);
 	o.setMilliseconds(0), o.setSeconds(0), o.setMinutes(0);
 	let s = "", c = 0;
 	for (; o < e.end;) {
-		let t = o.getTime() + Pt;
+		let t = o.getTime() + It;
 		if (t > e.start.getTime()) {
 			let e = `${o.getFullYear()}-${o.getMonth()}-${o.getDate()}`;
 			e !== s && (s = e, c += 1);
@@ -1612,17 +1644,17 @@ function Kt(e) {
 	}
 	return Math.max(1, c);
 }
-function qt(e) {
+function Yt(e) {
 	let t = /* @__PURE__ */ new Date(0);
 	return t.setUTCFullYear(e.getFullYear(), e.getMonth(), e.getDate()), t.setUTCHours(0, 0, 0, 0), t.getTime();
 }
-function Jt(e) {
-	return e === "5minute" ? jt : At;
-}
-function Yt(e) {
-	return e === "5minute" ? Tt : wt;
-}
 function Xt(e) {
+	return e === "5minute" ? Nt : Mt;
+}
+function Zt(e) {
+	return e === "5minute" ? Dt : Et;
+}
+function Qt(e) {
 	switch (e.navigation.mode) {
 		case "dots": return 24;
 		case "tabs": {
@@ -1635,12 +1667,12 @@ function Xt(e) {
 function X(e, t) {
 	return e === "hour" ? 24 : e === "5minute" ? 48 : e === "day" ? 7 : e === "month" ? 12 : Math.min(12, Math.ceil(Math.sqrt(t * 1.8)));
 }
-function Zt(e, t, n) {
+function $t(e, t, n) {
 	return Math.max(t, Math.min(n, e));
 }
 //#endregion
 //#region src/scale.ts
-var Qt = [
+var en = [
 	{
 		value: 0,
 		color: "#3a6ea5"
@@ -1654,8 +1686,8 @@ var Qt = [
 		color: "#f6c85f"
 	}
 ];
-function $t(e, t) {
-	let n = e.map((e) => e.value).filter((e) => typeof e == "number" && Number.isFinite(e)), r = n.filter((e) => e !== 0), i = on(t.ignore_zero === !0 || t.ignore_zero !== !1 && r.length > 0 && n.some((e) => e === 0) && !n.some((e) => e < 0) ? r : n, t.outlier_clip), a = i.min, o = i.max, { min: s, max: c } = nn(t, a, o), l = an(t.stops?.length ? t.stops : Qt, s, c, t.invert ?? !1), u = ln(t.sensitivity);
+function tn(e, t) {
+	let n = e.map((e) => e.value).filter((e) => typeof e == "number" && Number.isFinite(e)), r = n.filter((e) => e !== 0), i = sn(t.ignore_zero === !0 || t.ignore_zero !== !1 && r.length > 0 && n.some((e) => e === 0) && !n.some((e) => e < 0) ? r : n, t.outlier_clip), a = i.min, o = i.max, { min: s, max: c } = an(t, a, o), l = on(t.stops?.length ? t.stops : en, s, c, t.invert ?? !1), u = un(t.sensitivity);
 	return {
 		min: s,
 		max: c,
@@ -1666,25 +1698,25 @@ function $t(e, t) {
 		clippedHigh: n.some((e) => e > c)
 	};
 }
-function en(e, t) {
+function nn(e, t) {
 	if (e === null || !Number.isFinite(e)) return "rgba(127, 127, 127, 0.22)";
-	let n = un(e, t), r = t.stops;
+	let n = dn(e, t), r = t.stops;
 	if (r.length === 0) return "#999999";
 	if (r.length === 1) return r[0]?.color ?? "#999999";
 	for (let e = 0; e < r.length - 1; e += 1) {
 		let t = r[e], i = r[e + 1];
 		if (!(!t || !i) && n >= t.value && n <= i.value) {
 			let e = i.value - t.value || 1, r = (n - t.value) / e;
-			return dn(t.color, i.color, r);
+			return fn(t.color, i.color, r);
 		}
 	}
 	return n < (r[0]?.value ?? t.min) ? r[0]?.color ?? "#999999" : r[r.length - 1]?.color ?? "#999999";
 }
-function tn(e, t = 18) {
+function rn(e, t = 18) {
 	let n = e.max - e.min || 1, r = Math.max(2, t);
 	return Array.from({ length: r }, (t, i) => {
 		let a = i / (r - 1);
-		return `${en(e.min + n * a, e)} ${a * 100}%`;
+		return `${nn(e.min + n * a, e)} ${a * 100}%`;
 	}).join(", ");
 }
 function Z(e, t, n) {
@@ -1692,14 +1724,14 @@ function Z(e, t, n) {
 	let r = Math.abs(e), i = r >= 100 ? 0 : r >= 10 ? 1 : 2, a = new Intl.NumberFormat(n, { maximumFractionDigits: i }).format(e);
 	return t.unit ? `${a} ${t.unit}` : a;
 }
-function nn(e, t, n) {
+function an(e, t, n) {
 	let r = typeof e.min == "number", i = typeof e.max == "number", a = r ? e.min : t, o = i ? e.max : n;
 	return o > a ? {
 		min: a,
 		max: o
-	} : i ? r ? rn(a, !0) : rn(o, !1) : rn(a, !0);
+	} : i ? r ? Q(a, !0) : Q(o, !1) : Q(a, !0);
 }
-function rn(e, t) {
+function Q(e, t) {
 	let n = Math.abs(e) * 2 ** -52 * 4, r = n > 0 && Number.isFinite(n) ? n : 1, i = e + r, a = e - r;
 	return t && Number.isFinite(i) && i > e ? {
 		min: e,
@@ -1715,7 +1747,7 @@ function rn(e, t) {
 		max: e + 1
 	};
 }
-function an(e, t, n, r) {
+function on(e, t, n, r) {
 	let i = e.every((e) => e.value >= 0 && e.value <= 1), a = e.map((e) => i ? {
 		...e,
 		value: t + e.value * (n - t)
@@ -1727,17 +1759,17 @@ function an(e, t, n, r) {
 		color: o[t] ?? e.color
 	}));
 }
-function on(e, t) {
+function sn(e, t) {
 	if (e.length === 0) return {
 		min: 0,
 		max: 1
 	};
-	let n = [...e].sort((e, t) => e - t), r = sn(t);
+	let n = [...e].sort((e, t) => e - t), r = cn(t);
 	if (!r) return {
 		min: n[0] ?? 0,
 		max: n[n.length - 1] ?? 1
 	};
-	let i = cn(n, r.low), a = cn(n, r.high);
+	let i = ln(n, r.low), a = ln(n, r.high);
 	return a <= i ? {
 		min: n[0] ?? 0,
 		max: n[n.length - 1] ?? i + 1
@@ -1746,10 +1778,10 @@ function on(e, t) {
 		max: a
 	};
 }
-function sn(e) {
+function cn(e) {
 	if (typeof e == "number") {
 		if (!Number.isFinite(e) || e <= 0) return null;
-		let t = Q(e, 0, 49);
+		let t = $(e, 0, 49);
 		return {
 			low: t,
 			high: 100 - t
@@ -1758,25 +1790,25 @@ function sn(e) {
 	if (!Array.isArray(e) || e.length !== 2) return null;
 	let t = Number(e[0]), n = Number(e[1]);
 	return !Number.isFinite(t) || !Number.isFinite(n) || n <= t ? null : {
-		low: Q(t, 0, 100),
-		high: Q(n, 0, 100)
+		low: $(t, 0, 100),
+		high: $(n, 0, 100)
 	};
 }
-function cn(e, t) {
-	return e.length === 0 ? 0 : e[Q(Math.ceil(t / 100 * e.length) - 1, 0, e.length - 1)] ?? e[0] ?? 0;
+function ln(e, t) {
+	return e.length === 0 ? 0 : e[$(Math.ceil(t / 100 * e.length) - 1, 0, e.length - 1)] ?? e[0] ?? 0;
 }
-function ln(e) {
-	return typeof e != "number" || !Number.isFinite(e) || e <= 0 ? 1 : Q(e, .1, 5);
+function un(e) {
+	return typeof e != "number" || !Number.isFinite(e) || e <= 0 ? 1 : $(e, .1, 5);
 }
-function un(e, t) {
-	let n = t.max - t.min || 1, r = Q(.5 + ((Q(e, t.min, t.max) - t.min) / n - .5) * t.sensitivity, 0, 1);
+function dn(e, t) {
+	let n = t.max - t.min || 1, r = $(.5 + (($(e, t.min, t.max) - t.min) / n - .5) * t.sensitivity, 0, 1);
 	return t.min + r * n;
 }
-function dn(e, t, n) {
-	let r = fn(e), i = fn(t);
+function fn(e, t, n) {
+	let r = pn(e), i = pn(t);
 	return !r || !i ? n < .5 ? e : t : `rgb(${Math.round(r.r + (i.r - r.r) * n)}, ${Math.round(r.g + (i.g - r.g) * n)}, ${Math.round(r.b + (i.b - r.b) * n)})`;
 }
-function fn(e) {
+function pn(e) {
 	let t = e.replace("#", "").trim(), n = t.length === 3 ? t.split("").map((e) => `${e}${e}`).join("") : t;
 	return /^[0-9a-fA-F]{6}$/.test(n) ? {
 		r: Number.parseInt(n.slice(0, 2), 16),
@@ -1784,12 +1816,12 @@ function fn(e) {
 		b: Number.parseInt(n.slice(4, 6), 16)
 	} : null;
 }
-function Q(e, t, n) {
+function $(e, t, n) {
 	return e < t ? t : e > n ? n : e;
 }
 //#endregion
 //#region src/time-labels.ts
-function pn(e, t, n) {
+function mn(e, t, n) {
 	return new Intl.DateTimeFormat(n, {
 		month: "short",
 		day: "numeric",
@@ -1797,7 +1829,7 @@ function pn(e, t, n) {
 		minute: t === "5minute" ? "2-digit" : void 0
 	}).format(e);
 }
-function mn(e, t, n) {
+function hn(e, t, n) {
 	let r = t === "month" ? { year: "2-digit" } : t === "5minute" ? {
 		month: "short",
 		day: "numeric",
@@ -1809,7 +1841,7 @@ function mn(e, t, n) {
 	};
 	return new Intl.DateTimeFormat(n, r).format(e);
 }
-function hn(e) {
+function gn(e) {
 	switch (e) {
 		case "5minute": return {
 			x: "elapsed time within each 4-hour row",
@@ -1837,7 +1869,7 @@ function hn(e) {
 		};
 	}
 }
-function gn() {
+function _n() {
 	let e = [
 		0,
 		12,
@@ -1847,22 +1879,22 @@ function gn() {
 	];
 	return e.map((t, n) => ({
 		col: t,
-		label: _n(t * 5),
+		label: vn(t * 5),
 		align: n === 0 ? "left" : n === e.length - 1 ? "right" : "center"
 	}));
 }
-function _n(e) {
+function vn(e) {
 	if (e === 0) return "0h";
 	let t = Math.floor(e / 60), n = e % 60;
 	return `+${t}h${n === 0 ? "" : `${n}m`}`;
 }
 //#endregion
 //#region src/types.ts
-var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", bn = `${vn}-editor`, xn = class extends Error {
+var yn = "universal-heatmap-card", bn = "Universal Heatmap Card", xn = "0.1.4", Sn = `${yn}-editor`, Cn = class extends Error {
 	constructor() {
 		super("Stale heatmap load skipped.");
 	}
-}, Sn = class extends I {
+}, wn = class extends I {
 	constructor(...e) {
 		super(...e), this._activeIndex = 0, this._buckets = [], this._loading = !1, this._cache = /* @__PURE__ */ new Map(), this._debug = !1, this._deferredLoadPending = !1, this._visibleForLoad = globalThis.IntersectionObserver === void 0, this._loadSeq = 0, this._cellFormatCache = /* @__PURE__ */ new Map();
 	}
@@ -1881,9 +1913,9 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 	}
 	setConfig(e) {
 		let t = this._normalized?.entities[this._activeIndex]?.entity;
-		this._config = e, this._debug = _t(e), this._cache.clear(), this._inFlightKey = void 0, this._loadSeq += 1, this._normalized = Ge(e, this.hass, this._activeIndex);
+		this._config = e, this._debug = yt(e), this._cache.clear(), this._inFlightKey = void 0, this._loadSeq += 1, this._normalized = qe(e, this.hass, this._activeIndex);
 		let n = this._resolveActiveIndex(t);
-		n !== this._activeIndex && (this._activeIndex = n, this._normalized = Ge(e, this.hass, n)), this._tileValuesOverride = void 0, this._tooltip = void 0, J(this._debug, "config applied", {
+		n !== this._activeIndex && (this._activeIndex = n, this._normalized = qe(e, this.hass, n)), this._tileValuesOverride = void 0, this._tooltip = void 0, J(this._debug, "config applied", {
 			entityCount: this._normalized.entities.length,
 			bucket: this._normalized.bucket,
 			range: this._normalized.range,
@@ -1923,16 +1955,16 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		};
 	}
 	static getConfigElement() {
-		return document.createElement(bn);
+		return document.createElement(Sn);
 	}
 	static getConfigForm() {
-		return vt();
+		return bt();
 	}
 	updated(e) {
-		this._config && (e.has("hass") || e.has("_activeIndex")) && (this._normalized = Ge(this._config, this.hass, this._activeIndex), this._requestActiveSeriesLoad()), (e.has("_buckets") || e.has("_loading") || e.has("_tileValuesOverride") || e.has("_warning")) && this.updateComplete.then(() => this._drawHeatmap());
+		this._config && (e.has("hass") || e.has("_activeIndex")) && (this._normalized = qe(this._config, this.hass, this._activeIndex), this._requestActiveSeriesLoad()), (e.has("_buckets") || e.has("_loading") || e.has("_tileValuesOverride") || e.has("_warning")) && this.updateComplete.then(() => this._drawHeatmap());
 	}
 	render() {
-		if (!this._normalized) return O`<ha-card><div class="empty">Configure ${$}</div></ha-card>`;
+		if (!this._normalized) return O`<ha-card><div class="empty">Configure ${bn}</div></ha-card>`;
 		let e = this._normalized.entities[this._activeIndex], t = e ? this.hass?.states[e.entity] : void 0, n = this._normalized.title ?? e?.name ?? "Universal Heatmap Card";
 		return O`
       <ha-card class=${this._shouldBoundToGrid() ? "grid-bound" : ""}>
@@ -2045,11 +2077,11 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 	}
 	_estimatedGridRows() {
 		let e = this._normalized;
-		return e ? Bt(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
+		return e ? Ht(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
 	}
 	_estimatedMasonryRows() {
 		let e = this._normalized;
-		return e ? Vt(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
+		return e ? Ut(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
 	}
 	_layoutState() {
 		return {
@@ -2088,7 +2120,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
         <span>${e}</span>
         <div
           class="legend-bar"
-          style=${`background: linear-gradient(90deg, ${tn(this._scale)});`}
+          style=${`background: linear-gradient(90deg, ${rn(this._scale)});`}
         ></div>
         <span>${t}</span>
       </div>
@@ -2110,7 +2142,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		if (this._inFlightKey === r) {
 			J(this._debug, "load already in flight", {
 				entity: n.entity,
-				queue: Le(e.data.max_concurrent_requests)
+				queue: ze(e.data.max_concurrent_requests)
 			});
 			return;
 		}
@@ -2129,9 +2161,9 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 			bucket: e.bucket
 		});
 		try {
-			let i = await Ie(async () => {
-				if (a !== this._loadSeq) throw new xn();
-				return ft(t, e, n);
+			let i = await Re(async () => {
+				if (a !== this._loadSeq) throw new Cn();
+				return mt(t, e, n);
 			}, {
 				maxConcurrent: e.data.max_concurrent_requests,
 				onQueued: (e) => J(this._debug, "request queued", {
@@ -2144,7 +2176,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 				})
 			});
 			if (a !== this._loadSeq) return;
-			let c = this._debug ? q(K() - s) : 0, l = this._debug ? K() : 0, u = $t(i.buckets, {
+			let c = this._debug ? q(K() - s) : 0, l = this._debug ? K() : 0, u = tn(i.buckets, {
 				...e.scale,
 				...n.scale
 			}), d = this._debug ? q(K() - l) : 0;
@@ -2164,7 +2196,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 				warning: i.warning
 			});
 		} catch (e) {
-			if (e instanceof xn) {
+			if (e instanceof Cn) {
 				J(this._debug, "stale queued load skipped", { entity: n.entity });
 				return;
 			}
@@ -2181,7 +2213,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 	_requestActiveSeriesLoad() {
 		if (!(!this._normalized || !this.hass)) {
 			if (this._shouldDeferLoad()) {
-				this._deferredLoadPending = !0, J(this._debug, "load deferred until visible", { queue: Le(this._normalized.data.max_concurrent_requests) });
+				this._deferredLoadPending = !0, J(this._debug, "load deferred until visible", { queue: ze(this._normalized.data.max_concurrent_requests) });
 				return;
 			}
 			this._deferredLoadPending = !1, this._loadActiveSeries();
@@ -2230,7 +2262,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		for (let e of this._placement?.cells ?? []) {
 			let n = this._buckets[e.index];
 			if (!n) continue;
-			let r = o.cell / e.slots, i = o.gridX + e.col * (o.cell + o.gap) + e.slot * r, a = o.gridY + e.row * (o.cell + o.gap), s = en(n.value, this._scale);
+			let r = o.cell / e.slots, i = o.gridX + e.col * (o.cell + o.gap) + e.slot * r, a = o.gridY + e.row * (o.cell + o.gap), s = nn(n.value, this._scale);
 			t.fillStyle = s, t.fillRect(i, a, r, o.cell), n.quality === "carried" && (t.fillStyle = "rgba(255, 255, 255, 0.34)", t.fillRect(i, a + o.cell - 3, r, 3)), this._drawCellValue(t, n, o, i, a, s, r);
 		}
 		this._renderLayout = o, J(this._debug, "draw complete", {
@@ -2245,9 +2277,9 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		});
 	}
 	_calculateLayout(e, t) {
-		let n = this._normalized?.bucket.interval ?? "day", r = X(n, Math.max(1, this._buckets.length)), i = It(this._buckets, n, r);
+		let n = this._normalized?.bucket.interval ?? "day", r = X(n, Math.max(1, this._buckets.length)), i = Rt(this._buckets, n, r);
 		this._placement = i;
-		let a = Yt(n), o = this._shouldShowRowLabels() ? Jt(n) : 0, s = this._shouldShowXAxisLabels() ? 18 : 0, c = Math.max(160, e - o), l = i.rows, u = this._shouldReserveForTileValues(), d = u ? 14 : 7, f = Math.min(u ? 28 : 22, Math.floor((c - a * (r - 1)) / r));
+		let a = Zt(n), o = this._shouldShowRowLabels() ? Xt(n) : 0, s = this._shouldShowXAxisLabels() ? 18 : 0, c = Math.max(160, e - o), l = i.rows, u = this._shouldReserveForTileValues(), d = u ? 14 : 7, f = Math.min(u ? 28 : 22, Math.floor((c - a * (r - 1)) / r));
 		if (f = Math.max(f >= d ? d : 7, f), typeof t == "number") {
 			let e = Math.max(0, t - s), n = Math.floor((e - Math.max(0, l - 1) * a) / l);
 			Number.isFinite(n) && n >= 7 && (f = Math.min(f, n));
@@ -2268,7 +2300,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 	}
 	_drawCellValue(e, t, n, r, i, a, o = n.cell) {
 		if (!this._showTileValues() || !this._scale || t.value === null) return;
-		let s = et(n.cell);
+		let s = nt(n.cell);
 		if (s <= 0) return;
 		let c = this._formatCellValue(t.value, o);
 		if (!c) return;
@@ -2282,7 +2314,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 			maximumFractionDigits: 1,
 			notation: "compact"
 		}).format(e);
-		let n = tt(Math.abs(this._scale.max - this._scale.min), t);
+		let n = rt(Math.abs(this._scale.max - this._scale.min), t);
 		return this._cellNumberFormat(`fixed:${n}`, {
 			maximumFractionDigits: n,
 			minimumFractionDigits: n
@@ -2319,7 +2351,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		if (typeof e != "number" || !Number.isFinite(e) || e <= 0) return;
 		let t = this._normalized;
 		if (!t) return;
-		let n = Rt(e) - Ut(t, this._layoutState());
+		let n = Bt(e) - Gt(t, this._layoutState());
 		if (!(n <= 0)) return Math.max(120, n);
 	}
 	_shouldBoundToGrid() {
@@ -2360,7 +2392,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 			this._tooltip = void 0;
 			return;
 		}
-		let p = d.slots > 1 ? ` (${Lt(f.start)})` : "", m = `${this._formatDate(f.start)} - ${this._formatDate(f.end)}${p}: ${Z(f.value, this._scale, this.hass?.locale?.language)}`;
+		let p = d.slots > 1 ? ` (${zt(f.start)})` : "", m = `${this._formatDate(f.start)} - ${this._formatDate(f.end)}${p}: ${Z(f.value, this._scale, this.hass?.locale?.language)}`;
 		this._tooltip = {
 			x: Math.min(n + 12, t.width - 160),
 			y: Math.max(4, r - 28),
@@ -2426,13 +2458,13 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		return `${e.state}${t}`;
 	}
 	_formatDate(e) {
-		return pn(e, this._normalized?.bucket.interval ?? "day", this.hass?.locale?.language);
+		return mn(e, this._normalized?.bucket.interval ?? "day", this.hass?.locale?.language);
 	}
 	_xAxisLabel() {
-		return hn(this._normalized?.bucket.interval).x;
+		return gn(this._normalized?.bucket.interval).x;
 	}
 	_yAxisLabel() {
-		return hn(this._normalized?.bucket.interval).y;
+		return gn(this._normalized?.bucket.interval).y;
 	}
 	_colorAxisLabel() {
 		return `${this._bucketValueLabel(this._normalized?.bucket.value)}${this._scale?.unit ? ` (${this._scale.unit})` : ""}`;
@@ -2467,7 +2499,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 			12,
 			18,
 			23
-		]) : t === "5minute" ? gn() : t === "day" ? [
+		]) : t === "5minute" ? _n() : t === "day" ? [
 			"Mon",
 			"Tue",
 			"Wed",
@@ -2527,7 +2559,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		return new Intl.DateTimeFormat(this.hass?.locale?.language, { hour: "numeric" }).formatToParts(e).filter((e) => e.type === "hour" || e.type === "dayPeriod").map((e) => e.value.toLowerCase()).join("").replace(/\s/g, "");
 	}
 	_rowLabel(e) {
-		return mn(e, this._normalized?.bucket.interval ?? "day", this.hass?.locale?.language);
+		return hn(e, this._normalized?.bucket.interval ?? "day", this.hass?.locale?.language);
 	}
 	static {
 		this.styles = o`
@@ -2755,9 +2787,9 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
     }
   `;
 	}
-}, Cn = class extends I {
+}, Tn = class extends I {
 	constructor(...e) {
-		super(...e), this._form = vt();
+		super(...e), this._form = bt();
 	}
 	static {
 		this.properties = {
@@ -2793,7 +2825,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		let t = e.detail.value ?? {}, n = this._selectedEntities(t.entities), r = {
 			...this._config,
 			...t,
-			entities: bt(this._config, n)
+			entities: St(this._config, n)
 		};
 		this._applyConfig(r);
 	}
@@ -2802,7 +2834,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 	}
 	_renderEntityNameEditor() {
 		if (!this._config) return A;
-		let e = bt(this._config, Y(this._config));
+		let e = St(this._config, Y(this._config));
 		return e.length === 0 ? A : O`
       <section class="editor-section" aria-label="Entity labels">
         <div class="editor-title">Entity labels</div>
@@ -2831,7 +2863,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 	_handleEntityNameInput(e, t) {
 		if (!this._config) return;
 		let n = t.target;
-		this._applyConfig(xt(this._config, e, n.value));
+		this._applyConfig(Ct(this._config, e, n.value));
 	}
 	_defaultEntityName(e) {
 		let t = this.hass?.states[e];
@@ -2926,11 +2958,11 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
   `;
 	}
 };
-customElements.get("universal-heatmap-card") || customElements.define(vn, Sn), customElements.get(bn) || customElements.define(bn, Cn), window.customCards = window.customCards ?? [], window.customCards.push({
-	type: vn,
-	name: $,
+customElements.get("universal-heatmap-card") || customElements.define(yn, wn), customElements.get(Sn) || customElements.define(Sn, Tn), window.customCards = window.customCards ?? [], window.customCards.push({
+	type: yn,
+	name: bn,
 	preview: !0,
 	description: "Canvas heatmaps for Home Assistant recorder statistics and short history ranges.",
 	documentationURL: "https://github.com/gcs8/universal-heatmap-card"
-}), console.info(`%c${$}%c ${yn}`, "color: #3a6ea5; font-weight: 700;", "color: inherit;");
+}), console.info(`%c${bn}%c ${xn}`, "color: #3a6ea5; font-weight: 700;", "color: inherit;");
 //#endregion
