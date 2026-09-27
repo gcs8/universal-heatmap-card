@@ -2099,7 +2099,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		if (!e || !t || !n) return;
 		let r = this._seriesCacheKey(e, n), i = this._cache.get(r);
 		if (i && this._isCacheFresh(i, e.data.refresh_interval)) {
-			J(this._debug, "cache hit", {
+			this._loadSeq += 1, J(this._debug, "cache hit", {
 				entity: n.entity,
 				source: i.result.source,
 				buckets: i.result.buckets.length,
