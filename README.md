@@ -128,7 +128,7 @@ axes:
   show_key: false
 ```
 
-Set `axes.show_key: true` when you want the card to explicitly spell out the encoding. Hourly cards use `X = time of day` and `Y = date`. The 5-minute interval keeps native 5-minute buckets in 48-column, 4-hour rows: x-axis ticks show elapsed offsets within each row, row labels show the local date and strip start time, and tooltips include local hours and minutes.
+Set `axes.show_key: true` when you want the card to explicitly spell out the encoding. Hourly cards use `X = time of day` and `Y = date`. The 5-minute interval keeps native 5-minute buckets in 48-column, 4-hour rows: x-axis ticks show elapsed offsets within each row, row labels show the local date and strip start time, and tooltips include local hours and minutes. Daily cards place each day under its weekday column (Monday first) with one row per week, and monthly cards place each month under its calendar-month column with one row per year, so the first row may start with blank cells.
 
 By default, color scales use the observed bucket values in the rendered time window unless you set fixed `scale.min` or `scale.max`. For positive sensors, `scale.ignore_zero: auto` keeps an isolated zero from flattening a large active range.
 

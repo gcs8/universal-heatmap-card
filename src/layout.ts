@@ -55,7 +55,15 @@ export interface GridPlacement {
  * hour. That keeps 23-hour and 25-hour DST days intact - the nonexistent
  * spring-forward hour simply leaves its column blank, and the two fall-back
  * 01:00 hours stay separate logical cells sharing (splitting) one column.
- * Every other interval keeps the sequential row-major placement.
+ *
+ * Daily grids use a fixed 7-column weekday layout (Monday first): each bucket
+ * sits in the column of its local weekday, and a new row starts whenever the
+ * week wraps, so a range starting mid-week leaves the leading columns of the
+ * first row blank. Monthly grids use a fixed 12-column calendar-month layout
+ * with one row per local calendar year.
+ *
+ * Every other interval ("5minute", "week") keeps the sequential row-major
+ * placement.
  */
 export function placeBucketsOnGrid(
   buckets: ReadonlyArray<{ start: Date }>,
@@ -64,6 +72,30 @@ export function placeBucketsOnGrid(
 ): GridPlacement {
   const safeCols = Math.max(1, Math.floor(cols));
   const cells: GridCell[] = [];
+
+  if (interval === "day" || interval === "month") {
+    let row = -1;
+    let previousCol = -1;
+    let previousYear = Number.NaN;
+
+    buckets.forEach((bucket, index) => {
+      const start = bucket.start;
+      const rawCol = interval === "day" ? (start.getDay() + 6) % 7 : start.getMonth();
+      const col = Math.min(safeCols - 1, Math.max(0, rawCol));
+      const year = start.getFullYear();
+      const newRow = interval === "day"
+        ? index === 0 || col <= previousCol
+        : index === 0 || year !== previousYear;
+      if (newRow) {
+        row += 1;
+      }
+      previousCol = col;
+      previousYear = year;
+      cells.push({ index, row, col, slot: 0, slots: 1 });
+    });
+
+    return { rows: Math.max(1, row + 1), cols: safeCols, cells };
+  }
 
   if (interval !== "hour") {
     buckets.forEach((_bucket, index) => {
@@ -209,11 +241,38 @@ export function estimateCanvasHeight(
 export function estimateGridRows(config: NormalizedConfig, now: Date): number {
   const count = Math.max(1, estimateCellCount(config, now));
   const cols = columnsForInterval(config.bucket.interval, count);
-  if (config.bucket.interval !== "hour") {
-    return Math.ceil(count / cols);
+  switch (config.bucket.interval) {
+    case "hour":
+      return countHourlyGridRows(calculateRange(config.range, now));
+    case "day":
+      return countDailyGridRows(calculateRange(config.range, now));
+    case "month":
+      return countMonthlyGridRows(calculateRange(config.range, now));
+    default:
+      return Math.ceil(count / cols);
   }
+}
 
-  return countHourlyGridRows(calculateRange(config.range, now));
+/**
+ * Counts the Monday-anchored local weeks touched by the day buckets of a range,
+ * i.e. the rows placeBucketsOnGrid renders for a daily grid.
+ */
+export function countDailyGridRows(range: DateRange): number {
+  const firstDay = localCalendarDayTimestamp(range.start);
+  const lastDay = localCalendarDayTimestamp(new Date(range.end.getTime() - 1));
+  const firstMonday = mondayOfCalendarDay(firstDay);
+  const lastMonday = mondayOfCalendarDay(lastDay);
+  return Math.max(1, Math.floor((lastMonday - firstMonday) / (7 * DAY_MS)) + 1);
+}
+
+/**
+ * Counts the local calendar years touched by the month buckets of a range,
+ * i.e. the rows placeBucketsOnGrid renders for a monthly grid.
+ */
+export function countMonthlyGridRows(range: DateRange): number {
+  const firstYear = range.start.getFullYear();
+  const lastYear = new Date(range.end.getTime() - 1).getFullYear();
+  return Math.max(1, lastYear - firstYear + 1);
 }
 
 export function countHourlyGridRows(range: DateRange): number {
@@ -254,6 +313,12 @@ function localCalendarDayTimestamp(date: Date): number {
   day.setUTCFullYear(date.getFullYear(), date.getMonth(), date.getDate());
   day.setUTCHours(0, 0, 0, 0);
   return day.getTime();
+}
+
+/** Returns the Monday that starts the week of a localCalendarDayTimestamp value. */
+function mondayOfCalendarDay(dayTimestamp: number): number {
+  const weekday = (new Date(dayTimestamp).getUTCDay() + 6) % 7;
+  return dayTimestamp - weekday * DAY_MS;
 }
 
 export function rowLabelWidthForInterval(interval: BucketInterval): number {

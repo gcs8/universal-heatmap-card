@@ -4,6 +4,8 @@ import {
   fiveMinuteElapsedTicks,
   formatBucketDate,
   formatRowStart,
+  monthTickLabels,
+  weekdayTickLabels,
 } from "../src/time-labels";
 
 describe("time labels", () => {
@@ -33,6 +35,24 @@ describe("time labels", () => {
       { col: 24, label: "+2h", align: "center" },
       { col: 36, label: "+3h", align: "center" },
       { col: 47, label: "+3h55m", align: "right" },
+    ]);
+  });
+
+  it("labels daily columns with locale weekday names, Monday first", () => {
+    const ticks = weekdayTickLabels("en-US");
+
+    expect(ticks.map((tick) => tick.label)).toEqual(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
+    expect(ticks.map((tick) => tick.col)).toEqual([0, 1, 2, 3, 4, 5, 6]);
+    expect(ticks.every((tick) => tick.align === "center")).toBe(true);
+  });
+
+  it("labels monthly tick columns with locale month names", () => {
+    expect(monthTickLabels("en-US")).toEqual([
+      { col: 0, label: "Jan", align: "left" },
+      { col: 3, label: "Apr", align: "center" },
+      { col: 6, label: "Jul", align: "center" },
+      { col: 9, label: "Oct", align: "center" },
+      { col: 11, label: "Dec", align: "right" },
     ]);
   });
 });
