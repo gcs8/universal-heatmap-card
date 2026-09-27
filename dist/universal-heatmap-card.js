@@ -2333,8 +2333,8 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		if (!this._normalized?.axes.show) return;
 		let n = getComputedStyle(this), r = n.getPropertyValue("--secondary-text-color").trim() || "#64748b", i = n.getPropertyValue("--divider-color").trim() || "#d8dee8";
 		if (e.save(), e.font = "11px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", e.fillStyle = r, e.strokeStyle = i, e.lineWidth = 1, this._normalized.axes.x_labels) for (let n of this._xAxisTicks(t)) {
-			let r = t.gridX + n.col * (t.cell + t.gap);
-			e.textAlign = n.align, e.textBaseline = "top", e.fillText(n.label, r, 0);
+			let r = t.gridX + n.col * (t.cell + t.gap), i = n.align === "center" ? r + t.cell / 2 : n.align === "right" ? r + t.cell : r;
+			e.textAlign = n.align, e.textBaseline = "top", e.fillText(n.label, i, 0);
 		}
 		if (this._shouldShowRowLabels()) {
 			e.textAlign = "right", e.textBaseline = "middle";
