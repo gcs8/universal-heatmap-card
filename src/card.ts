@@ -91,6 +91,7 @@ export class UniversalHeatmapCard extends LitElement {
   private _inFlightKey?: string;
   private _visibleForLoad = typeof globalThis.IntersectionObserver === "undefined";
   private _visibilityObserver?: IntersectionObserver;
+  private _resizeObserver?: ResizeObserver;
   private _loadSeq = 0;
   private _renderLayout?: HeatmapRenderLayout;
   private _placement?: GridPlacement;
@@ -163,12 +164,15 @@ export class UniversalHeatmapCard extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this._setupVisibilityObserver();
+    this._setupResizeObserver();
     this._requestActiveSeriesLoad();
   }
 
   override disconnectedCallback(): void {
     this._visibilityObserver?.disconnect();
     this._visibilityObserver = undefined;
+    this._resizeObserver?.disconnect();
+    this._resizeObserver = undefined;
     super.disconnectedCallback();
   }
 
@@ -630,6 +634,31 @@ export class UniversalHeatmapCard extends LitElement {
       { rootMargin: "320px 0px" },
     );
     this._visibilityObserver.observe(this);
+  }
+
+  // The canvas is sized from the wrap's clientWidth at draw time and nothing
+  // else redraws it, so a card that gets narrower is squashed by the
+  // max-width rule (blurry cells, hover mapped to the wrong bucket) and one
+  // that gets wider leaves a gap. Redraw whenever the measured width moves
+  // away from the width of the last draw.
+  private _setupResizeObserver(): void {
+    this._resizeObserver?.disconnect();
+    if (typeof globalThis.ResizeObserver === "undefined") {
+      return;
+    }
+
+    this._resizeObserver = new ResizeObserver(() => {
+      const layout = this._renderLayout;
+      if (!layout) {
+        return;
+      }
+      const wrap = this.renderRoot.querySelector(".canvas-wrap");
+      const width = Math.max(260, Math.floor(wrap?.clientWidth ?? layout.width));
+      if (width !== layout.width) {
+        this._drawHeatmap();
+      }
+    });
+    this._resizeObserver.observe(this);
   }
 
   private _seriesCacheKey(
