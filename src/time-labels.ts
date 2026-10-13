@@ -75,7 +75,8 @@ export function weekdayTickLabels(locale?: string): AxisTick[] {
 
 /** Short month names at the monthly grid's tick columns, in the given locale. */
 export function monthTickLabels(locale?: string): AxisTick[] {
-  const format = new Intl.DateTimeFormat(locale, { month: "short" });
+  // Bucket columns use Date.getMonth(), even when the locale requests another calendar.
+  const format = new Intl.DateTimeFormat(locale, { month: "short", calendar: "gregory" });
   const columns = [0, 3, 6, 9, 11];
   return columns.map((col, index) => ({
     col,

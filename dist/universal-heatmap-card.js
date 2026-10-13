@@ -1912,7 +1912,10 @@ function bn(e) {
 }
 /** Short month names at the monthly grid's tick columns, in the given locale. */
 function xn(e) {
-	let t = new Intl.DateTimeFormat(e, { month: "short" }), n = [
+	let t = new Intl.DateTimeFormat(e, {
+		month: "short",
+		calendar: "gregory"
+	}), n = [
 		0,
 		3,
 		6,
