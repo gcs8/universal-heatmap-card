@@ -232,7 +232,8 @@ describe("hour grid placement across DST transitions (America/New_York)", () => 
     expect(placement.cells.filter((cell) => cell.row === 1)).toHaveLength(23);
   });
 
-  it("keeps sequential placement for non-hourly intervals", () => {
+  it("places daily buckets under their local weekday column, one row per week", () => {
+    // Friday, May 1, 2026 through Saturday, May 9, 2026.
     const placement = placeBucketsOnGrid(
       Array.from({ length: 9 }, (_, index) => ({ start: new Date(2026, 4, 1 + index) })),
       "day",
@@ -240,7 +241,86 @@ describe("hour grid placement across DST transitions (America/New_York)", () => 
 
     expect(placement.cols).toBe(7);
     expect(placement.rows).toBe(2);
-    expect(placement.cells[7]).toMatchObject({ row: 1, col: 0, slot: 0, slots: 1 });
+    expect(placement.cells[0]).toMatchObject({ index: 0, row: 0, col: 4, slot: 0, slots: 1 });
+    expect(placement.cells[2]).toMatchObject({ index: 2, row: 0, col: 6, slot: 0, slots: 1 });
+    expect(placement.cells[3]).toMatchObject({ index: 3, row: 1, col: 0, slot: 0, slots: 1 });
+    expect(placement.cells[8]).toMatchObject({ index: 8, row: 1, col: 5, slot: 0, slots: 1 });
+  });
+
+  it("places monthly buckets under their calendar month column, one row per year", () => {
+    // September 2025 through September 2026.
+    const placement = placeBucketsOnGrid(
+      Array.from({ length: 13 }, (_, index) => ({ start: new Date(2025, 8 + index, 1) })),
+      "month",
+    );
+
+    expect(placement.cols).toBe(12);
+    expect(placement.rows).toBe(2);
+    expect(placement.cells[0]).toMatchObject({ index: 0, row: 0, col: 8, slot: 0, slots: 1 });
+    expect(placement.cells[4]).toMatchObject({ index: 4, row: 1, col: 0, slot: 0, slots: 1 });
+    expect(placement.cells[12]).toMatchObject({ index: 12, row: 1, col: 8, slot: 0, slots: 1 });
+  });
+
+  it("keeps sequential placement for 5-minute and weekly intervals", () => {
+    // Starts on Friday, May 1, 2026 so weekday placement would not match.
+    const fiveMinute = placeBucketsOnGrid(
+      Array.from({ length: 50 }, (_, index) => ({ start: new Date(2026, 4, 1, 0, index * 5) })),
+      "5minute",
+    );
+    expect(fiveMinute.cols).toBe(48);
+    expect(fiveMinute.rows).toBe(2);
+    expect(fiveMinute.cells[0]).toMatchObject({ row: 0, col: 0, slot: 0, slots: 1 });
+    expect(fiveMinute.cells[48]).toMatchObject({ row: 1, col: 0, slot: 0, slots: 1 });
+
+    const weekly = placeBucketsOnGrid(
+      Array.from({ length: 9 }, (_, index) => ({ start: new Date(2026, 4, 1 + index * 7) })),
+      "week",
+      4,
+    );
+    expect(weekly.cols).toBe(4);
+    expect(weekly.rows).toBe(3);
+    expect(weekly.cells[0]).toMatchObject({ row: 0, col: 0, slot: 0, slots: 1 });
+    expect(weekly.cells[5]).toMatchObject({ row: 1, col: 1, slot: 0, slots: 1 });
+    expect(weekly.cells[8]).toMatchObject({ row: 2, col: 0, slot: 0, slots: 1 });
+  });
+
+  it("estimates the same rows rendered by daily and monthly grids", () => {
+    const cases: Array<{
+      interval: "day" | "month";
+      range: Record<string, unknown>;
+      now: Date;
+    }> = [
+      // 30 day-aligned days ending on each weekday, including a DST change.
+      { interval: "day", range: { days: 30, align: "day" }, now: new Date(2026, 4, 4, 12) },
+      { interval: "day", range: { days: 30, align: "day" }, now: new Date(2026, 4, 5, 12) },
+      { interval: "day", range: { days: 30, align: "day" }, now: new Date(2026, 4, 6, 12) },
+      { interval: "day", range: { days: 30, align: "day" }, now: new Date(2026, 4, 7, 12) },
+      { interval: "day", range: { days: 30, align: "day" }, now: new Date(2026, 4, 8, 12) },
+      { interval: "day", range: { days: 30, align: "day" }, now: new Date(2026, 4, 9, 12) },
+      { interval: "day", range: { days: 30, align: "day" }, now: new Date(2026, 4, 10, 12) },
+      { interval: "day", range: { days: 30, align: "day" }, now: new Date(2026, 2, 20, 12) },
+      { interval: "day", range: { days: 30, align: "day" }, now: new Date(2026, 10, 15, 12) },
+      // Across a year boundary.
+      { interval: "day", range: { days: 30, align: "day" }, now: new Date(2026, 0, 10, 12) },
+      { interval: "day", range: { days: 30, align: "rolling" }, now: new Date(2026, 0, 10, 12, 34) },
+      // Monthly ranges.
+      { interval: "month", range: { days: 365, align: "day" }, now: new Date(2026, 8, 27, 12) },
+      { interval: "month", range: { days: 365, align: "rolling" }, now: new Date(2026, 0, 1, 0, 30) },
+      { interval: "month", range: { days: 30, align: "day" }, now: new Date(2026, 5, 15, 12) },
+    ];
+
+    for (const { interval, range, now } of cases) {
+      const config = normalizeConfig({
+        entity: "sensor.room_temperature",
+        range,
+        bucket: { interval, value: "mean" },
+      });
+      const windows = generateBucketWindows(calculateRange(config.range, now), interval);
+      const rendered = placeBucketsOnGrid(windows, interval);
+      const label = `${interval} ${JSON.stringify(range)} ${now.toString()}`;
+
+      expect(estimateGridRows(config, now), label).toBe(rendered.rows);
+    }
   });
 
   it("labels the UTC offset of a bucket for repeated-hour tooltips", () => {

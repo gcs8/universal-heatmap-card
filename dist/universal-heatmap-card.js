@@ -34,7 +34,7 @@ var e = globalThis, t = e.ShadowRoot && (e.ShadyCSS === void 0 || e.ShadyCSS.nat
 	let t = "";
 	for (let n of e.cssRules) t += n.cssText;
 	return a(t);
-})(e) : e, { is: l, defineProperty: u, getOwnPropertyDescriptor: d, getOwnPropertyNames: f, getOwnPropertySymbols: p, getPrototypeOf: m } = Object, h = globalThis, ee = h.trustedTypes, te = ee ? ee.emptyScript : "", ne = h.reactiveElementPolyfillSupport, g = (e, t) => e, _ = {
+})(e) : e, { is: l, defineProperty: u, getOwnPropertyDescriptor: d, getOwnPropertyNames: f, getOwnPropertySymbols: p, getPrototypeOf: m } = Object, h = globalThis, ee = h.trustedTypes, te = ee ? ee.emptyScript : "", ne = h.reactiveElementPolyfillSupport, g = (e, t) => e, re = {
 	toAttribute(e, t) {
 		/**
 		* @license
@@ -68,23 +68,23 @@ var e = globalThis, t = e.ShadowRoot && (e.ShadyCSS === void 0 || e.ShadyCSS.nat
 		}
 		return n;
 	}
-}, re = (e, t) => !l(e, t), ie = {
+}, ie = (e, t) => !l(e, t), ae = {
 	attribute: !0,
 	type: String,
-	converter: _,
+	converter: re,
 	reflect: !1,
 	useDefault: !1,
-	hasChanged: re
+	hasChanged: ie
 };
 Symbol.metadata ??= Symbol("metadata"), h.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
-var v = class extends HTMLElement {
+var _ = class extends HTMLElement {
 	static addInitializer(e) {
 		this._$Ei(), (this.l ??= []).push(e);
 	}
 	static get observedAttributes() {
 		return this.finalize(), this._$Eh && [...this._$Eh.keys()];
 	}
-	static createProperty(e, t = ie) {
+	static createProperty(e, t = ae) {
 		if (t.state && (t.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((t = Object.create(t)).wrapped = !0), this.elementProperties.set(e, t), !t.noAccessor) {
 			let n = Symbol(), r = this.getPropertyDescriptor(e, n, t);
 			r !== void 0 && u(this.prototype, e, r);
@@ -110,7 +110,7 @@ var v = class extends HTMLElement {
 		};
 	}
 	static getPropertyOptions(e) {
-		return this.elementProperties.get(e) ?? ie;
+		return this.elementProperties.get(e) ?? ae;
 	}
 	static _$Ei() {
 		if (this.hasOwnProperty(g("elementProperties"))) return;
@@ -181,14 +181,14 @@ var v = class extends HTMLElement {
 	_$ET(e, t) {
 		let n = this.constructor.elementProperties.get(e), r = this.constructor._$Eu(e, n);
 		if (r !== void 0 && !0 === n.reflect) {
-			let i = (n.converter?.toAttribute === void 0 ? _ : n.converter).toAttribute(t, n.type);
+			let i = (n.converter?.toAttribute === void 0 ? re : n.converter).toAttribute(t, n.type);
 			this._$Em = e, i == null ? this.removeAttribute(r) : this.setAttribute(r, i), this._$Em = null;
 		}
 	}
 	_$AK(e, t) {
 		let n = this.constructor, r = n._$Eh.get(e);
 		if (r !== void 0 && this._$Em !== r) {
-			let e = n.getPropertyOptions(r), i = typeof e.converter == "function" ? { fromAttribute: e.converter } : e.converter?.fromAttribute === void 0 ? _ : e.converter;
+			let e = n.getPropertyOptions(r), i = typeof e.converter == "function" ? { fromAttribute: e.converter } : e.converter?.fromAttribute === void 0 ? re : e.converter;
 			this._$Em = r;
 			let a = i.fromAttribute(t, e.type);
 			this[r] = a ?? this._$Ej?.get(r) ?? a, this._$Em = null;
@@ -197,7 +197,7 @@ var v = class extends HTMLElement {
 	requestUpdate(e, t, n, r = !1, i) {
 		if (e !== void 0) {
 			let a = this.constructor;
-			if (!1 === r && (i = this[e]), n ??= a.getPropertyOptions(e), !((n.hasChanged ?? re)(i, t) || n.useDefault && n.reflect && i === this._$Ej?.get(e) && !this.hasAttribute(a._$Eu(e, n)))) return;
+			if (!1 === r && (i = this[e]), n ??= a.getPropertyOptions(e), !((n.hasChanged ?? ie)(i, t) || n.useDefault && n.reflect && i === this._$Ej?.get(e) && !this.hasAttribute(a._$Eu(e, n)))) return;
 			this.C(e, t, n);
 		}
 		!1 === this.isUpdatePending && (this._$ES = this._$EP());
@@ -261,7 +261,7 @@ var v = class extends HTMLElement {
 	updated(e) {}
 	firstUpdated(e) {}
 };
-v.elementStyles = [], v.shadowRootOptions = { mode: "open" }, v[g("elementProperties")] = /* @__PURE__ */ new Map(), v[g("finalized")] = /* @__PURE__ */ new Map(), ne?.({ ReactiveElement: v }), (h.reactiveElementVersions ??= []).push("2.1.2");
+_.elementStyles = [], _.shadowRootOptions = { mode: "open" }, _[g("elementProperties")] = /* @__PURE__ */ new Map(), _[g("finalized")] = /* @__PURE__ */ new Map(), ne?.({ ReactiveElement: _ }), (h.reactiveElementVersions ??= []).push("2.1.2");
 //#endregion
 //#region node_modules/lit-html/lit-html.js
 /**
@@ -269,14 +269,14 @@ v.elementStyles = [], v.shadowRootOptions = { mode: "open" }, v[g("elementProper
 * Copyright 2017 Google LLC
 * SPDX-License-Identifier: BSD-3-Clause
 */
-var y = globalThis, ae = (e) => e, b = y.trustedTypes, oe = b ? b.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, se = "$lit$", x = `lit$${Math.random().toFixed(9).slice(2)}$`, ce = "?" + x, le = `<${ce}>`, S = document, C = () => S.createComment(""), w = (e) => e === null || typeof e != "object" && typeof e != "function", ue = Array.isArray, de = (e) => ue(e) || typeof e?.[Symbol.iterator] == "function", T = "[ 	\n\f\r]", E = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, fe = /-->/g, pe = />/g, D = RegExp(`>|${T}(?:([^\\s"'>=/]+)(${T}*=${T}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g"), me = /'/g, he = /"/g, ge = /^(?:script|style|textarea|title)$/i, O = ((e) => (t, ...n) => ({
+var v = globalThis, oe = (e) => e, y = v.trustedTypes, se = y ? y.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, ce = "$lit$", b = `lit$${Math.random().toFixed(9).slice(2)}$`, le = "?" + b, ue = `<${le}>`, x = document, S = () => x.createComment(""), C = (e) => e === null || typeof e != "object" && typeof e != "function", w = Array.isArray, de = (e) => w(e) || typeof e?.[Symbol.iterator] == "function", T = "[ 	\n\f\r]", E = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, fe = /-->/g, pe = />/g, D = RegExp(`>|${T}(?:([^\\s"'>=/]+)(${T}*=${T}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g"), me = /'/g, he = /"/g, ge = /^(?:script|style|textarea|title)$/i, O = ((e) => (t, ...n) => ({
 	_$litType$: e,
 	strings: t,
 	values: n
-}))(1), k = Symbol.for("lit-noChange"), A = Symbol.for("lit-nothing"), _e = /* @__PURE__ */ new WeakMap(), j = S.createTreeWalker(S, 129);
+}))(1), k = Symbol.for("lit-noChange"), A = Symbol.for("lit-nothing"), _e = /* @__PURE__ */ new WeakMap(), j = x.createTreeWalker(x, 129);
 function ve(e, t) {
-	if (!ue(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
-	return oe === void 0 ? t : oe.createHTML(t);
+	if (!w(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
+	return se === void 0 ? t : se.createHTML(t);
 }
 var ye = (e, t) => {
 	let n = e.length - 1, r = [], i, a = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = E;
@@ -284,10 +284,10 @@ var ye = (e, t) => {
 		let n = e[t], s, c, l = -1, u = 0;
 		for (; u < n.length && (o.lastIndex = u, c = o.exec(n), c !== null);) u = o.lastIndex, o === E ? c[1] === "!--" ? o = fe : c[1] === void 0 ? c[2] === void 0 ? c[3] !== void 0 && (o = D) : (ge.test(c[2]) && (i = RegExp("</" + c[2], "g")), o = D) : o = pe : o === D ? c[0] === ">" ? (o = i ?? E, l = -1) : c[1] === void 0 ? l = -2 : (l = o.lastIndex - c[2].length, s = c[1], o = c[3] === void 0 ? D : c[3] === "\"" ? he : me) : o === he || o === me ? o = D : o === fe || o === pe ? o = E : (o = D, i = void 0);
 		let d = o === D && e[t + 1].startsWith("/>") ? " " : "";
-		a += o === E ? n + le : l >= 0 ? (r.push(s), n.slice(0, l) + se + n.slice(l) + x + d) : n + x + (l === -2 ? t : d);
+		a += o === E ? n + ue : l >= 0 ? (r.push(s), n.slice(0, l) + ce + n.slice(l) + b + d) : n + b + (l === -2 ? t : d);
 	}
 	return [ve(e, a + (e[n] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), r];
-}, M = class e {
+}, be = class e {
 	constructor({ strings: t, _$litType$: n }, r) {
 		let i;
 		this.parts = [];
@@ -298,55 +298,55 @@ var ye = (e, t) => {
 		}
 		for (; (i = j.nextNode()) !== null && c.length < s;) {
 			if (i.nodeType === 1) {
-				if (i.hasAttributes()) for (let e of i.getAttributeNames()) if (e.endsWith(se)) {
-					let t = u[o++], n = i.getAttribute(e).split(x), r = /([.?@])?(.*)/.exec(t);
+				if (i.hasAttributes()) for (let e of i.getAttributeNames()) if (e.endsWith(ce)) {
+					let t = u[o++], n = i.getAttribute(e).split(b), r = /([.?@])?(.*)/.exec(t);
 					c.push({
 						type: 1,
 						index: a,
 						name: r[2],
 						strings: n,
-						ctor: r[1] === "." ? Se : r[1] === "?" ? Ce : r[1] === "@" ? we : P
+						ctor: r[1] === "." ? Ce : r[1] === "?" ? we : r[1] === "@" ? Te : N
 					}), i.removeAttribute(e);
-				} else e.startsWith(x) && (c.push({
+				} else e.startsWith(b) && (c.push({
 					type: 6,
 					index: a
 				}), i.removeAttribute(e));
 				if (ge.test(i.tagName)) {
-					let e = i.textContent.split(x), t = e.length - 1;
+					let e = i.textContent.split(b), t = e.length - 1;
 					if (t > 0) {
-						i.textContent = b ? b.emptyScript : "";
-						for (let n = 0; n < t; n++) i.append(e[n], C()), j.nextNode(), c.push({
+						i.textContent = y ? y.emptyScript : "";
+						for (let n = 0; n < t; n++) i.append(e[n], S()), j.nextNode(), c.push({
 							type: 2,
 							index: ++a
 						});
-						i.append(e[t], C());
+						i.append(e[t], S());
 					}
 				}
-			} else if (i.nodeType === 8) if (i.data === ce) c.push({
+			} else if (i.nodeType === 8) if (i.data === le) c.push({
 				type: 2,
 				index: a
 			});
 			else {
 				let e = -1;
-				for (; (e = i.data.indexOf(x, e + 1)) !== -1;) c.push({
+				for (; (e = i.data.indexOf(b, e + 1)) !== -1;) c.push({
 					type: 7,
 					index: a
-				}), e += x.length - 1;
+				}), e += b.length - 1;
 			}
 			a++;
 		}
 	}
 	static createElement(e, t) {
-		let n = S.createElement("template");
+		let n = x.createElement("template");
 		return n.innerHTML = e, n;
 	}
 };
-function N(e, t, n = e, r) {
+function M(e, t, n = e, r) {
 	if (t === k) return t;
-	let i = r === void 0 ? n._$Cl : n._$Co?.[r], a = w(t) ? void 0 : t._$litDirective$;
-	return i?.constructor !== a && (i?._$AO?.(!1), a === void 0 ? i = void 0 : (i = new a(e), i._$AT(e, n, r)), r === void 0 ? n._$Cl = i : (n._$Co ??= [])[r] = i), i !== void 0 && (t = N(e, i._$AS(e, t.values), i, r)), t;
+	let i = r === void 0 ? n._$Cl : n._$Co?.[r], a = C(t) ? void 0 : t._$litDirective$;
+	return i?.constructor !== a && (i?._$AO?.(!1), a === void 0 ? i = void 0 : (i = new a(e), i._$AT(e, n, r)), r === void 0 ? n._$Cl = i : (n._$Co ??= [])[r] = i), i !== void 0 && (t = M(e, i._$AS(e, t.values), i, r)), t;
 }
-var be = class {
+var xe = class {
 	constructor(e, t) {
 		this._$AV = [], this._$AN = void 0, this._$AD = e, this._$AM = t;
 	}
@@ -357,23 +357,23 @@ var be = class {
 		return this._$AM._$AU;
 	}
 	u(e) {
-		let { el: { content: t }, parts: n } = this._$AD, r = (e?.creationScope ?? S).importNode(t, !0);
+		let { el: { content: t }, parts: n } = this._$AD, r = (e?.creationScope ?? x).importNode(t, !0);
 		j.currentNode = r;
 		let i = j.nextNode(), a = 0, o = 0, s = n[0];
 		for (; s !== void 0;) {
 			if (a === s.index) {
 				let t;
-				s.type === 2 ? t = new xe(i, i.nextSibling, this, e) : s.type === 1 ? t = new s.ctor(i, s.name, s.strings, this, e) : s.type === 6 && (t = new Te(i, this, e)), this._$AV.push(t), s = n[++o];
+				s.type === 2 ? t = new Se(i, i.nextSibling, this, e) : s.type === 1 ? t = new s.ctor(i, s.name, s.strings, this, e) : s.type === 6 && (t = new Ee(i, this, e)), this._$AV.push(t), s = n[++o];
 			}
 			a !== s?.index && (i = j.nextNode(), a++);
 		}
-		return j.currentNode = S, r;
+		return j.currentNode = x, r;
 	}
 	p(e) {
 		let t = 0;
 		for (let n of this._$AV) n !== void 0 && (n.strings === void 0 ? n._$AI(e[t]) : (n._$AI(e, n, t), t += n.strings.length - 2)), t++;
 	}
-}, xe = class e {
+}, Se = class e {
 	get _$AU() {
 		return this._$AM?._$AU ?? this._$Cv;
 	}
@@ -391,7 +391,7 @@ var be = class {
 		return this._$AB;
 	}
 	_$AI(e, t = this) {
-		e = N(this, e, t), w(e) ? e === A || e == null || e === "" ? (this._$AH !== A && this._$AR(), this._$AH = A) : e !== this._$AH && e !== k && this._(e) : e._$litType$ === void 0 ? e.nodeType === void 0 ? de(e) ? this.k(e) : this._(e) : this.T(e) : this.$(e);
+		e = M(this, e, t), C(e) ? e === A || e == null || e === "" ? (this._$AH !== A && this._$AR(), this._$AH = A) : e !== this._$AH && e !== k && this._(e) : e._$litType$ === void 0 ? e.nodeType === void 0 ? de(e) ? this.k(e) : this._(e) : this.T(e) : this.$(e);
 	}
 	O(e) {
 		return this._$AA.parentNode.insertBefore(e, this._$AB);
@@ -400,36 +400,36 @@ var be = class {
 		this._$AH !== e && (this._$AR(), this._$AH = this.O(e));
 	}
 	_(e) {
-		this._$AH !== A && w(this._$AH) ? this._$AA.nextSibling.data = e : this.T(S.createTextNode(e)), this._$AH = e;
+		this._$AH !== A && C(this._$AH) ? this._$AA.nextSibling.data = e : this.T(x.createTextNode(e)), this._$AH = e;
 	}
 	$(e) {
-		let { values: t, _$litType$: n } = e, r = typeof n == "number" ? this._$AC(e) : (n.el === void 0 && (n.el = M.createElement(ve(n.h, n.h[0]), this.options)), n);
+		let { values: t, _$litType$: n } = e, r = typeof n == "number" ? this._$AC(e) : (n.el === void 0 && (n.el = be.createElement(ve(n.h, n.h[0]), this.options)), n);
 		if (this._$AH?._$AD === r) this._$AH.p(t);
 		else {
-			let e = new be(r, this), n = e.u(this.options);
+			let e = new xe(r, this), n = e.u(this.options);
 			e.p(t), this.T(n), this._$AH = e;
 		}
 	}
 	_$AC(e) {
 		let t = _e.get(e.strings);
-		return t === void 0 && _e.set(e.strings, t = new M(e)), t;
+		return t === void 0 && _e.set(e.strings, t = new be(e)), t;
 	}
 	k(t) {
-		ue(this._$AH) || (this._$AH = [], this._$AR());
+		w(this._$AH) || (this._$AH = [], this._$AR());
 		let n = this._$AH, r, i = 0;
-		for (let a of t) i === n.length ? n.push(r = new e(this.O(C()), this.O(C()), this, this.options)) : r = n[i], r._$AI(a), i++;
+		for (let a of t) i === n.length ? n.push(r = new e(this.O(S()), this.O(S()), this, this.options)) : r = n[i], r._$AI(a), i++;
 		i < n.length && (this._$AR(r && r._$AB.nextSibling, i), n.length = i);
 	}
 	_$AR(e = this._$AA.nextSibling, t) {
 		for (this._$AP?.(!1, !0, t); e !== this._$AB;) {
-			let t = ae(e).nextSibling;
-			ae(e).remove(), e = t;
+			let t = oe(e).nextSibling;
+			oe(e).remove(), e = t;
 		}
 	}
 	setConnected(e) {
 		this._$AM === void 0 && (this._$Cv = e, this._$AP?.(e));
 	}
-}, P = class {
+}, N = class {
 	get tagName() {
 		return this.element.tagName;
 	}
@@ -441,43 +441,43 @@ var be = class {
 	}
 	_$AI(e, t = this, n, r) {
 		let i = this.strings, a = !1;
-		if (i === void 0) e = N(this, e, t, 0), a = !w(e) || e !== this._$AH && e !== k, a && (this._$AH = e);
+		if (i === void 0) e = M(this, e, t, 0), a = !C(e) || e !== this._$AH && e !== k, a && (this._$AH = e);
 		else {
 			let r = e, o, s;
-			for (e = i[0], o = 0; o < i.length - 1; o++) s = N(this, r[n + o], t, o), s === k && (s = this._$AH[o]), a ||= !w(s) || s !== this._$AH[o], s === A ? e = A : e !== A && (e += (s ?? "") + i[o + 1]), this._$AH[o] = s;
+			for (e = i[0], o = 0; o < i.length - 1; o++) s = M(this, r[n + o], t, o), s === k && (s = this._$AH[o]), a ||= !C(s) || s !== this._$AH[o], s === A ? e = A : e !== A && (e += (s ?? "") + i[o + 1]), this._$AH[o] = s;
 		}
 		a && !r && this.j(e);
 	}
 	j(e) {
 		e === A ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
 	}
-}, Se = class extends P {
+}, Ce = class extends N {
 	constructor() {
 		super(...arguments), this.type = 3;
 	}
 	j(e) {
 		this.element[this.name] = e === A ? void 0 : e;
 	}
-}, Ce = class extends P {
+}, we = class extends N {
 	constructor() {
 		super(...arguments), this.type = 4;
 	}
 	j(e) {
 		this.element.toggleAttribute(this.name, !!e && e !== A);
 	}
-}, we = class extends P {
+}, Te = class extends N {
 	constructor(e, t, n, r, i) {
 		super(e, t, n, r, i), this.type = 5;
 	}
 	_$AI(e, t = this) {
-		if ((e = N(this, e, t, 0) ?? A) === k) return;
+		if ((e = M(this, e, t, 0) ?? A) === k) return;
 		let n = this._$AH, r = e === A && n !== A || e.capture !== n.capture || e.once !== n.once || e.passive !== n.passive, i = e !== A && (n === A || r);
 		r && this.element.removeEventListener(this.name, this, n), i && this.element.addEventListener(this.name, this, e), this._$AH = e;
 	}
 	handleEvent(e) {
 		typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, e) : this._$AH.handleEvent(e);
 	}
-}, Te = class {
+}, Ee = class {
 	constructor(e, t, n) {
 		this.element = e, this.type = 6, this._$AN = void 0, this._$AM = t, this.options = n;
 	}
@@ -485,18 +485,18 @@ var be = class {
 		return this._$AM._$AU;
 	}
 	_$AI(e) {
-		N(this, e);
+		M(this, e);
 	}
-}, Ee = y.litHtmlPolyfillSupport;
-Ee?.(M, xe), (y.litHtmlVersions ??= []).push("3.3.3");
-var De = (e, t, n) => {
+}, De = v.litHtmlPolyfillSupport;
+De?.(be, Se), (v.litHtmlVersions ??= []).push("3.3.3");
+var Oe = (e, t, n) => {
 	let r = n?.renderBefore ?? t, i = r._$litPart$;
 	if (i === void 0) {
 		let e = n?.renderBefore ?? null;
-		r._$litPart$ = i = new xe(t.insertBefore(C(), e), e, void 0, n ?? {});
+		r._$litPart$ = i = new Se(t.insertBefore(S(), e), e, void 0, n ?? {});
 	}
 	return i._$AI(e), i;
-}, F = globalThis, I = class extends v {
+}, P = globalThis, F = class extends _ {
 	constructor() {
 		/**
 		* @license
@@ -511,7 +511,7 @@ var De = (e, t, n) => {
 	}
 	update(e) {
 		let t = this.render();
-		this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = De(t, this.renderRoot, this.renderOptions);
+		this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = Oe(t, this.renderRoot, this.renderOptions);
 	}
 	connectedCallback() {
 		super.connectedCallback(), this._$Do?.setConnected(!0);
@@ -523,12 +523,12 @@ var De = (e, t, n) => {
 		return k;
 	}
 };
-I._$litElement$ = !0, I.finalized = !0, F.litElementHydrateSupport?.({ LitElement: I });
-var Oe = F.litElementPolyfillSupport;
-Oe?.({ LitElement: I }), (F.litElementVersions ??= []).push("4.2.2");
+F._$litElement$ = !0, F.finalized = !0, P.litElementHydrateSupport?.({ LitElement: F });
+var ke = P.litElementPolyfillSupport;
+ke?.({ LitElement: F }), (P.litElementVersions ??= []).push("4.2.2");
 //#endregion
 //#region src/presets.ts
-var ke = [
+var Ae = [
 	{
 		value: 55,
 		color: "#315f9d",
@@ -549,7 +549,7 @@ var ke = [
 		color: "#d94841",
 		label: "Hot"
 	}
-], L = [
+], I = [
 	{
 		value: 0,
 		color: "#2f6f9f"
@@ -566,7 +566,7 @@ var ke = [
 		value: 100,
 		color: "#c44536"
 	}
-], R = [
+], L = [
 	{
 		value: 0,
 		color: "#2f6f9f"
@@ -583,7 +583,7 @@ var ke = [
 		value: 1,
 		color: "#c44536"
 	}
-], Ae = [
+], R = [
 	{
 		value: 0,
 		color: "#c44536",
@@ -604,7 +604,7 @@ var ke = [
 		color: "#2f6f9f",
 		label: "Full"
 	}
-], je = {
+], z = {
 	auto: {
 		id: "auto",
 		label: "Auto",
@@ -642,7 +642,7 @@ var ke = [
 		scale: {
 			preset: "temperature",
 			unit: "°",
-			stops: ke
+			stops: Ae
 		}
 	},
 	humidity: {
@@ -658,7 +658,7 @@ var ke = [
 			min: 0,
 			max: 100,
 			unit: "%",
-			stops: L
+			stops: I
 		}
 	},
 	power: {
@@ -671,7 +671,7 @@ var ke = [
 		},
 		scale: {
 			preset: "power",
-			stops: R
+			stops: L
 		},
 		highIsBad: !0
 	},
@@ -685,7 +685,7 @@ var ke = [
 		},
 		scale: {
 			preset: "energy_delta",
-			stops: R
+			stops: L
 		}
 	},
 	percent_health: {
@@ -701,7 +701,7 @@ var ke = [
 			min: 0,
 			max: 100,
 			unit: "%",
-			stops: Ae
+			stops: R
 		}
 	},
 	percent_utilization: {
@@ -717,7 +717,7 @@ var ke = [
 			min: 0,
 			max: 100,
 			unit: "%",
-			stops: L
+			stops: I
 		},
 		highIsBad: !0
 	},
@@ -734,7 +734,7 @@ var ke = [
 			min: 0,
 			max: 100,
 			unit: "%",
-			stops: Ae
+			stops: R
 		}
 	},
 	filter_load: {
@@ -750,7 +750,7 @@ var ke = [
 			min: 0,
 			max: 100,
 			unit: "%",
-			stops: L
+			stops: I
 		},
 		highIsBad: !0
 	},
@@ -764,7 +764,7 @@ var ke = [
 		},
 		scale: {
 			preset: "filter_dp",
-			stops: R
+			stops: L
 		},
 		highIsBad: !0
 	},
@@ -781,7 +781,7 @@ var ke = [
 			min: 0,
 			max: 100,
 			unit: "%",
-			stops: L
+			stops: I
 		}
 	},
 	battery: {
@@ -797,7 +797,7 @@ var ke = [
 			min: 0,
 			max: 100,
 			unit: "%",
-			stops: Ae
+			stops: R
 		}
 	},
 	signal_quality: {
@@ -810,69 +810,69 @@ var ke = [
 		},
 		scale: {
 			preset: "signal_quality",
-			stops: R
+			stops: L
 		}
 	}
 };
-function Me(e) {
-	return !e || e === "auto" ? je.auto : je[e] ?? je.auto;
+function je(e) {
+	return !e || e === "auto" ? z.auto : z[e] ?? z.auto;
 }
-function Ne(e) {
+function Me(e) {
 	if (!e) return "auto";
 	let t = e.entity_id, n = t.split(".")[0] ?? "", r = String(e.attributes.device_class ?? "").toLowerCase(), i = String(e.attributes.unit_of_measurement ?? "").toLowerCase(), a = String(e.attributes.friendly_name ?? t).toLowerCase();
 	return n === "binary_sensor" ? "binary_runtime" : r === "temperature" || i === "°f" || i === "°c" ? "temperature" : r === "humidity" || i === "%" ? r === "battery" || !r && a.includes("battery") ? "battery" : a.includes("life") || a.includes("health") ? "percent_health" : a.includes("load") || a.includes("utilization") ? "percent_utilization" : "humidity" : r === "power" || i === "w" || i === "kw" ? "power" : r === "energy" || i === "wh" || i === "kwh" ? "energy_delta" : r === "battery" ? "battery" : r === "pressure" || i.includes("pa") || i.includes("inh2o") ? a.includes("filter") ? "filter_dp" : "auto" : a.includes("filter") && a.includes("life") ? "filter_life" : a.includes("filter") && a.includes("load") ? "filter_load" : i === "dbm" || i === "lqi" || i === "db" ? "signal_quality" : "auto";
 }
 //#endregion
 //#region src/data/request-queue.ts
-var Pe = 2, Fe = 8, z = 0, B = [];
-function Ie(e, t = {}) {
+var Ne = 2, Pe = 8, B = 0, V = [];
+function Fe(e, t = {}) {
 	let n = {
 		...t,
-		maxConcurrent: Re(t.maxConcurrent)
+		maxConcurrent: Le(t.maxConcurrent)
 	};
 	return new Promise((t, r) => {
-		B.push({
+		V.push({
 			task: e,
 			resolve: t,
 			reject: r,
 			options: n
-		}), n.onQueued?.(Be(n.maxConcurrent)), ze();
+		}), n.onQueued?.(ze(n.maxConcurrent)), Re();
 	});
 }
-function Le(e = Pe) {
-	return Be(Re(e));
+function Ie(e = Ne) {
+	return ze(Le(e));
 }
-function Re(e) {
-	return typeof e != "number" || !Number.isFinite(e) ? Pe : Math.min(Fe, Math.max(1, Math.floor(e)));
+function Le(e) {
+	return typeof e != "number" || !Number.isFinite(e) ? Ne : Math.min(Pe, Math.max(1, Math.floor(e)));
 }
-function ze() {
-	let e = B[0];
-	!e || z >= e.options.maxConcurrent || (B.shift(), z += 1, e.options.onStart?.(Be(e.options.maxConcurrent)), Promise.resolve().then(e.task).then(e.resolve, e.reject).finally(() => {
-		--z, ze();
+function Re() {
+	let e = V[0];
+	!e || B >= e.options.maxConcurrent || (V.shift(), B += 1, e.options.onStart?.(ze(e.options.maxConcurrent)), Promise.resolve().then(e.task).then(e.resolve, e.reject).finally(() => {
+		--B, Re();
 	}));
 }
-function Be(e) {
+function ze(e) {
 	return {
-		active: z,
-		queued: B.length,
+		active: B,
+		queued: V.length,
 		maxConcurrent: e
 	};
 }
 //#endregion
 //#region src/config.ts
-var Ve = 5e3, He = 24, Ue = 300, We = /^(\d{4})-(\d{2})-(\d{2})$/;
-function Ge(e, t, n = 0) {
-	let r = Je(e, t);
+var Be = 5e3, Ve = 24, He = 300, Ue = /^(\d{4})-(\d{2})-(\d{2})$/;
+function We(e, t, n = 0) {
+	let r = qe(e, t);
 	if (r.length === 0) throw Error("Universal Heatmap Card requires entity or entities.");
-	let i = (Number.isInteger(n) && n >= 0 ? r[n] : void 0) ?? r[0], a = Ne(i ? t?.states[i.entity] : void 0), o = e.scale?.preset ?? a, s = Me(o), c = {
+	let i = (Number.isInteger(n) && n >= 0 ? r[n] : void 0) ?? r[0], a = Me(i ? t?.states[i.entity] : void 0), o = e.scale?.preset ?? a, s = je(o), c = {
 		interval: e.bucket?.interval ?? s.bucket.interval,
 		value: e.bucket?.value ?? s.bucket.value
 	}, l = {
 		...s.range,
 		...e.range,
-		align: qe(e.range?.align)
+		align: Ke(e.range?.align)
 	};
-	V(l);
+	H(l);
 	let u = e.navigation?.mode ?? (r.length > 8 ? "dropdown" : "tabs");
 	return {
 		title: e.title,
@@ -883,11 +883,11 @@ function Ge(e, t, n = 0) {
 		data: {
 			provider: e.data?.provider ?? "auto",
 			prefetch: e.data?.prefetch ?? !1,
-			max_cells: e.data?.max_cells ?? Ve,
-			raw_history_hours: e.data?.raw_history_hours ?? He,
-			refresh_interval: Ke(e.data?.refresh_interval),
+			max_cells: e.data?.max_cells ?? Be,
+			raw_history_hours: e.data?.raw_history_hours ?? Ve,
+			refresh_interval: Ge(e.data?.refresh_interval),
 			defer_until_visible: e.data?.defer_until_visible ?? !0,
-			max_concurrent_requests: Re(e.data?.max_concurrent_requests)
+			max_concurrent_requests: Le(e.data?.max_concurrent_requests)
 		},
 		missing: { mode: e.missing?.mode ?? "empty" },
 		scale: {
@@ -914,15 +914,15 @@ function Ge(e, t, n = 0) {
 		tooltip: { show: e.tooltip?.show ?? !0 }
 	};
 }
-function Ke(e) {
-	return typeof e != "number" || !Number.isFinite(e) ? Ue : Math.max(0, e);
+function Ge(e) {
+	return typeof e != "number" || !Number.isFinite(e) ? He : Math.max(0, e);
 }
-function qe(e) {
+function Ke(e) {
 	return e === "rolling" ? "rolling" : "day";
 }
-function Je(e, t) {
+function qe(e, t) {
 	return (e.entities?.length ? e.entities : e.entity ? [{ entity: e.entity }] : []).map((e) => {
-		let n = typeof e == "string" ? { entity: e } : e, r = t?.states[n.entity], i = n.name ?? (r && t?.formatEntityName ? t.formatEntityName(r) : r?.attributes.friendly_name ? String(r.attributes.friendly_name) : n.entity), a = Ye(n.scale);
+		let n = typeof e == "string" ? { entity: e } : e, r = t?.states[n.entity], i = n.name ?? (r && t?.formatEntityName ? t.formatEntityName(r) : r?.attributes.friendly_name ? String(r.attributes.friendly_name) : n.entity), a = Je(n.scale);
 		return {
 			...n,
 			...a ? { scale: a } : {},
@@ -930,23 +930,23 @@ function Je(e, t) {
 		};
 	});
 }
-function Ye(e) {
+function Je(e) {
 	return e?.preset ? {
 		min: void 0,
 		max: void 0,
 		unit: void 0,
 		stops: void 0,
-		...Me(e.preset).scale,
+		...je(e.preset).scale,
 		...e
 	} : e;
 }
-function V(e, t = /* @__PURE__ */ new Date()) {
-	let n = e.align === "day" && !e.end, r = e.end ? Xe(e.end) : n ? Ze(t) : t, i;
-	if (e.start) i = Xe(e.start);
-	else if (typeof e.hours == "number") i = n ? $e(r, e.hours) : /* @__PURE__ */ new Date(r.getTime() - e.hours * 60 * 60 * 1e3);
+function H(e, t = /* @__PURE__ */ new Date()) {
+	let n = e.align === "day" && !e.end, r = e.end ? Ye(e.end) : n ? Xe(t) : t, i;
+	if (e.start) i = Ye(e.start);
+	else if (typeof e.hours == "number") i = n ? Qe(r, e.hours) : /* @__PURE__ */ new Date(r.getTime() - e.hours * 60 * 60 * 1e3);
 	else {
 		let t = typeof e.days == "number" ? e.days : 30;
-		i = n ? Qe(r, t) : /* @__PURE__ */ new Date(r.getTime() - t * 24 * 60 * 60 * 1e3);
+		i = n ? Ze(r, t) : /* @__PURE__ */ new Date(r.getTime() - t * 24 * 60 * 60 * 1e3);
 	}
 	if (Number.isNaN(i.getTime()) || Number.isNaN(r.getTime())) throw Error("Universal Heatmap Card has an invalid range date.");
 	if (i >= r) throw Error("Universal Heatmap Card range start must be before end.");
@@ -955,26 +955,26 @@ function V(e, t = /* @__PURE__ */ new Date()) {
 		end: r
 	};
 }
-function Xe(e) {
-	let t = We.exec(e);
+function Ye(e) {
+	let t = Ue.exec(e);
 	if (!t) return new Date(e);
 	let [, n = "0", r = "1", i = "1"] = t, a = Number(n), o = Number(r) - 1, s = Number(i), c = /* @__PURE__ */ new Date(0);
 	return c.setFullYear(a, o, s), c.setHours(0, 0, 0, 0), c.getFullYear() !== a || c.getMonth() !== o || c.getDate() !== s ? /* @__PURE__ */ new Date(NaN) : c;
 }
-function Ze(e) {
+function Xe(e) {
 	let t = new Date(e);
 	return t.setHours(0, 0, 0, 0), t.setDate(t.getDate() + 1), t;
 }
-function Qe(e, t) {
+function Ze(e, t) {
 	let n = new Date(e);
 	return n.setDate(n.getDate() - t), n;
 }
-function $e(e, t) {
+function Qe(e, t) {
 	let n = Math.trunc(t), r = new Date(e);
 	return r.setHours(r.getHours() - n), /* @__PURE__ */ new Date(r.getTime() - (t - n) * 60 * 60 * 1e3);
 }
-function H(e, t = /* @__PURE__ */ new Date()) {
-	let n = V(e.range, t), r = (n.end.getTime() - n.start.getTime()) / 36e5;
+function $e(e, t = /* @__PURE__ */ new Date()) {
+	let n = H(e.range, t), r = (n.end.getTime() - n.start.getTime()) / 36e5;
 	switch (e.bucket.interval) {
 		case "5minute": return Math.ceil(r * 12);
 		case "hour": return Math.ceil(r);
@@ -1000,7 +1000,7 @@ var nt = 36e5;
 function rt(e) {
 	return e;
 }
-function U(e) {
+function it(e) {
 	return e === "last" ? "state" : [
 		"mean",
 		"min",
@@ -1010,7 +1010,7 @@ function U(e) {
 		"change"
 	].includes(e) ? e : null;
 }
-function it(e, t) {
+function at(e, t) {
 	let n = new Date(e);
 	if (n.setMilliseconds(0), n.setSeconds(0), t === "5minute" ? n.setMinutes(Math.floor(n.getMinutes() / 5) * 5) : n.setMinutes(0), (t === "day" || t === "week" || t === "month") && n.setHours(0, 0, 0, 0), t === "week") {
 		let e = n.getDay(), t = e === 0 ? -6 : 1 - e;
@@ -1018,7 +1018,7 @@ function it(e, t) {
 	}
 	return t === "month" && n.setDate(1), n;
 }
-function at(e, t) {
+function ot(e, t) {
 	let n = new Date(e);
 	switch (t) {
 		case "5minute": return n.setTime(n.getTime() + 5 * 6e4), n;
@@ -1029,10 +1029,10 @@ function at(e, t) {
 		default: return n;
 	}
 }
-function ot(e, t) {
-	let n = [], r = it(e.start, t);
+function st(e, t) {
+	let n = [], r = at(e.start, t);
 	for (; r < e.end;) {
-		let i = at(r, t);
+		let i = ot(r, t);
 		i > e.start && n.push({
 			start: new Date(r),
 			end: new Date(i)
@@ -1040,7 +1040,7 @@ function ot(e, t) {
 	}
 	return n;
 }
-function W(e, t) {
+function U(e, t) {
 	return e.map((e) => ({
 		...e,
 		value: null,
@@ -1048,13 +1048,13 @@ function W(e, t) {
 		source: t
 	}));
 }
-function st(e, t, n, r) {
-	let i = U(n), a = W(e, "statistics");
-	if (!i) return G(a, r);
+function ct(e, t, n, r) {
+	let i = it(n), a = U(e, "statistics");
+	if (!i) return W(a, r);
 	for (let n of t) {
 		let t = n.start ? new Date(n.start) : void 0;
 		if (!t || Number.isNaN(t.getTime())) continue;
-		let r = ut(e, t);
+		let r = dt(e, t);
 		if (r < 0) continue;
 		let o = e[r];
 		if (!o) continue;
@@ -1066,9 +1066,9 @@ function st(e, t, n, r) {
 			source: "statistics"
 		};
 	}
-	return G(a, r);
+	return W(a, r);
 }
-function ct(e, t, n, r) {
+function lt(e, t, n, r) {
 	let i = e.map(() => []);
 	for (let n of t) {
 		let t = Number(n.state);
@@ -1077,14 +1077,14 @@ function ct(e, t, n, r) {
 		if (!r) continue;
 		let a = new Date(r).getTime();
 		if (!Number.isFinite(a)) continue;
-		let o = dt(e, a);
+		let o = ft(e, a);
 		o >= 0 && i[o]?.push({
 			at: a,
 			value: t
 		});
 	}
-	return G(e.map((e, t) => {
-		let r = lt(i[t] ?? [], n);
+	return W(e.map((e, t) => {
+		let r = ut(i[t] ?? [], n);
 		return {
 			...e,
 			value: r,
@@ -1093,7 +1093,7 @@ function ct(e, t, n, r) {
 		};
 	}), r);
 }
-function G(e, t) {
+function W(e, t) {
 	if (t === "empty") return e;
 	let n = null;
 	return e.map((e) => e.value === null ? t === "zero" ? {
@@ -1106,7 +1106,7 @@ function G(e, t) {
 		quality: "carried"
 	} : e : (n = e.value, e));
 }
-function lt(e, t) {
+function ut(e, t) {
 	if (e.length === 0) return null;
 	switch (t) {
 		case "min": return Math.min(...e.map((e) => e.value));
@@ -1123,10 +1123,10 @@ function lt(e, t) {
 		default: return e.reduce((e, t) => e + t.value, 0) / e.length;
 	}
 }
-function ut(e, t) {
-	return dt(e, t.getTime());
-}
 function dt(e, t) {
+	return ft(e, t.getTime());
+}
+function ft(e, t) {
 	let n = 0, r = e.length - 1;
 	for (; n <= r;) {
 		let i = Math.floor((n + r) / 2), a = e[i];
@@ -1139,31 +1139,31 @@ function dt(e, t) {
 }
 //#endregion
 //#region src/data/provider.ts
-async function ft(e, t, n) {
-	let r = H(t), i = ot(V(t.range), t.bucket.interval);
+async function pt(e, t, n) {
+	let r = $e(t), i = st(H(t.range), t.bucket.interval);
 	if (r > t.data.max_cells) return {
 		source: "current",
-		buckets: W(i, "current"),
+		buckets: U(i, "current"),
 		warning: `This heatmap would render ${r.toLocaleString()} cells. Raise data.max_cells to load it.`
 	};
-	let a = t.data.provider, o = U(t.bucket.value) !== null, s;
+	let a = t.data.provider, o = it(t.bucket.value) !== null, s;
 	if ((a === "auto" || a === "statistics") && o) try {
-		let r = await pt(e, t, n, i);
+		let r = await mt(e, t, n, i);
 		if (r.some((e) => e.value !== null) || a === "statistics") return {
 			source: "statistics",
-			buckets: G(r, t.missing.mode)
+			buckets: W(r, t.missing.mode)
 		};
 		s = `No ${t.bucket.value} statistics were available for ${n.entity}.`;
 	} catch (e) {
 		if (a === "statistics") return {
 			source: "statistics",
-			buckets: W(i, "statistics"),
-			warning: ht(e, "Statistics query failed.")
+			buckets: U(i, "statistics"),
+			warning: gt(e, "Statistics query failed.")
 		};
 		s = "Statistics query failed.";
 	}
 	if (a === "auto" || a === "history") {
-		let r = await mt(e, t, n, i, s !== void 0);
+		let r = await ht(e, t, n, i, s !== void 0);
 		return s ? {
 			...r,
 			warning: r.warning ? `${s} ${r.warning}` : `${s} Showing raw history instead.`
@@ -1171,15 +1171,15 @@ async function ft(e, t, n) {
 	}
 	return {
 		source: "current",
-		buckets: W(i, "current"),
+		buckets: U(i, "current"),
 		warning: "No supported data provider is available for this bucket value yet."
 	};
 }
-async function pt(e, t, n, r) {
-	let i = U(t.bucket.value);
-	if (!i) return W(r, "statistics");
-	let a = V(t.range);
-	return st(r, (await e.callWS({
+async function mt(e, t, n, r) {
+	let i = it(t.bucket.value);
+	if (!i) return U(r, "statistics");
+	let a = H(t.range);
+	return ct(r, (await e.callWS({
 		type: "recorder/statistics_during_period",
 		start_time: a.start.toISOString(),
 		end_time: a.end.toISOString(),
@@ -1188,16 +1188,16 @@ async function pt(e, t, n, r) {
 		types: [i]
 	}))[n.entity] ?? [], t.bucket.value, "empty");
 }
-async function mt(e, t, n, r, i = !1) {
-	let a = V(t.range), o = (a.end.getTime() - a.start.getTime()) / 36e5;
+async function ht(e, t, n, r, i = !1) {
+	let a = H(t.range), o = (a.end.getTime() - a.start.getTime()) / 36e5;
 	if (!e.callApi) return {
 		source: "history",
-		buckets: W(r, "history"),
+		buckets: U(r, "history"),
 		warning: "This Home Assistant object does not expose callApi for history fallback."
 	};
 	if (o > t.data.raw_history_hours) return {
 		source: "history",
-		buckets: W(r, "history"),
+		buckets: U(r, "history"),
 		warning: `Raw history fallback is capped at ${t.data.raw_history_hours} hours by default. Use recorder statistics or reduce range.`
 	};
 	try {
@@ -1207,39 +1207,39 @@ async function mt(e, t, n, r, i = !1) {
 		});
 		return {
 			source: "history",
-			buckets: ct(r, (await e.callApi("GET", `history/period/${a.start.toISOString()}?${i.toString()}&minimal_response&no_attributes`)).flat(), t.bucket.value, t.missing.mode)
+			buckets: lt(r, (await e.callApi("GET", `history/period/${a.start.toISOString()}?${i.toString()}&minimal_response&no_attributes`)).flat(), t.bucket.value, t.missing.mode)
 		};
 	} catch (e) {
 		return {
 			source: "history",
-			buckets: W(r, "history"),
-			warning: i ? "History fallback failed." : ht(e, "History fallback failed.")
+			buckets: U(r, "history"),
+			warning: i ? "History fallback failed." : gt(e, "History fallback failed.")
 		};
 	}
 }
-function ht(e, t) {
+function gt(e, t) {
 	return e instanceof Error && e.message ? e.message : t;
 }
 //#endregion
 //#region src/debug.ts
-var gt = "universal-heatmap-card:debug";
-function _t(e) {
+var _t = "universal-heatmap-card:debug";
+function vt(e) {
 	if (e?.debug === !0) return !0;
 	if (e?.debug === !1 || typeof window > "u") return !1;
 	try {
-		let e = window.localStorage?.getItem(gt);
+		let e = window.localStorage?.getItem(_t);
 		return e === "1" || e === "true";
 	} catch {
 		return !1;
 	}
 }
-function K() {
+function G() {
 	return globalThis.performance?.now?.() ?? Date.now();
 }
-function q(e) {
+function K(e) {
 	return Math.round(e * 10) / 10;
 }
-function J(e, t, n) {
+function q(e, t, n) {
 	if (e) {
 		if (n) {
 			console.debug(`[Universal Heatmap Card] ${t}`, n);
@@ -1250,7 +1250,7 @@ function J(e, t, n) {
 }
 //#endregion
 //#region src/editor-form.ts
-function vt() {
+function yt() {
 	return {
 		schema: [
 			{
@@ -1491,22 +1491,22 @@ function vt() {
 		}[e.name] : void 0
 	};
 }
-function Y(e) {
-	return yt(e).map((e) => typeof e == "string" ? e : e.entity).filter((e) => typeof e == "string" && e.length > 0);
+function J(e) {
+	return bt(e).map((e) => typeof e == "string" ? e : e.entity).filter((e) => typeof e == "string" && e.length > 0);
 }
-function yt(e) {
+function bt(e) {
 	return (e.entities?.length ? e.entities : e.entity ? [e.entity] : []).map((e) => typeof e == "string" ? e : { ...e });
 }
-function bt(e, t) {
+function xt(e, t) {
 	let n = /* @__PURE__ */ new Map();
-	for (let t of yt(e)) {
+	for (let t of bt(e)) {
 		let e = typeof t == "string" ? t : t.entity;
 		e && n.set(e, typeof t == "string" ? t : { ...t });
 	}
 	return t.map((e) => n.get(e) ?? e);
 }
-function xt(e, t, n) {
-	let r = Y(e), i = n.trim(), a = bt(e, r).map((e) => {
+function St(e, t, n) {
+	let r = J(e), i = n.trim(), a = xt(e, r).map((e) => {
 		let n = typeof e == "string" ? e : e.entity;
 		if (n !== t) return e;
 		let r = typeof e == "string" ? { entity: n } : { ...e };
@@ -1517,7 +1517,7 @@ function xt(e, t, n) {
 	};
 	return delete o.entity, o;
 }
-var St = 12, Ct = 560, wt = 3, Tt = 2, Et = 7, Dt = 22, Ot = 14, kt = 28, At = 58, jt = 120, Mt = 18, Nt = 864e5, Pt = 36e5, Ft = 5e4;
+var Ct = 12, wt = 560, Tt = 3, Et = 2, Dt = 7, Ot = 22, kt = 14, At = 28, jt = 58, Mt = 120, Nt = 18, Pt = 864e5, Ft = 36e5, It = 5e4;
 /**
 * Maps buckets onto the render grid.
 *
@@ -1526,10 +1526,35 @@ var St = 12, Ct = 560, wt = 3, Tt = 2, Et = 7, Dt = 22, Ot = 14, kt = 28, At = 5
 * hour. That keeps 23-hour and 25-hour DST days intact - the nonexistent
 * spring-forward hour simply leaves its column blank, and the two fall-back
 * 01:00 hours stay separate logical cells sharing (splitting) one column.
-* Every other interval keeps the sequential row-major placement.
+*
+* Daily grids use a fixed 7-column weekday layout (Monday first): each bucket
+* sits in the column of its local weekday, and a new row starts whenever the
+* week wraps, so a range starting mid-week leaves the leading columns of the
+* first row blank. Monthly grids use a fixed 12-column calendar-month layout
+* with one row per local calendar year.
+*
+* Every other interval ("5minute", "week") keeps the sequential row-major
+* placement.
 */
-function It(e, t, n = X(t, Math.max(1, e.length))) {
+function Lt(e, t, n = X(t, Math.max(1, e.length))) {
 	let r = Math.max(1, Math.floor(n)), i = [];
+	if (t === "day" || t === "month") {
+		let n = -1, a = -1, o = NaN;
+		return e.forEach((e, s) => {
+			let c = e.start, l = t === "day" ? (c.getDay() + 6) % 7 : c.getMonth(), u = Math.min(r - 1, Math.max(0, l)), d = c.getFullYear();
+			(t === "day" ? s === 0 || u <= a : s === 0 || d !== o) && (n += 1), a = u, o = d, i.push({
+				index: s,
+				row: n,
+				col: u,
+				slot: 0,
+				slots: 1
+			});
+		}), {
+			rows: Math.max(1, n + 1),
+			cols: r,
+			cells: i
+		};
+	}
 	if (t !== "hour") return e.forEach((e, t) => {
 		i.push({
 			index: t,
@@ -1564,46 +1589,67 @@ function It(e, t, n = X(t, Math.max(1, e.length))) {
 	};
 }
 /** Formats a date's local UTC offset, used to disambiguate repeated DST hours. */
-function Lt(e) {
+function Rt(e) {
 	let t = -e.getTimezoneOffset(), n = t < 0 ? "-" : "+", r = Math.abs(t);
 	return `UTC${n}${String(Math.floor(r / 60)).padStart(2, "0")}:${String(r % 60).padStart(2, "0")}`;
 }
-function Rt(e) {
+function zt(e) {
 	let t = Math.max(1, Math.floor(e));
 	return t * 56 + Math.max(0, t - 1) * 8;
 }
-function zt(e) {
+function Bt(e) {
 	return !Number.isFinite(e) || e <= 0 ? 4 : Math.ceil((e + 8) / 64);
 }
-function Bt(e, t = {}, n = /* @__PURE__ */ new Date()) {
-	return Zt(zt(Ht(e, t, n)), 4, St);
-}
 function Vt(e, t = {}, n = /* @__PURE__ */ new Date()) {
-	return Math.max(1, Math.ceil(Ht(e, t, n) / 50));
+	return en(Bt(Ut(e, t, n)), 4, Ct);
 }
 function Ht(e, t = {}, n = /* @__PURE__ */ new Date()) {
-	return Ut(e, t) + Wt(e, Ct, n);
+	return Math.max(1, Math.ceil(Ut(e, t, n) / 50));
 }
-function Ut(e, t = {}) {
+function Ut(e, t = {}, n = /* @__PURE__ */ new Date()) {
+	return Wt(e, t) + Gt(e, wt, n);
+}
+function Wt(e, t = {}) {
 	let n = 58;
-	return n += 16, e.entities.length > 1 && (n += Xt(e)), (t.loading || t.warning || t.error) && (n += 33), e.axes.show_key && (n += 24), n += 25, e.legend.show && (n += 25), n;
+	return n += 16, e.entities.length > 1 && (n += $t(e)), (t.loading || t.warning || t.error) && (n += 33), e.axes.show_key && (n += 24), n += 25, e.legend.show && (n += 25), n;
 }
-function Wt(e, t = Ct, n = /* @__PURE__ */ new Date()) {
-	let r = Math.max(1, H(e, n)), i = X(e.bucket.interval, r), a = Gt(e, n), o = Yt(e.bucket.interval), s = e.axes.show && e.axes.y_labels ? Jt(e.bucket.interval) : 0, c = e.axes.show && e.axes.x_labels ? Mt : 0, l = Math.max(160, t - s), u = e.tiles.show_values || e.tiles.show_value_toggle;
-	return c + a * Math.max(u ? Ot : Et, Math.min(u ? kt : Dt, Math.floor((l - Math.max(0, i - 1) * o) / i))) + Math.max(0, a - 1) * o;
+function Gt(e, t = wt, n = /* @__PURE__ */ new Date()) {
+	let r = Math.max(1, $e(e, n)), i = X(e.bucket.interval, r), a = Kt(e, n), o = Qt(e.bucket.interval), s = e.axes.show && e.axes.y_labels ? Zt(e.bucket.interval) : 0, c = e.axes.show && e.axes.x_labels ? Nt : 0, l = Math.max(160, t - s), u = e.tiles.show_values || e.tiles.show_value_toggle;
+	return c + a * Math.max(u ? kt : Dt, Math.min(u ? At : Ot, Math.floor((l - Math.max(0, i - 1) * o) / i))) + Math.max(0, a - 1) * o;
 }
-function Gt(e, t) {
-	let n = Math.max(1, H(e, t)), r = X(e.bucket.interval, n);
-	return e.bucket.interval === "hour" ? Kt(V(e.range, t)) : Math.ceil(n / r);
+function Kt(e, t) {
+	let n = Math.max(1, $e(e, t)), r = X(e.bucket.interval, n);
+	switch (e.bucket.interval) {
+		case "hour": return Yt(H(e.range, t));
+		case "day": return qt(H(e.range, t));
+		case "month": return Jt(H(e.range, t));
+		default: return Math.ceil(n / r);
+	}
 }
-function Kt(e) {
-	let t = e.start, n = /* @__PURE__ */ new Date(e.end.getTime() - 1), r = qt(t), i = qt(n), a = Math.max(1, Math.floor((i - r) / Nt) + 1);
-	if (Math.ceil((e.end.getTime() - e.start.getTime()) / Pt) + 1 > Ft) return a;
+/**
+* Counts the Monday-anchored local weeks touched by the day buckets of a range,
+* i.e. the rows placeBucketsOnGrid renders for a daily grid.
+*/
+function qt(e) {
+	let t = Y(e.start), n = Y(/* @__PURE__ */ new Date(e.end.getTime() - 1)), r = Xt(t), i = Xt(n);
+	return Math.max(1, Math.floor((i - r) / (7 * Pt)) + 1);
+}
+/**
+* Counts the local calendar years touched by the month buckets of a range,
+* i.e. the rows placeBucketsOnGrid renders for a monthly grid.
+*/
+function Jt(e) {
+	let t = e.start.getFullYear(), n = (/* @__PURE__ */ new Date(e.end.getTime() - 1)).getFullYear();
+	return Math.max(1, n - t + 1);
+}
+function Yt(e) {
+	let t = e.start, n = /* @__PURE__ */ new Date(e.end.getTime() - 1), r = Y(t), i = Y(n), a = Math.max(1, Math.floor((i - r) / Pt) + 1);
+	if (Math.ceil((e.end.getTime() - e.start.getTime()) / Ft) + 1 > It) return a;
 	let o = new Date(e.start);
 	o.setMilliseconds(0), o.setSeconds(0), o.setMinutes(0);
 	let s = "", c = 0;
 	for (; o < e.end;) {
-		let t = o.getTime() + Pt;
+		let t = o.getTime() + Ft;
 		if (t > e.start.getTime()) {
 			let e = `${o.getFullYear()}-${o.getMonth()}-${o.getDate()}`;
 			e !== s && (s = e, c += 1);
@@ -1612,17 +1658,21 @@ function Kt(e) {
 	}
 	return Math.max(1, c);
 }
-function qt(e) {
+function Y(e) {
 	let t = /* @__PURE__ */ new Date(0);
 	return t.setUTCFullYear(e.getFullYear(), e.getMonth(), e.getDate()), t.setUTCHours(0, 0, 0, 0), t.getTime();
 }
-function Jt(e) {
-	return e === "5minute" ? jt : At;
-}
-function Yt(e) {
-	return e === "5minute" ? Tt : wt;
-}
+/** Returns the Monday that starts the week of a localCalendarDayTimestamp value. */
 function Xt(e) {
+	return e - (new Date(e).getUTCDay() + 6) % 7 * Pt;
+}
+function Zt(e) {
+	return e === "5minute" ? Mt : jt;
+}
+function Qt(e) {
+	return e === "5minute" ? Et : Tt;
+}
+function $t(e) {
 	switch (e.navigation.mode) {
 		case "dots": return 24;
 		case "tabs": {
@@ -1635,12 +1685,12 @@ function Xt(e) {
 function X(e, t) {
 	return e === "hour" ? 24 : e === "5minute" ? 48 : e === "day" ? 7 : e === "month" ? 12 : Math.min(12, Math.ceil(Math.sqrt(t * 1.8)));
 }
-function Zt(e, t, n) {
+function en(e, t, n) {
 	return Math.max(t, Math.min(n, e));
 }
 //#endregion
 //#region src/scale.ts
-var Qt = [
+var tn = [
 	{
 		value: 0,
 		color: "#3a6ea5"
@@ -1654,8 +1704,8 @@ var Qt = [
 		color: "#f6c85f"
 	}
 ];
-function $t(e, t) {
-	let n = e.map((e) => e.value).filter((e) => typeof e == "number" && Number.isFinite(e)), r = n.filter((e) => e !== 0), i = on(t.ignore_zero === !0 || t.ignore_zero !== !1 && r.length > 0 && n.some((e) => e === 0) && !n.some((e) => e < 0) ? r : n, t.outlier_clip), a = i.min, o = i.max, { min: s, max: c } = nn(t, a, o), l = an(t.stops?.length ? t.stops : Qt, s, c, t.invert ?? !1), u = ln(t.sensitivity);
+function nn(e, t) {
+	let n = e.map((e) => e.value).filter((e) => typeof e == "number" && Number.isFinite(e)), r = n.filter((e) => e !== 0), i = ln(t.ignore_zero === !0 || t.ignore_zero !== !1 && r.length > 0 && n.some((e) => e === 0) && !n.some((e) => e < 0) ? r : n, t.outlier_clip), a = i.min, o = i.max, { min: s, max: c } = on(t, a, o), l = cn(t.stops?.length ? t.stops : tn, s, c, t.invert ?? !1), u = fn(t.sensitivity);
 	return {
 		min: s,
 		max: c,
@@ -1666,25 +1716,25 @@ function $t(e, t) {
 		clippedHigh: n.some((e) => e > c)
 	};
 }
-function en(e, t) {
+function rn(e, t) {
 	if (e === null || !Number.isFinite(e)) return "rgba(127, 127, 127, 0.22)";
-	let n = un(e, t), r = t.stops;
+	let n = pn(e, t), r = t.stops;
 	if (r.length === 0) return "#999999";
 	if (r.length === 1) return r[0]?.color ?? "#999999";
 	for (let e = 0; e < r.length - 1; e += 1) {
 		let t = r[e], i = r[e + 1];
 		if (!(!t || !i) && n >= t.value && n <= i.value) {
 			let e = i.value - t.value || 1, r = (n - t.value) / e;
-			return dn(t.color, i.color, r);
+			return mn(t.color, i.color, r);
 		}
 	}
 	return n < (r[0]?.value ?? t.min) ? r[0]?.color ?? "#999999" : r[r.length - 1]?.color ?? "#999999";
 }
-function tn(e, t = 18) {
+function an(e, t = 18) {
 	let n = e.max - e.min || 1, r = Math.max(2, t);
 	return Array.from({ length: r }, (t, i) => {
 		let a = i / (r - 1);
-		return `${en(e.min + n * a, e)} ${a * 100}%`;
+		return `${rn(e.min + n * a, e)} ${a * 100}%`;
 	}).join(", ");
 }
 function Z(e, t, n) {
@@ -1692,14 +1742,14 @@ function Z(e, t, n) {
 	let r = Math.abs(e), i = r >= 100 ? 0 : r >= 10 ? 1 : 2, a = new Intl.NumberFormat(n, { maximumFractionDigits: i }).format(e);
 	return t.unit ? `${a} ${t.unit}` : a;
 }
-function nn(e, t, n) {
+function on(e, t, n) {
 	let r = typeof e.min == "number", i = typeof e.max == "number", a = r ? e.min : t, o = i ? e.max : n;
 	return o > a ? {
 		min: a,
 		max: o
-	} : i ? r ? rn(a, !0) : rn(o, !1) : rn(a, !0);
+	} : i ? r ? sn(a, !0) : sn(o, !1) : sn(a, !0);
 }
-function rn(e, t) {
+function sn(e, t) {
 	let n = Math.abs(e) * 2 ** -52 * 4, r = n > 0 && Number.isFinite(n) ? n : 1, i = e + r, a = e - r;
 	return t && Number.isFinite(i) && i > e ? {
 		min: e,
@@ -1715,7 +1765,7 @@ function rn(e, t) {
 		max: e + 1
 	};
 }
-function an(e, t, n, r) {
+function cn(e, t, n, r) {
 	let i = e.every((e) => e.value >= 0 && e.value <= 1), a = e.map((e) => i ? {
 		...e,
 		value: t + e.value * (n - t)
@@ -1727,17 +1777,17 @@ function an(e, t, n, r) {
 		color: o[t] ?? e.color
 	}));
 }
-function on(e, t) {
+function ln(e, t) {
 	if (e.length === 0) return {
 		min: 0,
 		max: 1
 	};
-	let n = [...e].sort((e, t) => e - t), r = sn(t);
+	let n = [...e].sort((e, t) => e - t), r = un(t);
 	if (!r) return {
 		min: n[0] ?? 0,
 		max: n[n.length - 1] ?? 1
 	};
-	let i = cn(n, r.low), a = cn(n, r.high);
+	let i = dn(n, r.low), a = dn(n, r.high);
 	return a <= i ? {
 		min: n[0] ?? 0,
 		max: n[n.length - 1] ?? i + 1
@@ -1746,7 +1796,7 @@ function on(e, t) {
 		max: a
 	};
 }
-function sn(e) {
+function un(e) {
 	if (typeof e == "number") {
 		if (!Number.isFinite(e) || e <= 0) return null;
 		let t = Q(e, 0, 49);
@@ -1762,21 +1812,21 @@ function sn(e) {
 		high: Q(n, 0, 100)
 	};
 }
-function cn(e, t) {
+function dn(e, t) {
 	return e.length === 0 ? 0 : e[Q(Math.ceil(t / 100 * e.length) - 1, 0, e.length - 1)] ?? e[0] ?? 0;
 }
-function ln(e) {
+function fn(e) {
 	return typeof e != "number" || !Number.isFinite(e) || e <= 0 ? 1 : Q(e, .1, 5);
 }
-function un(e, t) {
+function pn(e, t) {
 	let n = t.max - t.min || 1, r = Q(.5 + ((Q(e, t.min, t.max) - t.min) / n - .5) * t.sensitivity, 0, 1);
 	return t.min + r * n;
 }
-function dn(e, t, n) {
-	let r = fn(e), i = fn(t);
+function mn(e, t, n) {
+	let r = hn(e), i = hn(t);
 	return !r || !i ? n < .5 ? e : t : `rgb(${Math.round(r.r + (i.r - r.r) * n)}, ${Math.round(r.g + (i.g - r.g) * n)}, ${Math.round(r.b + (i.b - r.b) * n)})`;
 }
-function fn(e) {
+function hn(e) {
 	let t = e.replace("#", "").trim(), n = t.length === 3 ? t.split("").map((e) => `${e}${e}`).join("") : t;
 	return /^[0-9a-fA-F]{6}$/.test(n) ? {
 		r: Number.parseInt(n.slice(0, 2), 16),
@@ -1789,7 +1839,7 @@ function Q(e, t, n) {
 }
 //#endregion
 //#region src/time-labels.ts
-function pn(e, t, n) {
+function gn(e, t, n) {
 	return new Intl.DateTimeFormat(n, {
 		month: "short",
 		day: "numeric",
@@ -1797,7 +1847,7 @@ function pn(e, t, n) {
 		minute: t === "5minute" ? "2-digit" : void 0
 	}).format(e);
 }
-function mn(e, t, n) {
+function _n(e, t, n) {
 	let r = t === "month" ? { year: "2-digit" } : t === "5minute" ? {
 		month: "short",
 		day: "numeric",
@@ -1809,7 +1859,7 @@ function mn(e, t, n) {
 	};
 	return new Intl.DateTimeFormat(n, r).format(e);
 }
-function hn(e) {
+function vn(e) {
 	switch (e) {
 		case "5minute": return {
 			x: "elapsed time within each 4-hour row",
@@ -1837,7 +1887,7 @@ function hn(e) {
 		};
 	}
 }
-function gn() {
+function yn() {
 	let e = [
 		0,
 		12,
@@ -1847,22 +1897,49 @@ function gn() {
 	];
 	return e.map((t, n) => ({
 		col: t,
-		label: _n(t * 5),
+		label: Sn(t * 5),
 		align: n === 0 ? "left" : n === e.length - 1 ? "right" : "center"
 	}));
 }
-function _n(e) {
+/** Short weekday names for a Monday-first week, in the given locale. */
+function bn(e) {
+	let t = new Intl.DateTimeFormat(e, { weekday: "short" });
+	return Array.from({ length: 7 }, (e, n) => ({
+		col: n,
+		label: t.format(new Date(2024, 0, 1 + n)),
+		align: "center"
+	}));
+}
+/** Short month names at the monthly grid's tick columns, in the given locale. */
+function xn(e) {
+	let t = new Intl.DateTimeFormat(e, {
+		month: "short",
+		calendar: "gregory"
+	}), n = [
+		0,
+		3,
+		6,
+		9,
+		11
+	];
+	return n.map((e, r) => ({
+		col: e,
+		label: t.format(new Date(2024, e, 1)),
+		align: r === 0 ? "left" : r === n.length - 1 ? "right" : "center"
+	}));
+}
+function Sn(e) {
 	if (e === 0) return "0h";
 	let t = Math.floor(e / 60), n = e % 60;
 	return `+${t}h${n === 0 ? "" : `${n}m`}`;
 }
 //#endregion
 //#region src/types.ts
-var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", bn = `${vn}-editor`, xn = class extends Error {
+var Cn = "universal-heatmap-card", wn = "Universal Heatmap Card", Tn = "0.1.4", $ = `${Cn}-editor`, En = class extends Error {
 	constructor() {
 		super("Stale heatmap load skipped.");
 	}
-}, Sn = class extends I {
+}, Dn = class extends F {
 	constructor(...e) {
 		super(...e), this._activeIndex = 0, this._buckets = [], this._loading = !1, this._cache = /* @__PURE__ */ new Map(), this._debug = !1, this._deferredLoadPending = !1, this._visibleForLoad = globalThis.IntersectionObserver === void 0, this._loadSeq = 0, this._cellFormatCache = /* @__PURE__ */ new Map();
 	}
@@ -1881,9 +1958,9 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 	}
 	setConfig(e) {
 		let t = this._normalized?.entities[this._activeIndex]?.entity;
-		this._config = e, this._debug = _t(e), this._cache.clear(), this._inFlightKey = void 0, this._loadSeq += 1, this._normalized = Ge(e, this.hass, this._activeIndex);
+		this._config = e, this._debug = vt(e), this._cache.clear(), this._inFlightKey = void 0, this._loadSeq += 1, this._normalized = We(e, this.hass, this._activeIndex);
 		let n = this._resolveActiveIndex(t);
-		n !== this._activeIndex && (this._activeIndex = n, this._normalized = Ge(e, this.hass, n)), this._tileValuesOverride = void 0, this._tooltip = void 0, J(this._debug, "config applied", {
+		n !== this._activeIndex && (this._activeIndex = n, this._normalized = We(e, this.hass, n)), this._tileValuesOverride = void 0, this._tooltip = void 0, q(this._debug, "config applied", {
 			entityCount: this._normalized.entities.length,
 			bucket: this._normalized.bucket,
 			range: this._normalized.range,
@@ -1923,16 +2000,16 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		};
 	}
 	static getConfigElement() {
-		return document.createElement(bn);
+		return document.createElement($);
 	}
 	static getConfigForm() {
-		return vt();
+		return yt();
 	}
 	updated(e) {
-		this._config && (e.has("hass") || e.has("_activeIndex")) && (this._normalized = Ge(this._config, this.hass, this._activeIndex), this._requestActiveSeriesLoad()), (e.has("_buckets") || e.has("_loading") || e.has("_tileValuesOverride") || e.has("_warning")) && this.updateComplete.then(() => this._drawHeatmap());
+		this._config && (e.has("hass") || e.has("_activeIndex")) && (this._normalized = We(this._config, this.hass, this._activeIndex), this._requestActiveSeriesLoad()), (e.has("_buckets") || e.has("_loading") || e.has("_tileValuesOverride") || e.has("_warning")) && this.updateComplete.then(() => this._drawHeatmap());
 	}
 	render() {
-		if (!this._normalized) return O`<ha-card><div class="empty">Configure ${$}</div></ha-card>`;
+		if (!this._normalized) return O`<ha-card><div class="empty">Configure ${wn}</div></ha-card>`;
 		let e = this._normalized.entities[this._activeIndex], t = e ? this.hass?.states[e.entity] : void 0, n = this._normalized.title ?? e?.name ?? "Universal Heatmap Card";
 		return O`
       <ha-card class=${this._shouldBoundToGrid() ? "grid-bound" : ""}>
@@ -2045,11 +2122,11 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 	}
 	_estimatedGridRows() {
 		let e = this._normalized;
-		return e ? Bt(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
+		return e ? Vt(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
 	}
 	_estimatedMasonryRows() {
 		let e = this._normalized;
-		return e ? Vt(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
+		return e ? Ht(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
 	}
 	_layoutState() {
 		return {
@@ -2088,7 +2165,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
         <span>${e}</span>
         <div
           class="legend-bar"
-          style=${`background: linear-gradient(90deg, ${tn(this._scale)});`}
+          style=${`background: linear-gradient(90deg, ${an(this._scale)});`}
         ></div>
         <span>${t}</span>
       </div>
@@ -2099,7 +2176,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		if (!e || !t || !n) return;
 		let r = this._seriesCacheKey(e, n), i = this._cache.get(r);
 		if (i && this._isCacheFresh(i, e.data.refresh_interval)) {
-			J(this._debug, "cache hit", {
+			q(this._debug, "cache hit", {
 				entity: n.entity,
 				source: i.result.source,
 				buckets: i.result.buckets.length,
@@ -2108,70 +2185,70 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 			return;
 		}
 		if (this._inFlightKey === r) {
-			J(this._debug, "load already in flight", {
+			q(this._debug, "load already in flight", {
 				entity: n.entity,
-				queue: Le(e.data.max_concurrent_requests)
+				queue: Ie(e.data.max_concurrent_requests)
 			});
 			return;
 		}
-		i && J(this._debug, "cache stale", {
+		i && q(this._debug, "cache stale", {
 			entity: n.entity,
 			ageMs: Date.now() - i.loadedAt,
 			refreshInterval: e.data.refresh_interval
 		});
 		let a = ++this._loadSeq;
 		this._inFlightKey = r, this._loading = !0, this._error = void 0, this._warning = void 0;
-		let o = this._debug ? K() : 0, s = this._debug ? K() : 0;
-		J(this._debug, "load start", {
+		let o = this._debug ? G() : 0, s = this._debug ? G() : 0;
+		q(this._debug, "load start", {
 			entity: n.entity,
 			provider: e.data.provider,
 			range: e.range,
 			bucket: e.bucket
 		});
 		try {
-			let i = await Ie(async () => {
-				if (a !== this._loadSeq) throw new xn();
-				return ft(t, e, n);
+			let i = await Fe(async () => {
+				if (a !== this._loadSeq) throw new En();
+				return pt(t, e, n);
 			}, {
 				maxConcurrent: e.data.max_concurrent_requests,
-				onQueued: (e) => J(this._debug, "request queued", {
+				onQueued: (e) => q(this._debug, "request queued", {
 					entity: n.entity,
 					...e
 				}),
-				onStart: (e) => J(this._debug, "request start", {
+				onStart: (e) => q(this._debug, "request start", {
 					entity: n.entity,
 					...e
 				})
 			});
 			if (a !== this._loadSeq) return;
-			let c = this._debug ? q(K() - s) : 0, l = this._debug ? K() : 0, u = $t(i.buckets, {
+			let c = this._debug ? K(G() - s) : 0, l = this._debug ? G() : 0, u = nn(i.buckets, {
 				...e.scale,
 				...n.scale
-			}), d = this._debug ? q(K() - l) : 0;
+			}), d = this._debug ? K(G() - l) : 0;
 			this._cache.set(r, {
 				result: i,
 				scale: u,
 				loadedAt: Date.now()
-			}), this._buckets = i.buckets, this._scale = u, this._warning = i.warning, J(this._debug, "load complete", {
+			}), this._buckets = i.buckets, this._scale = u, this._warning = i.warning, q(this._debug, "load complete", {
 				entity: n.entity,
 				source: i.source,
 				buckets: i.buckets.length,
 				fetchMs: c,
 				scaleMs: d,
-				totalMs: q(K() - o),
+				totalMs: K(G() - o),
 				scaleMin: u.min,
 				scaleMax: u.max,
 				warning: i.warning
 			});
 		} catch (e) {
-			if (e instanceof xn) {
-				J(this._debug, "stale queued load skipped", { entity: n.entity });
+			if (e instanceof En) {
+				q(this._debug, "stale queued load skipped", { entity: n.entity });
 				return;
 			}
 			if (a !== this._loadSeq) return;
-			this._error = e instanceof Error ? e.message : "Could not load heatmap data.", this._buckets = [], J(this._debug, "load failed", {
+			this._error = e instanceof Error ? e.message : "Could not load heatmap data.", this._buckets = [], q(this._debug, "load failed", {
 				entity: n.entity,
-				totalMs: q(K() - o),
+				totalMs: K(G() - o),
 				error: this._error
 			});
 		} finally {
@@ -2181,7 +2258,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 	_requestActiveSeriesLoad() {
 		if (!(!this._normalized || !this.hass)) {
 			if (this._shouldDeferLoad()) {
-				this._deferredLoadPending = !0, J(this._debug, "load deferred until visible", { queue: Le(this._normalized.data.max_concurrent_requests) });
+				this._deferredLoadPending = !0, q(this._debug, "load deferred until visible", { queue: Ie(this._normalized.data.max_concurrent_requests) });
 				return;
 			}
 			this._deferredLoadPending = !1, this._loadActiveSeries();
@@ -2225,15 +2302,15 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		if (!e || !this._scale) return;
 		let t = e.getContext("2d");
 		if (!t) return;
-		let n = this._debug ? K() : 0, r = e.parentElement, i = Math.max(260, Math.floor(r?.clientWidth ?? 320)), a = this._boundedCanvasHeight(), o = this._calculateLayout(i, a), s = window.devicePixelRatio || 1;
+		let n = this._debug ? G() : 0, r = e.parentElement, i = Math.max(260, Math.floor(r?.clientWidth ?? 320)), a = this._boundedCanvasHeight(), o = this._calculateLayout(i, a), s = window.devicePixelRatio || 1;
 		e.width = Math.floor(o.width * s), e.height = Math.floor(o.height * s), e.style.height = `${o.height}px`, e.style.width = `${o.width}px`, t.setTransform(s, 0, 0, s, 0, 0), t.clearRect(0, 0, o.width, o.height), this._drawAxes(t, o);
 		for (let e of this._placement?.cells ?? []) {
 			let n = this._buckets[e.index];
 			if (!n) continue;
-			let r = o.cell / e.slots, i = o.gridX + e.col * (o.cell + o.gap) + e.slot * r, a = o.gridY + e.row * (o.cell + o.gap), s = en(n.value, this._scale);
+			let r = o.cell / e.slots, i = o.gridX + e.col * (o.cell + o.gap) + e.slot * r, a = o.gridY + e.row * (o.cell + o.gap), s = rn(n.value, this._scale);
 			t.fillStyle = s, t.fillRect(i, a, r, o.cell), n.quality === "carried" && (t.fillStyle = "rgba(255, 255, 255, 0.34)", t.fillRect(i, a + o.cell - 3, r, 3)), this._drawCellValue(t, n, o, i, a, s, r);
 		}
-		this._renderLayout = o, J(this._debug, "draw complete", {
+		this._renderLayout = o, q(this._debug, "draw complete", {
 			buckets: this._buckets.length,
 			cols: o.cols,
 			rows: o.rows,
@@ -2241,13 +2318,13 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 			width: o.width,
 			height: o.height,
 			maxCanvasHeight: a,
-			ms: q(K() - n)
+			ms: K(G() - n)
 		});
 	}
 	_calculateLayout(e, t) {
-		let n = this._normalized?.bucket.interval ?? "day", r = X(n, Math.max(1, this._buckets.length)), i = It(this._buckets, n, r);
+		let n = this._normalized?.bucket.interval ?? "day", r = X(n, Math.max(1, this._buckets.length)), i = Lt(this._buckets, n, r);
 		this._placement = i;
-		let a = Yt(n), o = this._shouldShowRowLabels() ? Jt(n) : 0, s = this._shouldShowXAxisLabels() ? 18 : 0, c = Math.max(160, e - o), l = i.rows, u = this._shouldReserveForTileValues(), d = u ? 14 : 7, f = Math.min(u ? 28 : 22, Math.floor((c - a * (r - 1)) / r));
+		let a = Qt(n), o = this._shouldShowRowLabels() ? Zt(n) : 0, s = this._shouldShowXAxisLabels() ? 18 : 0, c = Math.max(160, e - o), l = i.rows, u = this._shouldReserveForTileValues(), d = u ? 14 : 7, f = Math.min(u ? 28 : 22, Math.floor((c - a * (r - 1)) / r));
 		if (f = Math.max(f >= d ? d : 7, f), typeof t == "number") {
 			let e = Math.max(0, t - s), n = Math.floor((e - Math.max(0, l - 1) * a) / l);
 			Number.isFinite(n) && n >= 7 && (f = Math.min(f, n));
@@ -2319,7 +2396,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		if (typeof e != "number" || !Number.isFinite(e) || e <= 0) return;
 		let t = this._normalized;
 		if (!t) return;
-		let n = Rt(e) - Ut(t, this._layoutState());
+		let n = zt(e) - Wt(t, this._layoutState());
 		if (!(n <= 0)) return Math.max(120, n);
 	}
 	_shouldBoundToGrid() {
@@ -2360,7 +2437,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 			this._tooltip = void 0;
 			return;
 		}
-		let p = d.slots > 1 ? ` (${Lt(f.start)})` : "", m = `${this._formatDate(f.start)} - ${this._formatDate(f.end)}${p}: ${Z(f.value, this._scale, this.hass?.locale?.language)}`;
+		let p = d.slots > 1 ? ` (${Rt(f.start)})` : "", m = `${this._formatDate(f.start)} - ${this._formatDate(f.end)}${p}: ${Z(f.value, this._scale, this.hass?.locale?.language)}`;
 		this._tooltip = {
 			x: Math.min(n + 12, t.width - 160),
 			y: Math.max(4, r - 28),
@@ -2426,13 +2503,13 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		return `${e.state}${t}`;
 	}
 	_formatDate(e) {
-		return pn(e, this._normalized?.bucket.interval ?? "day", this.hass?.locale?.language);
+		return gn(e, this._normalized?.bucket.interval ?? "day", this.hass?.locale?.language);
 	}
 	_xAxisLabel() {
-		return hn(this._normalized?.bucket.interval).x;
+		return vn(this._normalized?.bucket.interval).x;
 	}
 	_yAxisLabel() {
-		return hn(this._normalized?.bucket.interval).y;
+		return vn(this._normalized?.bucket.interval).y;
 	}
 	_colorAxisLabel() {
 		return `${this._bucketValueLabel(this._normalized?.bucket.value)}${this._scale?.unit ? ` (${this._scale.unit})` : ""}`;
@@ -2467,35 +2544,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 			12,
 			18,
 			23
-		]) : t === "5minute" ? gn() : t === "day" ? [
-			"Mon",
-			"Tue",
-			"Wed",
-			"Thu",
-			"Fri",
-			"Sat",
-			"Sun"
-		].map((e, t) => ({
-			col: t,
-			label: e,
-			align: "center"
-		})) : t === "month" ? [
-			"Jan",
-			"Apr",
-			"Jul",
-			"Oct",
-			"Dec"
-		].map((e, t) => ({
-			col: [
-				0,
-				3,
-				6,
-				9,
-				11
-			][t] ?? 0,
-			label: e,
-			align: t === 0 ? "left" : t === 4 ? "right" : "center"
-		})) : [{
+		]) : t === "5minute" ? yn() : t === "day" ? bn(this.hass?.locale?.language) : t === "month" ? xn(this.hass?.locale?.language) : [{
 			col: 0,
 			label: "Start",
 			align: "left"
@@ -2527,7 +2576,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		return new Intl.DateTimeFormat(this.hass?.locale?.language, { hour: "numeric" }).formatToParts(e).filter((e) => e.type === "hour" || e.type === "dayPeriod").map((e) => e.value.toLowerCase()).join("").replace(/\s/g, "");
 	}
 	_rowLabel(e) {
-		return mn(e, this._normalized?.bucket.interval ?? "day", this.hass?.locale?.language);
+		return _n(e, this._normalized?.bucket.interval ?? "day", this.hass?.locale?.language);
 	}
 	static {
 		this.styles = o`
@@ -2755,9 +2804,9 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
     }
   `;
 	}
-}, Cn = class extends I {
+}, On = class extends F {
 	constructor(...e) {
-		super(...e), this._form = vt();
+		super(...e), this._form = yt();
 	}
 	static {
 		this.properties = {
@@ -2785,7 +2834,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		let { entity: e, ...t } = this._config ?? {};
 		return {
 			...t,
-			entities: Y(this._config ?? {})
+			entities: J(this._config ?? {})
 		};
 	}
 	_handleValueChanged(e) {
@@ -2793,16 +2842,16 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 		let t = e.detail.value ?? {}, n = this._selectedEntities(t.entities), r = {
 			...this._config,
 			...t,
-			entities: bt(this._config, n)
+			entities: xt(this._config, n)
 		};
 		this._applyConfig(r);
 	}
 	_selectedEntities(e) {
-		return Array.isArray(e) ? e.filter((e) => typeof e == "string" && e.length > 0) : typeof e == "string" && e.length > 0 ? [e] : Y(this._config ?? {});
+		return Array.isArray(e) ? e.filter((e) => typeof e == "string" && e.length > 0) : typeof e == "string" && e.length > 0 ? [e] : J(this._config ?? {});
 	}
 	_renderEntityNameEditor() {
 		if (!this._config) return A;
-		let e = bt(this._config, Y(this._config));
+		let e = xt(this._config, J(this._config));
 		return e.length === 0 ? A : O`
       <section class="editor-section" aria-label="Entity labels">
         <div class="editor-title">Entity labels</div>
@@ -2831,7 +2880,7 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
 	_handleEntityNameInput(e, t) {
 		if (!this._config) return;
 		let n = t.target;
-		this._applyConfig(xt(this._config, e, n.value));
+		this._applyConfig(St(this._config, e, n.value));
 	}
 	_defaultEntityName(e) {
 		let t = this.hass?.states[e];
@@ -2926,11 +2975,11 @@ var vn = "universal-heatmap-card", $ = "Universal Heatmap Card", yn = "0.1.4", b
   `;
 	}
 };
-customElements.get("universal-heatmap-card") || customElements.define(vn, Sn), customElements.get(bn) || customElements.define(bn, Cn), window.customCards = window.customCards ?? [], window.customCards.push({
-	type: vn,
-	name: $,
+customElements.get("universal-heatmap-card") || customElements.define(Cn, Dn), customElements.get($) || customElements.define($, On), window.customCards = window.customCards ?? [], window.customCards.push({
+	type: Cn,
+	name: wn,
 	preview: !0,
 	description: "Canvas heatmaps for Home Assistant recorder statistics and short history ranges.",
 	documentationURL: "https://github.com/gcs8/universal-heatmap-card"
-}), console.info(`%c${$}%c ${yn}`, "color: #3a6ea5; font-weight: 700;", "color: inherit;");
+}), console.info(`%c${wn}%c ${Tn}`, "color: #3a6ea5; font-weight: 700;", "color: inherit;");
 //#endregion

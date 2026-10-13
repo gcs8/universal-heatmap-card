@@ -62,6 +62,29 @@ export function fiveMinuteElapsedTicks(): AxisTick[] {
   }));
 }
 
+/** Short weekday names for a Monday-first week, in the given locale. */
+export function weekdayTickLabels(locale?: string): AxisTick[] {
+  const format = new Intl.DateTimeFormat(locale, { weekday: "short" });
+  // Monday, January 1, 2024 anchors a fixed Monday-first week.
+  return Array.from({ length: 7 }, (_, col) => ({
+    col,
+    label: format.format(new Date(2024, 0, 1 + col)),
+    align: "center" as const,
+  }));
+}
+
+/** Short month names at the monthly grid's tick columns, in the given locale. */
+export function monthTickLabels(locale?: string): AxisTick[] {
+  // Bucket columns use Date.getMonth(), even when the locale requests another calendar.
+  const format = new Intl.DateTimeFormat(locale, { month: "short", calendar: "gregory" });
+  const columns = [0, 3, 6, 9, 11];
+  return columns.map((col, index) => ({
+    col,
+    label: format.format(new Date(2024, col, 1)),
+    align: index === 0 ? "left" : index === columns.length - 1 ? "right" : "center",
+  }));
+}
+
 function formatElapsedMinutes(minutes: number): string {
   if (minutes === 0) {
     return "0h";

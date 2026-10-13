@@ -31,6 +31,8 @@ import {
   fiveMinuteElapsedTicks,
   formatBucketDate,
   formatRowStart,
+  monthTickLabels,
+  weekdayTickLabels,
 } from "./time-labels";
 import {
   CARD_NAME,
@@ -1187,18 +1189,10 @@ export class UniversalHeatmapCard extends LitElement {
       return fiveMinuteElapsedTicks();
     }
     if (interval === "day") {
-      return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((label, col) => ({
-        col,
-        label,
-        align: "center" as const,
-      }));
+      return weekdayTickLabels(this.hass?.locale?.language);
     }
     if (interval === "month") {
-      return ["Jan", "Apr", "Jul", "Oct", "Dec"].map((label, index) => ({
-        col: [0, 3, 6, 9, 11][index] ?? 0,
-        label,
-        align: index === 0 ? ("left" as const) : index === 4 ? ("right" as const) : ("center" as const),
-      }));
+      return monthTickLabels(this.hass?.locale?.language);
     }
 
     const last = Math.max(0, layout.cols - 1);
