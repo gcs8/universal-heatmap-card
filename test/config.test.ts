@@ -254,6 +254,121 @@ describe("normalizeConfig", () => {
     expect(config.entities[0]?.scale?.min).toBe(0);
   });
 
+  it("lets the unit decide the preset before a 'battery' name match", () => {
+    const states: HomeAssistant["states"] = {
+      "sensor.battery_voltage": {
+        entity_id: "sensor.battery_voltage",
+        state: "12.6",
+        attributes: {
+          friendly_name: "Battery Voltage",
+          device_class: "voltage",
+          unit_of_measurement: "V",
+        },
+      },
+      "sensor.phone_battery_level": {
+        entity_id: "sensor.phone_battery_level",
+        state: "80",
+        attributes: {
+          friendly_name: "Phone Battery Level",
+          unit_of_measurement: "%",
+        },
+      },
+      "sensor.sensor_battery": {
+        entity_id: "sensor.sensor_battery",
+        state: "80",
+        attributes: {
+          friendly_name: "Attic Sensor",
+          device_class: "battery",
+          unit_of_measurement: "%",
+        },
+      },
+    };
+    const hassWithBatteries = { ...hass, states };
+
+    const voltage = normalizeConfig({ entity: "sensor.battery_voltage" }, hassWithBatteries);
+    const level = normalizeConfig({ entity: "sensor.phone_battery_level" }, hassWithBatteries);
+    const classed = normalizeConfig({ entity: "sensor.sensor_battery" }, hassWithBatteries);
+
+    expect(voltage.scale.preset).toBe("auto");
+    expect(voltage.scale.unit).toBeUndefined();
+    expect(voltage.scale.min).toBeUndefined();
+    expect(level.scale.preset).toBe("battery");
+    expect(classed.scale.preset).toBe("battery");
+  });
+
+  it.each([
+    ["humidity", "%", "Battery Room Humidity", "humidity", "mean", 30, [0, 50, 75, 100]],
+    ["humidity", undefined, "Battery Room Humidity", "humidity", "mean", 30, [0, 50, 75, 100]],
+    ["moisture", "%", "Battery Room Moisture", "humidity", "mean", 30, [0, 50, 75, 100]],
+    [undefined, "%", "Phone Battery Level", "battery", "min", 90, [0, 35, 70, 100]],
+    ["", "%", "Phone Battery Level", "battery", "min", 90, [0, 35, 70, 100]],
+    ["battery", "%", "Attic Sensor", "battery", "min", 90, [0, 35, 70, 100]],
+    [undefined, "%", "Filter Health", "percent_health", "min", 90, [0, 35, 70, 100]],
+    [undefined, "%", "Filter Load", "percent_utilization", "mean", 30, [0, 50, 75, 100]],
+  ])("normalizes %s / %s / %s without a conflicting battery name fallback", (
+    deviceClass, unit, name, preset, value, days, stopValues,
+  ) => {
+    const entity = "sensor.inference_example";
+    const config = normalizeConfig({ entity }, {
+      ...hass,
+      states: {
+        [entity]: {
+          entity_id: entity,
+          state: "80",
+          attributes: {
+            device_class: deviceClass,
+            unit_of_measurement: unit,
+            friendly_name: name,
+          },
+        },
+      },
+    });
+
+    expect(config.scale.preset).toBe(preset);
+    expect(config.bucket).toEqual({ interval: "day", value });
+    expect(config.range.days).toBe(days);
+    expect(config.scale.unit).toBe("%");
+    expect(config.scale.min).toBe(0);
+    expect(config.scale.max).toBe(100);
+    expect(config.scale.stops?.map((stop) => stop.value)).toEqual(stopValues);
+  });
+
+  it("preserves explicit configuration on battery-named humidity entities", () => {
+    const entity = "sensor.battery_room_humidity";
+    const humidityHass: HomeAssistant = {
+      ...hass,
+      states: {
+        [entity]: {
+          entity_id: entity,
+          state: "80",
+          attributes: {
+            device_class: "humidity",
+            unit_of_measurement: "%",
+            friendly_name: "Battery Room Humidity",
+          },
+        },
+      },
+    };
+    const stops = [{ value: 0, color: "#000000" }, { value: 80, color: "#ffffff" }];
+    const config = normalizeConfig({
+      entity,
+      scale: { preset: "battery", min: 10, max: 80, unit: "custom", stops },
+      bucket: { interval: "hour", value: "max" },
+      range: { days: 7 },
+    }, humidityHass);
+
+    expect(config.scale).toMatchObject({ preset: "battery", min: 10, max: 80, unit: "custom", stops });
+    expect(config.bucket).toEqual({ interval: "hour", value: "max" });
+    expect(config.range.days).toBe(7);
+
+    const perEntity = normalizeConfig({
+      entities: [{ entity, scale: { preset: "battery", stops, max: 80, unit: "custom" } }],
+    }, humidityHass);
+    const merged = { ...perEntity.scale, ...perEntity.entities[0]?.scale };
+    expect(merged).toMatchObject({ preset: "battery", min: 0, max: 80, unit: "custom", stops });
+    expect(perEntity.bucket).toEqual({ interval: "day", value: "mean" });
+  });
+
   it("infers the preset from the active entity rather than the first", () => {
     const card = {
       entities: ["sensor.room_temperature", "sensor.example_power"],

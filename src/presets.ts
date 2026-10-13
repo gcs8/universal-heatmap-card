@@ -215,6 +215,11 @@ export function inferPresetFromEntity(stateObj?: HassEntity): string {
     return "temperature";
   }
   if (deviceClass === "humidity" || unit === "%") {
+    // Percent battery sensors without a device_class must resolve here, but
+    // a battery name must not override an explicit conflicting device_class.
+    if (deviceClass === "battery" || (!deviceClass && name.includes("battery"))) {
+      return "battery";
+    }
     if (name.includes("life") || name.includes("health")) {
       return "percent_health";
     }
@@ -229,7 +234,10 @@ export function inferPresetFromEntity(stateObj?: HassEntity): string {
   if (deviceClass === "energy" || unit === "wh" || unit === "kwh") {
     return "energy_delta";
   }
-  if (deviceClass === "battery" || name.includes("battery")) {
+  // A name match alone is not enough past this point: "Battery Voltage" and
+  // "Battery Current" measure volts and amps, and the battery preset would
+  // pin them to a 0-100 % scale.
+  if (deviceClass === "battery") {
     return "battery";
   }
   if (deviceClass === "pressure" || unit.includes("pa") || unit.includes("inh2o")) {
