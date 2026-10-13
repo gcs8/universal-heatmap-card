@@ -215,10 +215,9 @@ export function inferPresetFromEntity(stateObj?: HassEntity): string {
     return "temperature";
   }
   if (deviceClass === "humidity" || unit === "%") {
-    // Percent battery sensors without a device_class (template and MQTT
-    // sensors, mostly) must resolve here; the later battery branch is never
-    // reached once this branch returns.
-    if (deviceClass === "battery" || name.includes("battery")) {
+    // Percent battery sensors without a device_class must resolve here, but
+    // a battery name must not override an explicit conflicting device_class.
+    if (deviceClass === "battery" || (!deviceClass && name.includes("battery"))) {
       return "battery";
     }
     if (name.includes("life") || name.includes("health")) {
