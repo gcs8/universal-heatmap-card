@@ -1983,10 +1983,10 @@ var Cn = "universal-heatmap-card", wn = "Universal Heatmap Card", Tn = "0.1.4", 
 		};
 	}
 	connectedCallback() {
-		super.connectedCallback(), this._setupVisibilityObserver(), this._requestActiveSeriesLoad();
+		super.connectedCallback(), this._setupVisibilityObserver(), this._setupResizeObserver(), this._requestActiveSeriesLoad();
 	}
 	disconnectedCallback() {
-		this._visibilityObserver?.disconnect(), this._visibilityObserver = void 0, super.disconnectedCallback();
+		this._visibilityObserver?.disconnect(), this._visibilityObserver = void 0, this._resizeObserver?.disconnect(), this._resizeObserver = void 0, super.disconnectedCallback();
 	}
 	static getStubConfig() {
 		return {
@@ -2276,6 +2276,14 @@ var Cn = "universal-heatmap-card", wn = "Universal Heatmap Card", Tn = "0.1.4", 
 			let t = e.some((e) => e.isIntersecting || e.intersectionRatio > 0);
 			t !== this._visibleForLoad && (this._visibleForLoad = t, t && this._deferredLoadPending && this._requestActiveSeriesLoad());
 		}, { rootMargin: "320px 0px" }), this._visibilityObserver.observe(this);
+	}
+	_setupResizeObserver() {
+		this._resizeObserver?.disconnect(), globalThis.ResizeObserver !== void 0 && (this._resizeObserver = new ResizeObserver(() => {
+			let e = this._renderLayout;
+			if (!e) return;
+			let t = this.renderRoot.querySelector(".canvas-wrap");
+			Math.max(260, Math.floor(t?.clientWidth ?? e.width)) !== e.width && this._drawHeatmap();
+		}), this._resizeObserver.observe(this));
 	}
 	_seriesCacheKey(e, t) {
 		return JSON.stringify({
