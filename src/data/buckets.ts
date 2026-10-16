@@ -19,7 +19,11 @@ export function statisticsTypeForValue(value: BucketValueName): string | null {
   if (value === "last") {
     return "state";
   }
-  if (["mean", "min", "max", "state", "sum", "change"].includes(value)) {
+  if (value === "sum") {
+    // Recorder sum is cumulative; change is the total for this bucket.
+    return "change";
+  }
+  if (["mean", "min", "max", "state", "change"].includes(value)) {
     return value;
   }
   return null;

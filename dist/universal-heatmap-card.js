@@ -1001,12 +1001,11 @@ function rt(e) {
 	return e;
 }
 function it(e) {
-	return e === "last" ? "state" : [
+	return e === "last" ? "state" : e === "sum" ? "change" : [
 		"mean",
 		"min",
 		"max",
 		"state",
-		"sum",
 		"change"
 	].includes(e) ? e : null;
 }

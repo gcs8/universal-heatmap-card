@@ -130,7 +130,7 @@ axes:
 
 Set `axes.show_key: true` when you want the card to explicitly spell out the encoding. Hourly cards use `X = time of day` and `Y = date`. The 5-minute interval keeps native 5-minute buckets in 48-column, 4-hour rows: x-axis ticks show elapsed offsets within each row, row labels show the local date and strip start time, and tooltips include local hours and minutes. Daily cards place each day under its weekday column (Monday first) with one row per week, and monthly cards place each month under its calendar-month column with one row per year, so the first row may start with blank cells.
 
-By default, color scales use the observed bucket values in the rendered time window unless you set fixed `scale.min` or `scale.max`. For positive sensors, `scale.ignore_zero: auto` keeps an isolated zero from flattening a large active range.
+By default, color scales use the observed bucket values in the rendered time window unless you set fixed `scale.min` or `scale.max`. With `scale.ignore_zero: auto`, zero values are excluded from the automatic domain whenever the finite values include both zero and a positive value, with no negatives. This applies regardless of how often zero occurs. Zero-valued cells still render, but clamp to the lowest color and can look the same as the lowest positive value. Set `scale.ignore_zero: false` to include zeros in the domain. Set it to `true` to exclude zeros even when negative values are present; negative values remain in the domain. Fixed scale bounds still win.
 
 Scale tuning is optional:
 
@@ -226,7 +226,9 @@ data:
 ## Supported Data And Limits
 
 - Numeric sensors with recorder statistics are the primary supported data path. The card queries Home Assistant from the browser with `recorder/statistics_during_period`.
+- With recorder statistics, `bucket.value: sum` reads `change`, the per-bucket total, rather than the recorder's cumulative `sum`. `change` also reads recorder `change`; `last` reads `state`; `mean`, `min`, `max`, and `state` read their matching statistic.
 - Short raw-history fallback is available for values that are not in recorder statistics, but it is capped by `data.raw_history_hours` to avoid large browser-side history pulls.
+- With raw history, `sum` adds the numeric samples within each bucket. It is not a meter delta and depends on sample frequency. Automatic fallback can therefore change the meaning of a `sum` bucket and reports a warning when statistics are unavailable. For cumulative energy or water meters, use `data.provider: statistics` with `bucket.value: sum` or `change` to avoid sample-sum fallback. The card uses the recorder's change values as returned, including its reset handling; it does not difference cumulative totals itself.
 - Dense windows are bounded by `data.max_cells`; raise it deliberately if you really want a larger grid.
 - Wide dashboards are protected by lazy loading and a shared request queue. Off-screen cards wait until they are near the viewport, repeated Home Assistant state updates reuse the in-flight load for the same card, and `data.max_concurrent_requests` defaults to `2`.
 - Multi-entity cards work best when all entities share comparable bucket semantics and units. Per-entity `scale` overrides are supported.
