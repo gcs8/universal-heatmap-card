@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { normalizeConfig } from "../src/config";
 import { buildScale, colorForValue, formatValue, legendGradient } from "../src/scale";
 import type { BucketValue } from "../src/types";
 
@@ -254,6 +255,26 @@ describe("scale", () => {
 });
 
 describe("temperature preset in Celsius", () => {
+  it("colors cells and the legend through the normalized Celsius preset without converting values", () => {
+    const series = bucketsFor([18, 19.5, 21, 22.5, 24, 25.5]);
+    const values = series.map((bucket) => bucket.value);
+    const config = normalizeConfig({ entity: "sensor.celsius" }, {
+      states: {
+        "sensor.celsius": {
+          entity_id: "sensor.celsius", state: "21",
+          attributes: { device_class: "temperature", unit_of_measurement: "°C" },
+        },
+      },
+      callWS: async <T>() => ({}) as T,
+    });
+    const scale = buildScale(series, config.scale);
+    expect(new Set(series.map((bucket) => colorForValue(bucket.value, scale))).size).toBe(series.length);
+    const colors = legendGradient(scale).match(/rgb\([^)]+\)|#[0-9a-f]{6}/gi) ?? [];
+    expect(new Set(colors).size).toBeGreaterThan(1);
+    expect(series.map((bucket) => bucket.value)).toEqual(values);
+    expect(scale.unit).toBe("°");
+  });
+
   it("produces a gradient for a Celsius room instead of one color", () => {
     const celsiusStops = [
       { value: 13, color: "#315f9d" },
