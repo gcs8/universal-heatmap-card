@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Read recorder `change` for `bucket.value: sum` so statistics show per-bucket totals rather than cumulative meter totals. Raw-history sums remain sums of samples and are documented separately. (#52)
+- Documented the existing `scale.ignore_zero: auto` rule and zero-color clamping without changing scale behavior. (#56)
+
 ## 0.1.4
 
 - Fixed raw-history requests so `provider: history` and automatic history fallback send filters in the GET query string instead of a rejected request body. (#16, PR #21)
