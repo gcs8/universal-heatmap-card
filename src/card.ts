@@ -93,6 +93,7 @@ export class UniversalHeatmapCard extends LitElement {
   private _inFlightKey?: string;
   private _visibleForLoad = typeof globalThis.IntersectionObserver === "undefined";
   private _visibilityObserver?: IntersectionObserver;
+  private _resizeObserver?: ResizeObserver;
   private _loadSeq = 0;
   private _renderLayout?: HeatmapRenderLayout;
   private _placement?: GridPlacement;
@@ -165,12 +166,15 @@ export class UniversalHeatmapCard extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this._setupVisibilityObserver();
+    this._setupResizeObserver();
     this._requestActiveSeriesLoad();
   }
 
   override disconnectedCallback(): void {
     this._visibilityObserver?.disconnect();
     this._visibilityObserver = undefined;
+    this._resizeObserver?.disconnect();
+    this._resizeObserver = undefined;
     super.disconnectedCallback();
   }
 
@@ -469,6 +473,13 @@ export class UniversalHeatmapCard extends LitElement {
     const cacheKey = this._seriesCacheKey(config, activeEntity);
     const cached = this._cache.get(cacheKey);
     if (cached && this._isCacheFresh(cached, config.data.refresh_interval)) {
+      // Showing a cached series supersedes any load still in flight for a
+      // previous selection. Without this bump that response would pass the
+      // sequence check and land its buckets under this entity's title.
+      this._loadSeq += 1;
+      // The marker belongs to the invalidated generation, not just its key.
+      // Reselecting that entity must be able to start a new owned request.
+      this._inFlightKey = undefined;
       debugLog(this._debug, "cache hit", {
         entity: activeEntity.entity,
         source: cached.result.source,
@@ -574,10 +585,10 @@ export class UniversalHeatmapCard extends LitElement {
         error: this._error,
       });
     } finally {
-      if (this._inFlightKey === cacheKey) {
-        this._inFlightKey = undefined;
-      }
+      // A stale request can have the same key as its successor. Only the
+      // current generation may release that successor's in-flight marker.
       if (seq === this._loadSeq) {
+        this._inFlightKey = undefined;
         this._loading = false;
       }
     }
@@ -632,6 +643,31 @@ export class UniversalHeatmapCard extends LitElement {
       { rootMargin: "320px 0px" },
     );
     this._visibilityObserver.observe(this);
+  }
+
+  // The canvas is sized from the wrap's clientWidth at draw time and nothing
+  // else redraws it, so a card that gets narrower is squashed by the
+  // max-width rule (blurry cells, hover mapped to the wrong bucket) and one
+  // that gets wider leaves a gap. Redraw whenever the measured width moves
+  // away from the width of the last draw.
+  private _setupResizeObserver(): void {
+    this._resizeObserver?.disconnect();
+    if (typeof globalThis.ResizeObserver === "undefined") {
+      return;
+    }
+
+    this._resizeObserver = new ResizeObserver(() => {
+      const layout = this._renderLayout;
+      if (!layout) {
+        return;
+      }
+      const wrap = this.renderRoot.querySelector(".canvas-wrap");
+      const width = Math.max(260, Math.floor(wrap?.clientWidth ?? layout.width));
+      if (width !== layout.width) {
+        this._drawHeatmap();
+      }
+    });
+    this._resizeObserver.observe(this);
   }
 
   private _seriesCacheKey(
@@ -929,7 +965,17 @@ export class UniversalHeatmapCard extends LitElement {
 
     if (this._normalized.axes.x_labels) {
       for (const tick of this._xAxisTicks(layout)) {
-        const x = layout.gridX + tick.col * (layout.cell + layout.gap);
+        // Anchor the label to the part of its column the alignment implies:
+        // a centred label sits over the column centre, a right-aligned one
+        // ends at the column's right edge. Using the left edge for all three
+        // drew centred labels half a cell to the left of the column they name.
+        const left = layout.gridX + tick.col * (layout.cell + layout.gap);
+        const x =
+          tick.align === "center"
+            ? left + layout.cell / 2
+            : tick.align === "right"
+              ? left + layout.cell
+              : left;
         ctx.textAlign = tick.align;
         ctx.textBaseline = "top";
         ctx.fillText(tick.label, x, 0);
@@ -968,8 +1014,16 @@ export class UniversalHeatmapCard extends LitElement {
     }
     const canvas = event.currentTarget as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    if (rect.width <= 0 || rect.height <= 0) {
+      this._tooltip = undefined;
+      return;
+    }
+    const pointerX = event.clientX - rect.left;
+    const pointerY = event.clientY - rect.top;
+    // CSS may scale the canvas before a resize redraw, or below the minimum
+    // layout width. Hit-test in layout pixels, but place the tooltip in CSS pixels.
+    const x = pointerX * this._renderLayout.width / rect.width;
+    const y = pointerY * this._renderLayout.height / rect.height;
     const stride = this._renderLayout.cell + this._renderLayout.gap;
     if (
       x < this._renderLayout.gridX ||
@@ -1007,8 +1061,8 @@ export class UniversalHeatmapCard extends LitElement {
       this.hass?.locale?.language,
     )}`;
     this._tooltip = {
-      x: Math.min(x + 12, rect.width - 160),
-      y: Math.max(4, y - 28),
+      x: Math.min(pointerX + 12, rect.width - 160),
+      y: Math.max(4, pointerY - 28),
       bucket,
       label,
     };
