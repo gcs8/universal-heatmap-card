@@ -477,6 +477,9 @@ export class UniversalHeatmapCard extends LitElement {
       // previous selection. Without this bump that response would pass the
       // sequence check and land its buckets under this entity's title.
       this._loadSeq += 1;
+      // The marker belongs to the invalidated generation, not just its key.
+      // Reselecting that entity must be able to start a new owned request.
+      this._inFlightKey = undefined;
       debugLog(this._debug, "cache hit", {
         entity: activeEntity.entity,
         source: cached.result.source,
@@ -582,10 +585,10 @@ export class UniversalHeatmapCard extends LitElement {
         error: this._error,
       });
     } finally {
-      if (this._inFlightKey === cacheKey) {
-        this._inFlightKey = undefined;
-      }
+      // A stale request can have the same key as its successor. Only the
+      // current generation may release that successor's in-flight marker.
       if (seq === this._loadSeq) {
+        this._inFlightKey = undefined;
         this._loading = false;
       }
     }
@@ -1011,8 +1014,16 @@ export class UniversalHeatmapCard extends LitElement {
     }
     const canvas = event.currentTarget as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    if (rect.width <= 0 || rect.height <= 0) {
+      this._tooltip = undefined;
+      return;
+    }
+    const pointerX = event.clientX - rect.left;
+    const pointerY = event.clientY - rect.top;
+    // CSS may scale the canvas before a resize redraw, or below the minimum
+    // layout width. Hit-test in layout pixels, but place the tooltip in CSS pixels.
+    const x = pointerX * this._renderLayout.width / rect.width;
+    const y = pointerY * this._renderLayout.height / rect.height;
     const stride = this._renderLayout.cell + this._renderLayout.gap;
     if (
       x < this._renderLayout.gridX ||
@@ -1050,8 +1061,8 @@ export class UniversalHeatmapCard extends LitElement {
       this.hass?.locale?.language,
     )}`;
     this._tooltip = {
-      x: Math.min(x + 12, rect.width - 160),
-      y: Math.max(4, y - 28),
+      x: Math.min(pointerX + 12, rect.width - 160),
+      y: Math.max(4, pointerY - 28),
       bucket,
       label,
     };
