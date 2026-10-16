@@ -1081,63 +1081,63 @@ function W(e, t) {
 		source: t
 	}));
 }
-function lt(e, t, n, r) {
-	let i = at(n), a = W(e, "statistics");
-	if (!i) return G(a, r);
+function lt(e, t, n, r, i = Date.now()) {
+	let a = at(n), o = W(e, "statistics");
+	if (!a) return G(o, r, i);
 	for (let n of t) {
 		let t = n.start ? new Date(n.start) : void 0;
 		if (!t || Number.isNaN(t.getTime())) continue;
 		let r = ft(e, t);
 		if (r < 0) continue;
-		let o = e[r];
-		if (!o) continue;
-		let s = n[i], c = typeof s == "number" ? s : null;
-		a[r] = {
-			...o,
+		let i = e[r];
+		if (!i) continue;
+		let s = n[a], c = typeof s == "number" ? s : null;
+		o[r] = {
+			...i,
 			value: c,
 			quality: c === null ? "missing" : "ok",
 			source: "statistics"
 		};
 	}
-	return G(a, r);
+	return G(o, r, i);
 }
-function ut(e, t, n, r) {
-	let i = e.map(() => []);
+function ut(e, t, n, r, i = Date.now()) {
+	let a = e.map(() => []);
 	for (let n of t) {
 		let t = Number(n.state);
 		if (!Number.isFinite(t)) continue;
 		let r = n.last_changed ?? n.last_updated;
 		if (!r) continue;
-		let a = new Date(r).getTime();
-		if (!Number.isFinite(a)) continue;
-		let o = pt(e, a);
-		o >= 0 && i[o]?.push({
-			at: a,
+		let i = new Date(r).getTime();
+		if (!Number.isFinite(i)) continue;
+		let o = pt(e, i);
+		o >= 0 && a[o]?.push({
+			at: i,
 			value: t
 		});
 	}
 	return G(e.map((e, t) => {
-		let r = dt(i[t] ?? [], n);
+		let r = dt(a[t] ?? [], n);
 		return {
 			...e,
 			value: r,
 			quality: r === null ? "missing" : "ok",
 			source: "history"
 		};
-	}), r);
+	}), r, i);
 }
-function G(e, t) {
+function G(e, t, n = Date.now()) {
 	if (t === "empty") return e;
-	let n = null;
-	return e.map((e) => e.value === null ? t === "zero" ? {
+	let r = null;
+	return e.map((e) => e.value === null ? e.start.getTime() >= n ? e : t === "zero" ? {
 		...e,
 		value: 0,
 		quality: "ok"
-	} : t === "carry_forward" && n !== null ? {
+	} : t === "carry_forward" && r !== null ? {
 		...e,
-		value: n,
+		value: r,
 		quality: "carried"
-	} : e : (n = e.value, e));
+	} : e : (r = e.value, e));
 }
 function dt(e, t) {
 	if (e.length === 0) return null;
@@ -1173,80 +1173,78 @@ function pt(e, t) {
 //#endregion
 //#region src/data/provider.ts
 async function mt(e, t, n) {
-	let r = et(t), i = ct(U(t.range), t.bucket.interval);
-	if (r > t.data.max_cells) return {
+	let r = Date.now(), i = new Date(r), a = et(t, i), o = U(t.range, i), s = ct(o, t.bucket.interval);
+	if (a > t.data.max_cells) return {
 		source: "current",
-		buckets: W(i, "current"),
-		warning: `This heatmap would render ${r.toLocaleString()} cells. Raise data.max_cells to load it.`
+		buckets: W(s, "current"),
+		warning: `This heatmap would render ${a.toLocaleString()} cells. Raise data.max_cells to load it.`
 	};
-	let a = t.data.provider, o = at(t.bucket.value) !== null, s;
-	if ((a === "auto" || a === "statistics") && o) try {
-		let r = await ht(e, t, n, i);
-		if (r.some((e) => e.value !== null) || a === "statistics") return {
+	let c = t.data.provider, l = at(t.bucket.value) !== null, u;
+	if ((c === "auto" || c === "statistics") && l) try {
+		let i = await ht(e, t, n, s, o);
+		if (i.some((e) => e.value !== null) || c === "statistics") return {
 			source: "statistics",
-			buckets: G(r, t.missing.mode)
+			buckets: G(i, t.missing.mode, r)
 		};
-		s = `No ${t.bucket.value} statistics were available for ${n.entity}.`;
+		u = `No ${t.bucket.value} statistics were available for ${n.entity}.`;
 	} catch (e) {
-		if (a === "statistics") return {
+		if (c === "statistics") return {
 			source: "statistics",
-			buckets: W(i, "statistics"),
+			buckets: W(s, "statistics"),
 			warning: _t(e, "Statistics query failed.")
 		};
-		s = "Statistics query failed.";
+		u = "Statistics query failed.";
 	}
-	if (a === "auto" || a === "history") {
-		let r = await gt(e, t, n, i, s !== void 0);
-		return s ? {
-			...r,
-			warning: r.warning ? `${s} ${r.warning}` : `${s} Showing raw history instead.`
-		} : r;
+	if (c === "auto" || c === "history") {
+		let i = await gt(e, t, n, s, o, r, u !== void 0);
+		return u ? {
+			...i,
+			warning: i.warning ? `${u} ${i.warning}` : `${u} Showing raw history instead.`
+		} : i;
 	}
 	return {
 		source: "current",
-		buckets: W(i, "current"),
+		buckets: W(s, "current"),
 		warning: "No supported data provider is available for this bucket value yet."
 	};
 }
-async function ht(e, t, n, r) {
-	let i = at(t.bucket.value);
-	if (!i) return W(r, "statistics");
-	let a = U(t.range);
-	return lt(r, (await e.callWS({
+async function ht(e, t, n, r, i) {
+	let a = at(t.bucket.value);
+	return a ? lt(r, (await e.callWS({
 		type: "recorder/statistics_during_period",
-		start_time: a.start.toISOString(),
-		end_time: a.end.toISOString(),
+		start_time: i.start.toISOString(),
+		end_time: i.end.toISOString(),
 		statistic_ids: [n.entity],
 		period: it(t.bucket.interval),
-		types: [i]
-	}))[n.entity] ?? [], t.bucket.value, "empty");
+		types: [a]
+	}))[n.entity] ?? [], t.bucket.value, "empty") : W(r, "statistics");
 }
-async function gt(e, t, n, r, i = !1) {
-	let a = U(t.range), o = (a.end.getTime() - a.start.getTime()) / 36e5;
+async function gt(e, t, n, r, i, a, o = !1) {
+	let s = (i.end.getTime() - i.start.getTime()) / 36e5;
 	if (!e.callApi) return {
 		source: "history",
 		buckets: W(r, "history"),
 		warning: "This Home Assistant object does not expose callApi for history fallback."
 	};
-	if (o > t.data.raw_history_hours) return {
+	if (s > t.data.raw_history_hours) return {
 		source: "history",
 		buckets: W(r, "history"),
 		warning: `Raw history fallback is capped at ${t.data.raw_history_hours} hours by default. Use recorder statistics or reduce range.`
 	};
 	try {
-		let i = new URLSearchParams({
-			end_time: a.end.toISOString(),
+		let o = new URLSearchParams({
+			end_time: i.end.toISOString(),
 			filter_entity_id: n.entity
 		});
 		return {
 			source: "history",
-			buckets: ut(r, (await e.callApi("GET", `history/period/${a.start.toISOString()}?${i.toString()}&minimal_response&no_attributes`)).flat(), t.bucket.value, t.missing.mode)
+			buckets: ut(r, (await e.callApi("GET", `history/period/${i.start.toISOString()}?${o.toString()}&minimal_response&no_attributes`)).flat(), t.bucket.value, t.missing.mode, a)
 		};
 	} catch (e) {
 		return {
 			source: "history",
 			buckets: W(r, "history"),
-			warning: i ? "History fallback failed." : _t(e, "History fallback failed.")
+			warning: o ? "History fallback failed." : _t(e, "History fallback failed.")
 		};
 	}
 }
