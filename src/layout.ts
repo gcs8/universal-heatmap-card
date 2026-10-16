@@ -11,9 +11,7 @@ const SECTION_MAX_ROWS = 12;
 const REFERENCE_CARD_WIDTH = 560;
 const CANVAS_GAP = 3;
 const CANVAS_FIVE_MINUTE_GAP = 2;
-const CANVAS_MIN_CELL = 7;
 const CANVAS_MAX_CELL = 22;
-const CANVAS_VALUE_MIN_CELL = 14;
 const CANVAS_VALUE_MAX_CELL = 28;
 const CANVAS_LABEL_WIDTH = 58;
 const CANVAS_FIVE_MINUTE_LABEL_WIDTH = 120;
@@ -218,24 +216,43 @@ export function estimateCanvasHeight(
   const count = Math.max(1, estimateCellCount(config, now));
   const cols = columnsForInterval(config.bucket.interval, count);
   const rows = estimateGridRows(config, now);
-  const gap = canvasGapForInterval(config.bucket.interval);
-  const labelWidth = config.axes.show && config.axes.y_labels
-    ? rowLabelWidthForInterval(config.bucket.interval)
-    : 0;
+  const { cell, gap } = fitCanvasColumns({
+    width, cols, interval: config.bucket.interval,
+    labelWidth: config.axes.show && config.axes.y_labels ? rowLabelWidthForInterval(config.bucket.interval) : 0,
+    reserveValues: config.tiles.show_values || config.tiles.show_value_toggle,
+  });
   const labelHeight = config.axes.show && config.axes.x_labels ? CANVAS_LABEL_HEIGHT : 0;
-  const gridWidth = Math.max(160, width - labelWidth);
-  const reservesValues = config.tiles.show_values || config.tiles.show_value_toggle;
-  const minCell = reservesValues ? CANVAS_VALUE_MIN_CELL : CANVAS_MIN_CELL;
-  const maxCell = reservesValues ? CANVAS_VALUE_MAX_CELL : CANVAS_MAX_CELL;
-  const cell = Math.max(
-    minCell,
-    Math.min(
-      maxCell,
-      Math.floor((gridWidth - Math.max(0, cols - 1) * gap) / cols),
-    ),
-  );
 
   return labelHeight + rows * cell + Math.max(0, rows - 1) * gap;
+}
+
+/** One logical pixel per column even below the densest grid's supported width. */
+export function canvasWidthForContainer(width: number): number {
+  return Math.max(48, Math.floor(width));
+}
+
+/** Share the width fit between the renderer and height estimates. */
+export function fitCanvasColumns(options: {
+  width: number;
+  cols: number;
+  interval: BucketInterval;
+  labelWidth: number;
+  reserveValues: boolean;
+}): { width: number; cell: number; gap: number; labelWidth: number } {
+  const { cols, interval } = options;
+  const width = canvasWidthForContainer(options.width);
+  // At extreme widths, give up gaps and then label room before losing cells.
+  const gap = Math.min(
+    canvasGapForInterval(interval),
+    Math.floor(Math.max(0, width - cols) / Math.max(1, cols - 1)),
+  );
+  const gapsWidth = Math.max(0, cols - 1) * gap;
+  const labelWidth = Math.min(options.labelWidth, Math.max(0, width - cols - gapsWidth));
+  const maxCell = options.reserveValues ? CANVAS_VALUE_MAX_CELL : CANVAS_MAX_CELL;
+  // Value labels already degrade at small sizes. A preferred minimum must
+  // never push the grid beyond the actual bitmap.
+  const cell = Math.max(1, Math.min(maxCell, Math.floor((width - labelWidth - gapsWidth) / cols)));
+  return { width, cell, gap, labelWidth };
 }
 
 export function estimateGridRows(config: NormalizedConfig, now: Date): number {

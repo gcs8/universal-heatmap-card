@@ -3,11 +3,13 @@ import { calculateRange, normalizeConfig } from "../src/config";
 import { generateBucketWindows } from "../src/data/buckets";
 import {
   canvasGapForInterval,
+  columnsForInterval,
   countHourlyGridRows,
   estimateCanvasHeight,
   estimateGridRows,
   estimateMasonryCardSize,
   estimateSectionGridRows,
+  fitCanvasColumns,
   placeBucketsOnGrid,
   rowLabelWidthForInterval,
   sectionRowsForHeight,
@@ -16,6 +18,38 @@ import {
 } from "../src/layout";
 
 describe("sections layout estimates", () => {
+  it("keeps the complete grid inside the bitmap across widths, axes and value modes", () => {
+    for (const interval of ["5minute", "hour", "day", "week", "month"] as const) {
+      const cols = columnsForInterval(interval, 288);
+      for (const width of [1, 47, 48, 49, 72, 100, 120, 160, 208, 260, 448, 528, 560, 640, 900]) {
+        for (const rowLabels of [false, true]) {
+          for (const reserveValues of [false, true]) {
+            const fit = fitCanvasColumns({
+              width, cols, interval, labelWidth: rowLabels ? rowLabelWidthForInterval(interval) : 0, reserveValues,
+            });
+            expect(fit.width).toBe(Math.max(48, width));
+            expect(fit.cell).toBeGreaterThanOrEqual(1);
+            expect(fit.labelWidth + cols * fit.cell + (cols - 1) * fit.gap).toBeLessThanOrEqual(fit.width);
+          }
+        }
+      }
+    }
+  });
+
+  it.each([
+    { interval: "hour" as const, width: 208, height: 21 },
+    { interval: "5minute" as const, width: 448, height: 52 },
+    { interval: "5minute" as const, width: 528, height: 64 },
+  ])("estimates a width-fitted $interval grid at $width px", ({ interval, width, height }) => {
+    for (const tiles of [{}, { show_values: true }, { show_value_toggle: true }]) {
+      const config = normalizeConfig({
+        entity: "sensor.a", range: { start: "2026-01-01", end: "2026-01-02" },
+        bucket: { interval }, tiles,
+      });
+      expect(estimateCanvasHeight(config, width)).toBe(height);
+    }
+  });
+
   it("reserves a wider gutter for dated 5-minute row start labels", () => {
     expect(rowLabelWidthForInterval("5minute")).toBeGreaterThanOrEqual(120);
     expect(rowLabelWidthForInterval("hour")).toBe(58);

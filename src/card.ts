@@ -11,10 +11,11 @@ import {
   updateEditorEntityName,
 } from "./editor-form";
 import {
-  canvasGapForInterval,
+  canvasWidthForContainer,
   columnsForInterval,
   estimateCardChromeHeight,
   estimateMasonryCardSize,
+  fitCanvasColumns,
   placeBucketsOnGrid,
   rowLabelWidthForInterval,
   utcOffsetLabel,
@@ -82,6 +83,7 @@ export class UniversalHeatmapCard extends LitElement {
   private _activeIndex = 0;
   private _buckets: BucketValue[] = [];
   private _scale?: ScaleModel;
+  private _displayedSeriesKey?: string;
   private _loading = false;
   private _error?: string;
   private _warning?: string;
@@ -471,6 +473,9 @@ export class UniversalHeatmapCard extends LitElement {
     }
 
     const cacheKey = this._seriesCacheKey(config, activeEntity);
+    if (this._displayedSeriesKey !== cacheKey) {
+      this._clearDisplayedSeries();
+    }
     const cached = this._cache.get(cacheKey);
     if (cached && this._isCacheFresh(cached, config.data.refresh_interval)) {
       // Showing a cached series supersedes any load still in flight for a
@@ -488,6 +493,7 @@ export class UniversalHeatmapCard extends LitElement {
       });
       this._buckets = cached.result.buckets;
       this._scale = cached.scale;
+      this._displayedSeriesKey = cacheKey;
       this._warning = cached.result.warning;
       this._error = undefined;
       this._loading = false;
@@ -555,6 +561,7 @@ export class UniversalHeatmapCard extends LitElement {
       this._cache.set(cacheKey, { result, scale, loadedAt: Date.now() });
       this._buckets = result.buckets;
       this._scale = scale;
+      this._displayedSeriesKey = cacheKey;
       this._warning = result.warning;
       debugLog(this._debug, "load complete", {
         entity: activeEntity.entity,
@@ -578,7 +585,9 @@ export class UniversalHeatmapCard extends LitElement {
         return;
       }
       this._error = error instanceof Error ? error.message : "Could not load heatmap data.";
-      this._buckets = [];
+      // Preserve same-key data only while refreshing. A current failure
+      // discards it, including its legend, pixels and hover geometry.
+      this._clearDisplayedSeries();
       debugLog(this._debug, "load failed", {
         entity: activeEntity.entity,
         totalMs: roundMs(debugNow() - loadStart),
@@ -594,12 +603,28 @@ export class UniversalHeatmapCard extends LitElement {
     }
   }
 
+  private _clearDisplayedSeries(): void {
+    this._buckets = [];
+    this._scale = undefined;
+    this._displayedSeriesKey = undefined;
+    this._tooltip = undefined;
+    this._renderLayout = undefined;
+    this._placement = undefined;
+    // render() keeps the canvas mounted during loading and failure. Clear
+    // the existing bitmap synchronously, not only the reactive text fields.
+    this._drawHeatmap();
+  }
+
   private _requestActiveSeriesLoad(): void {
     if (!this._normalized || !this.hass) {
       return;
     }
 
     if (this._shouldDeferLoad()) {
+      const entity = this._normalized.entities[this._activeIndex];
+      if (entity && this._displayedSeriesKey !== this._seriesCacheKey(this._normalized, entity)) {
+        this._clearDisplayedSeries();
+      }
       this._deferredLoadPending = true;
       debugLog(this._debug, "load deferred until visible", {
         queue: heatmapRequestQueueState(this._normalized.data.max_concurrent_requests),
@@ -662,7 +687,7 @@ export class UniversalHeatmapCard extends LitElement {
         return;
       }
       const wrap = this.renderRoot.querySelector(".canvas-wrap");
-      const width = Math.max(260, Math.floor(wrap?.clientWidth ?? layout.width));
+      const width = canvasWidthForContainer(wrap?.clientWidth ?? layout.width);
       if (width !== layout.width) {
         this._drawHeatmap();
       }
@@ -696,8 +721,8 @@ export class UniversalHeatmapCard extends LitElement {
   }
 
   private _drawHeatmap(): void {
-    const canvas = this.renderRoot.querySelector("canvas");
-    if (!canvas || !this._scale) {
+    const canvas = this.renderRoot?.querySelector("canvas");
+    if (!canvas) {
       return;
     }
 
@@ -705,10 +730,18 @@ export class UniversalHeatmapCard extends LitElement {
     if (!ctx) {
       return;
     }
+    if (!this._scale) {
+      this._renderLayout = undefined;
+      this._placement = undefined;
+      this._tooltip = undefined;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
     const drawStart = this._debug ? debugNow() : 0;
 
     const canvasWrap = canvas.parentElement;
-    const width = Math.max(260, Math.floor(canvasWrap?.clientWidth ?? 320));
+    const width = canvasWidthForContainer(canvasWrap?.clientWidth ?? 320);
     const maxCanvasHeight = this._boundedCanvasHeight();
     const layout = this._calculateLayout(width, maxCanvasHeight);
     const ratio = window.devicePixelRatio || 1;
@@ -736,7 +769,8 @@ export class UniversalHeatmapCard extends LitElement {
 
       if (bucket.quality === "carried") {
         ctx.fillStyle = "rgba(255, 255, 255, 0.34)";
-        ctx.fillRect(x, y + layout.cell - 3, cellWidth, 3);
+        const markerHeight = Math.min(3, layout.cell);
+        ctx.fillRect(x, y + layout.cell - markerHeight, cellWidth, markerHeight);
       }
 
       this._drawCellValue(ctx, bucket, layout, x, y, fill, cellWidth);
@@ -761,17 +795,16 @@ export class UniversalHeatmapCard extends LitElement {
     const cols = columnsForInterval(interval, count);
     const placement = placeBucketsOnGrid(this._buckets, interval, cols);
     this._placement = placement;
-    const gap = canvasGapForInterval(interval);
-    const labelWidth = this._shouldShowRowLabels() ? rowLabelWidthForInterval(interval) : 0;
+    const fit = fitCanvasColumns({
+      width, cols, interval,
+      labelWidth: this._shouldShowRowLabels() ? rowLabelWidthForInterval(interval) : 0,
+      reserveValues: this._shouldReserveForTileValues(),
+    });
+    const { gap, labelWidth } = fit;
     const labelHeight = this._shouldShowXAxisLabels() ? 18 : 0;
-    const gridWidth = Math.max(160, width - labelWidth);
     const rows = placement.rows;
-    const showValues = this._shouldReserveForTileValues();
     const minCell = 7;
-    const preferredMinCell = showValues ? 14 : minCell;
-    const maxCell = showValues ? 28 : 22;
-    let cell = Math.min(maxCell, Math.floor((gridWidth - gap * (cols - 1)) / cols));
-    cell = Math.max(cell >= preferredMinCell ? preferredMinCell : minCell, cell);
+    let cell = fit.cell;
     if (typeof maxHeight === "number") {
       const availableGridHeight = Math.max(0, maxHeight - labelHeight);
       const heightBoundCell = Math.floor((availableGridHeight - Math.max(0, rows - 1) * gap) / rows);
@@ -788,7 +821,7 @@ export class UniversalHeatmapCard extends LitElement {
       rows,
       cell,
       gap,
-      width,
+      width: fit.width,
       height,
       gridX: labelWidth,
       gridY: labelHeight,
@@ -982,7 +1015,7 @@ export class UniversalHeatmapCard extends LitElement {
       }
     }
 
-    if (this._shouldShowRowLabels()) {
+    if (this._shouldShowRowLabels() && layout.gridX >= 12) {
       ctx.textAlign = "right";
       ctx.textBaseline = "middle";
       for (let row = 0; row < layout.rows; row += 1) {

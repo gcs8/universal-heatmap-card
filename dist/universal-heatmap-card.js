@@ -1550,7 +1550,7 @@ function Ct(e, t, n) {
 	};
 	return delete o.entity, o;
 }
-var wt = 12, Tt = 560, Et = 3, Dt = 2, Ot = 7, kt = 22, At = 14, jt = 28, Mt = 58, Nt = 120, Pt = 18, Ft = 864e5, It = 36e5, Lt = 5e4;
+var wt = 12, Tt = 560, Et = 3, Dt = 2, Ot = 22, kt = 28, At = 58, jt = 120, Mt = 18, Nt = 864e5, Pt = 36e5, Ft = 5e4;
 /**
 * Maps buckets onto the render grid.
 *
@@ -1569,7 +1569,7 @@ var wt = 12, Tt = 560, Et = 3, Dt = 2, Ot = 7, kt = 22, At = 14, jt = 28, Mt = 5
 * Every other interval ("5minute", "week") keeps the sequential row-major
 * placement.
 */
-function Rt(e, t, n = Z(t, Math.max(1, e.length))) {
+function It(e, t, n = Z(t, Math.max(1, e.length))) {
 	let r = Math.max(1, Math.floor(n)), i = [];
 	if (t === "day" || t === "month") {
 		let n = -1, a = -1, o = NaN;
@@ -1622,33 +1622,53 @@ function Rt(e, t, n = Z(t, Math.max(1, e.length))) {
 	};
 }
 /** Formats a date's local UTC offset, used to disambiguate repeated DST hours. */
-function zt(e) {
+function Lt(e) {
 	let t = -e.getTimezoneOffset(), n = t < 0 ? "-" : "+", r = Math.abs(t);
 	return `UTC${n}${String(Math.floor(r / 60)).padStart(2, "0")}:${String(r % 60).padStart(2, "0")}`;
 }
-function Bt(e) {
+function Rt(e) {
 	let t = Math.max(1, Math.floor(e));
 	return t * 56 + Math.max(0, t - 1) * 8;
 }
-function Vt(e) {
+function zt(e) {
 	return !Number.isFinite(e) || e <= 0 ? 4 : Math.ceil((e + 8) / 64);
 }
+function Bt(e, t = {}, n = /* @__PURE__ */ new Date()) {
+	return tn(zt(Ht(e, t, n)), 4, wt);
+}
+function Vt(e, t = {}, n = /* @__PURE__ */ new Date()) {
+	return Math.max(1, Math.ceil(Ht(e, t, n) / 50));
+}
 function Ht(e, t = {}, n = /* @__PURE__ */ new Date()) {
-	return tn(Vt(Wt(e, t, n)), 4, wt);
+	return Ut(e, t) + Wt(e, Tt, n);
 }
-function Ut(e, t = {}, n = /* @__PURE__ */ new Date()) {
-	return Math.max(1, Math.ceil(Wt(e, t, n) / 50));
-}
-function Wt(e, t = {}, n = /* @__PURE__ */ new Date()) {
-	return Gt(e, t) + Kt(e, Tt, n);
-}
-function Gt(e, t = {}) {
+function Ut(e, t = {}) {
 	let n = 58;
 	return n += 16, e.entities.length > 1 && (n += en(e)), (t.loading || t.warning || t.error) && (n += 33), e.axes.show_key && (n += 24), n += 25, e.legend.show && (n += 25), n;
 }
-function Kt(e, t = Tt, n = /* @__PURE__ */ new Date()) {
-	let r = Math.max(1, et(e, n)), i = Z(e.bucket.interval, r), a = qt(e, n), o = $t(e.bucket.interval), s = e.axes.show && e.axes.y_labels ? Qt(e.bucket.interval) : 0, c = e.axes.show && e.axes.x_labels ? Pt : 0, l = Math.max(160, t - s), u = e.tiles.show_values || e.tiles.show_value_toggle;
-	return c + a * Math.max(u ? At : Ot, Math.min(u ? jt : kt, Math.floor((l - Math.max(0, i - 1) * o) / i))) + Math.max(0, a - 1) * o;
+function Wt(e, t = Tt, n = /* @__PURE__ */ new Date()) {
+	let r = Math.max(1, et(e, n)), i = Z(e.bucket.interval, r), a = qt(e, n), { cell: o, gap: s } = Kt({
+		width: t,
+		cols: i,
+		interval: e.bucket.interval,
+		labelWidth: e.axes.show && e.axes.y_labels ? Qt(e.bucket.interval) : 0,
+		reserveValues: e.tiles.show_values || e.tiles.show_value_toggle
+	});
+	return (e.axes.show && e.axes.x_labels ? Mt : 0) + a * o + Math.max(0, a - 1) * s;
+}
+/** One logical pixel per column even below the densest grid's supported width. */
+function Gt(e) {
+	return Math.max(48, Math.floor(e));
+}
+/** Share the width fit between the renderer and height estimates. */
+function Kt(e) {
+	let { cols: t, interval: n } = e, r = Gt(e.width), i = Math.min($t(n), Math.floor(Math.max(0, r - t) / Math.max(1, t - 1))), a = Math.max(0, t - 1) * i, o = Math.min(e.labelWidth, Math.max(0, r - t - a)), s = e.reserveValues ? kt : Ot;
+	return {
+		width: r,
+		cell: Math.max(1, Math.min(s, Math.floor((r - o - a) / t))),
+		gap: i,
+		labelWidth: o
+	};
 }
 function qt(e, t) {
 	let n = Math.max(1, et(e, t)), r = Z(e.bucket.interval, n);
@@ -1665,7 +1685,7 @@ function qt(e, t) {
 */
 function Jt(e) {
 	let t = X(e.start), n = X(/* @__PURE__ */ new Date(e.end.getTime() - 1)), r = Zt(t), i = Zt(n);
-	return Math.max(1, Math.floor((i - r) / (7 * Ft)) + 1);
+	return Math.max(1, Math.floor((i - r) / (7 * Nt)) + 1);
 }
 /**
 * Counts the local calendar years touched by the month buckets of a range,
@@ -1676,13 +1696,13 @@ function Yt(e) {
 	return Math.max(1, n - t + 1);
 }
 function Xt(e) {
-	let t = e.start, n = /* @__PURE__ */ new Date(e.end.getTime() - 1), r = X(t), i = X(n), a = Math.max(1, Math.floor((i - r) / Ft) + 1);
-	if (Math.ceil((e.end.getTime() - e.start.getTime()) / It) + 1 > Lt) return a;
+	let t = e.start, n = /* @__PURE__ */ new Date(e.end.getTime() - 1), r = X(t), i = X(n), a = Math.max(1, Math.floor((i - r) / Nt) + 1);
+	if (Math.ceil((e.end.getTime() - e.start.getTime()) / Pt) + 1 > Ft) return a;
 	let o = new Date(e.start);
 	o.setMilliseconds(0), o.setSeconds(0), o.setMinutes(0);
 	let s = "", c = 0;
 	for (; o < e.end;) {
-		let t = o.getTime() + It;
+		let t = o.getTime() + Pt;
 		if (t > e.start.getTime()) {
 			let e = `${o.getFullYear()}-${o.getMonth()}-${o.getDate()}`;
 			e !== s && (s = e, c += 1);
@@ -1697,10 +1717,10 @@ function X(e) {
 }
 /** Returns the Monday that starts the week of a localCalendarDayTimestamp value. */
 function Zt(e) {
-	return e - (new Date(e).getUTCDay() + 6) % 7 * Ft;
+	return e - (new Date(e).getUTCDay() + 6) % 7 * Nt;
 }
 function Qt(e) {
-	return e === "5minute" ? Nt : Mt;
+	return e === "5minute" ? jt : At;
 }
 function $t(e) {
 	return e === "5minute" ? Dt : Et;
@@ -2155,11 +2175,11 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 	}
 	_estimatedGridRows() {
 		let e = this._normalized;
-		return e ? Ht(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
+		return e ? Bt(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
 	}
 	_estimatedMasonryRows() {
 		let e = this._normalized;
-		return e ? Ut(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
+		return e ? Vt(e, this._layoutState(), /* @__PURE__ */ new Date()) : 6;
 	}
 	_layoutState() {
 		return {
@@ -2207,14 +2227,16 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 	async _loadActiveSeries() {
 		let e = this._normalized, t = this.hass, n = e?.entities[this._activeIndex];
 		if (!e || !t || !n) return;
-		let r = this._seriesCacheKey(e, n), i = this._cache.get(r);
+		let r = this._seriesCacheKey(e, n);
+		this._displayedSeriesKey !== r && this._clearDisplayedSeries();
+		let i = this._cache.get(r);
 		if (i && this._isCacheFresh(i, e.data.refresh_interval)) {
 			this._loadSeq += 1, this._inFlightKey = void 0, J(this._debug, "cache hit", {
 				entity: n.entity,
 				source: i.result.source,
 				buckets: i.result.buckets.length,
 				ageMs: Date.now() - i.loadedAt
-			}), this._buckets = i.result.buckets, this._scale = i.scale, this._warning = i.result.warning, this._error = void 0, this._loading = !1;
+			}), this._buckets = i.result.buckets, this._scale = i.scale, this._displayedSeriesKey = r, this._warning = i.result.warning, this._error = void 0, this._loading = !1;
 			return;
 		}
 		if (this._inFlightKey === r) {
@@ -2262,7 +2284,7 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 				result: i,
 				scale: u,
 				loadedAt: Date.now()
-			}), this._buckets = i.buckets, this._scale = u, this._warning = i.warning, J(this._debug, "load complete", {
+			}), this._buckets = i.buckets, this._scale = u, this._displayedSeriesKey = r, this._warning = i.warning, J(this._debug, "load complete", {
 				entity: n.entity,
 				source: i.source,
 				buckets: i.buckets.length,
@@ -2279,7 +2301,7 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 				return;
 			}
 			if (a !== this._loadSeq) return;
-			this._error = e instanceof Error ? e.message : "Could not load heatmap data.", this._buckets = [], J(this._debug, "load failed", {
+			this._error = e instanceof Error ? e.message : "Could not load heatmap data.", this._clearDisplayedSeries(), J(this._debug, "load failed", {
 				entity: n.entity,
 				totalMs: q(K() - o),
 				error: this._error
@@ -2288,10 +2310,14 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 			a === this._loadSeq && (this._inFlightKey = void 0, this._loading = !1);
 		}
 	}
+	_clearDisplayedSeries() {
+		this._buckets = [], this._scale = void 0, this._displayedSeriesKey = void 0, this._tooltip = void 0, this._renderLayout = void 0, this._placement = void 0, this._drawHeatmap();
+	}
 	_requestActiveSeriesLoad() {
 		if (this._normalized && this.hass) {
 			if (this._shouldDeferLoad()) {
-				this._deferredLoadPending = !0, J(this._debug, "load deferred until visible", { queue: Be(this._normalized.data.max_concurrent_requests) });
+				let e = this._normalized.entities[this._activeIndex];
+				e && this._displayedSeriesKey !== this._seriesCacheKey(this._normalized, e) && this._clearDisplayedSeries(), this._deferredLoadPending = !0, J(this._debug, "load deferred until visible", { queue: Be(this._normalized.data.max_concurrent_requests) });
 				return;
 			}
 			this._deferredLoadPending = !1, this._loadActiveSeries();
@@ -2313,9 +2339,7 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 	_setupResizeObserver() {
 		this._resizeObserver?.disconnect(), globalThis.ResizeObserver !== void 0 && (this._resizeObserver = new ResizeObserver(() => {
 			let e = this._renderLayout;
-			if (!e) return;
-			let t = this.renderRoot.querySelector(".canvas-wrap");
-			Math.max(260, Math.floor(t?.clientWidth ?? e.width)) !== e.width && this._drawHeatmap();
+			e && Gt(this.renderRoot.querySelector(".canvas-wrap")?.clientWidth ?? e.width) !== e.width && this._drawHeatmap();
 		}), this._resizeObserver.observe(this));
 	}
 	_seriesCacheKey(e, t) {
@@ -2339,17 +2363,26 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 		return t <= 0 || Date.now() - e.loadedAt < t * 1e3;
 	}
 	_drawHeatmap() {
-		let e = this.renderRoot.querySelector("canvas");
-		if (!e || !this._scale) return;
+		let e = this.renderRoot?.querySelector("canvas");
+		if (!e) return;
 		let t = e.getContext("2d");
 		if (!t) return;
-		let n = this._debug ? K() : 0, r = e.parentElement, i = Math.max(260, Math.floor(r?.clientWidth ?? 320)), a = this._boundedCanvasHeight(), o = this._calculateLayout(i, a), s = window.devicePixelRatio || 1;
+		if (!this._scale) {
+			this._renderLayout = void 0, this._placement = void 0, this._tooltip = void 0, t.setTransform(1, 0, 0, 1, 0, 0), t.clearRect(0, 0, e.width, e.height);
+			return;
+		}
+		let n = this._debug ? K() : 0, r = e.parentElement, i = Gt(r?.clientWidth ?? 320), a = this._boundedCanvasHeight(), o = this._calculateLayout(i, a), s = window.devicePixelRatio || 1;
 		e.width = Math.floor(o.width * s), e.height = Math.floor(o.height * s), e.style.height = `${o.height}px`, e.style.width = `${o.width}px`, t.setTransform(s, 0, 0, s, 0, 0), t.clearRect(0, 0, o.width, o.height), this._drawAxes(t, o);
 		for (let e of this._placement?.cells ?? []) {
 			let n = this._buckets[e.index];
 			if (!n) continue;
 			let r = o.cell / e.slots, i = o.gridX + e.col * (o.cell + o.gap) + e.slot * r, a = o.gridY + e.row * (o.cell + o.gap), s = an(n.value, this._scale);
-			t.fillStyle = s, t.fillRect(i, a, r, o.cell), n.quality === "carried" && (t.fillStyle = "rgba(255, 255, 255, 0.34)", t.fillRect(i, a + o.cell - 3, r, 3)), this._drawCellValue(t, n, o, i, a, s, r);
+			if (t.fillStyle = s, t.fillRect(i, a, r, o.cell), n.quality === "carried") {
+				t.fillStyle = "rgba(255, 255, 255, 0.34)";
+				let e = Math.min(3, o.cell);
+				t.fillRect(i, a + o.cell - e, r, e);
+			}
+			this._drawCellValue(t, n, o, i, a, s, r);
 		}
 		this._renderLayout = o, J(this._debug, "draw complete", {
 			buckets: this._buckets.length,
@@ -2363,25 +2396,31 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 		});
 	}
 	_calculateLayout(e, t) {
-		let n = this._normalized?.bucket.interval ?? "day", r = Z(n, Math.max(1, this._buckets.length)), i = Rt(this._buckets, n, r);
+		let n = this._normalized?.bucket.interval ?? "day", r = Z(n, Math.max(1, this._buckets.length)), i = It(this._buckets, n, r);
 		this._placement = i;
-		let a = $t(n), o = this._shouldShowRowLabels() ? Qt(n) : 0, s = this._shouldShowXAxisLabels() ? 18 : 0, c = Math.max(160, e - o), l = i.rows, u = this._shouldReserveForTileValues(), d = u ? 14 : 7, f = Math.min(u ? 28 : 22, Math.floor((c - a * (r - 1)) / r));
-		if (f = Math.max(f >= d ? d : 7, f), typeof t == "number") {
-			let e = Math.max(0, t - s), n = Math.floor((e - Math.max(0, l - 1) * a) / l);
-			Number.isFinite(n) && n >= 7 && (f = Math.min(f, n));
+		let a = Kt({
+			width: e,
+			cols: r,
+			interval: n,
+			labelWidth: this._shouldShowRowLabels() ? Qt(n) : 0,
+			reserveValues: this._shouldReserveForTileValues()
+		}), { gap: o, labelWidth: s } = a, c = this._shouldShowXAxisLabels() ? 18 : 0, l = i.rows, u = a.cell;
+		if (typeof t == "number") {
+			let e = Math.max(0, t - c), n = Math.floor((e - Math.max(0, l - 1) * o) / l);
+			Number.isFinite(n) && n >= 7 && (u = Math.min(u, n));
 		}
-		let p = r * f + Math.max(0, r - 1) * a, m = l * f + Math.max(0, l - 1) * a, h = s + m;
+		let d = r * u + Math.max(0, r - 1) * o, f = l * u + Math.max(0, l - 1) * o, p = c + f;
 		return {
 			cols: r,
 			rows: l,
-			cell: f,
-			gap: a,
-			width: e,
-			height: h,
-			gridX: o,
-			gridY: s,
-			gridWidth: p,
-			gridHeight: m
+			cell: u,
+			gap: o,
+			width: a.width,
+			height: p,
+			gridX: s,
+			gridY: c,
+			gridWidth: d,
+			gridHeight: f
 		};
 	}
 	_drawCellValue(e, t, n, r, i, a, o = n.cell) {
@@ -2437,7 +2476,7 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 		if (typeof e != "number" || !Number.isFinite(e) || e <= 0) return;
 		let t = this._normalized;
 		if (!t) return;
-		let n = Bt(e) - Gt(t, this._layoutState());
+		let n = Rt(e) - Ut(t, this._layoutState());
 		if (!(n <= 0)) return Math.max(120, n);
 	}
 	_shouldBoundToGrid() {
@@ -2454,7 +2493,7 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 			let r = t.gridX + n.col * (t.cell + t.gap), i = n.align === "center" ? r + t.cell / 2 : n.align === "right" ? r + t.cell : r;
 			e.textAlign = n.align, e.textBaseline = "top", e.fillText(n.label, i, 0);
 		}
-		if (this._shouldShowRowLabels()) {
+		if (this._shouldShowRowLabels() && t.gridX >= 12) {
 			e.textAlign = "right", e.textBaseline = "middle";
 			for (let n = 0; n < t.rows; n += 1) {
 				let r = this._firstBucketInRow(n);
@@ -2483,7 +2522,7 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 			this._tooltip = void 0;
 			return;
 		}
-		let h = p.slots > 1 ? ` (${zt(m.start)})` : "", g = `${this._formatDate(m.start)} - ${this._formatDate(m.end)}${h}: ${Q(m.value, this._scale, this.hass?.locale?.language)}`;
+		let h = p.slots > 1 ? ` (${Lt(m.start)})` : "", g = `${this._formatDate(m.start)} - ${this._formatDate(m.end)}${h}: ${Q(m.value, this._scale, this.hass?.locale?.language)}`;
 		this._tooltip = {
 			x: Math.min(n + 12, t.width - 160),
 			y: Math.max(4, r - 28),
