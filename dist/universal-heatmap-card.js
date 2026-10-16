@@ -138,7 +138,7 @@ var v = class extends HTMLElement {
 	static finalizeStyles(e) {
 		let t = [];
 		if (Array.isArray(e)) {
-			let n = new Set(e.flat(Infinity).reverse());
+			let n = new Set(e.flat(1 / 0).reverse());
 			for (let e of n) t.unshift(c(e));
 		} else e !== void 0 && t.push(c(e));
 		return t;
@@ -322,16 +322,18 @@ var be = (e, t) => {
 						i.append(e[t], C());
 					}
 				}
-			} else if (i.nodeType === 8) if (i.data === ce) c.push({
-				type: 2,
-				index: a
-			});
-			else {
-				let e = -1;
-				for (; (e = i.data.indexOf(x, e + 1)) !== -1;) c.push({
-					type: 7,
+			} else if (i.nodeType === 8) {
+				if (i.data === ce) c.push({
+					type: 2,
 					index: a
-				}), e += x.length - 1;
+				});
+				else {
+					let e = -1;
+					for (; (e = i.data.indexOf(x, e + 1)) !== -1;) c.push({
+						type: 7,
+						index: a
+					}), e += x.length - 1;
+				}
 			}
 			a++;
 		}
@@ -1052,7 +1054,7 @@ function ot(e, t) {
 function st(e, t) {
 	let n = new Date(e);
 	switch (t) {
-		case "5minute": return n.setTime(n.getTime() + 5 * 6e4), n;
+		case "5minute": return n.setTime(n.getTime() + 3e5), n;
 		case "hour": return n.setTime(n.getTime() + rt), n;
 		case "day": return n.setDate(n.getDate() + 1), n;
 		case "week": return n.setDate(n.getDate() + 7), n;
@@ -1754,7 +1756,7 @@ function an(e, t) {
 	if (r.length === 1) return r[0]?.color ?? "#999999";
 	for (let e = 0; e < r.length - 1; e += 1) {
 		let t = r[e], i = r[e + 1];
-		if (!(!t || !i) && n >= t.value && n <= i.value) {
+		if (t && i && n >= t.value && n <= i.value) {
 			let e = i.value - t.value || 1, r = (n - t.value) / e;
 			return hn(t.color, i.color, r);
 		}
@@ -2287,7 +2289,7 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 		}
 	}
 	_requestActiveSeriesLoad() {
-		if (!(!this._normalized || !this.hass)) {
+		if (this._normalized && this.hass) {
 			if (this._shouldDeferLoad()) {
 				this._deferredLoadPending = !0, J(this._debug, "load deferred until visible", { queue: Be(this._normalized.data.max_concurrent_requests) });
 				return;
@@ -2334,7 +2336,7 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 		});
 	}
 	_isCacheFresh(e, t) {
-		return t <= 0 ? !0 : Date.now() - e.loadedAt < t * 1e3;
+		return t <= 0 || Date.now() - e.loadedAt < t * 1e3;
 	}
 	_drawHeatmap() {
 		let e = this.renderRoot.querySelector("canvas");
@@ -2493,7 +2495,7 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", 
 		this._openActiveEntityDetails();
 	}
 	_handleCanvasKeyDown(e) {
-		e.key !== "Enter" && e.key !== " " || (e.preventDefault(), this._openActiveEntityDetails());
+		(e.key === "Enter" || e.key === " ") && (e.preventDefault(), this._openActiveEntityDetails());
 	}
 	_openActiveEntityDetails() {
 		let e = this._normalized?.entities[this._activeIndex];
