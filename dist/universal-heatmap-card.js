@@ -1986,7 +1986,7 @@ function Cn(e) {
 }
 //#endregion
 //#region src/types.ts
-var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.4", Dn = `${wn}-editor`, On = class extends Error {
+var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.5", Dn = `${wn}-editor`, On = class extends Error {
 	constructor() {
 		super("Stale heatmap load skipped.");
 	}
