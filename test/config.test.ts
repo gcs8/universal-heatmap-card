@@ -369,6 +369,50 @@ describe("normalizeConfig", () => {
     expect(perEntity.bucket).toEqual({ interval: "day", value: "mean" });
   });
 
+  it("uses Celsius comfort stops when the temperature entity reports °C", () => {
+    const celsius: HomeAssistant = {
+      ...hass,
+      states: {
+        ...hass.states,
+        "sensor.outdoor_temperature": {
+          entity_id: "sensor.outdoor_temperature",
+          state: "21.5",
+          attributes: {
+            friendly_name: "Outdoor Temperature",
+            device_class: "temperature",
+            unit_of_measurement: "°C",
+          },
+        },
+      },
+    };
+
+    const inferred = normalizeConfig({ entity: "sensor.outdoor_temperature" }, celsius);
+    const fahrenheit = normalizeConfig({ entity: "sensor.room_temperature" }, celsius);
+    const explicitStops = normalizeConfig(
+      {
+        entity: "sensor.outdoor_temperature",
+        scale: { stops: [{ value: 0, color: "#000000" }, { value: 1, color: "#ffffff" }] },
+      },
+      celsius,
+    );
+    const perEntity = normalizeConfig(
+      {
+        entities: [
+          "sensor.example_power",
+          { entity: "sensor.outdoor_temperature", scale: { preset: "temperature" } },
+        ],
+      },
+      celsius,
+    );
+
+    expect(inferred.scale.preset).toBe("temperature");
+    expect(inferred.scale.stops?.map((stop) => stop.value)).toEqual([13, 20, 24.5, 29.5]);
+    expect(inferred.scale.stops?.map((stop) => stop.label)).toEqual(["Cool", "Comfort", "Warm", "Hot"]);
+    expect(fahrenheit.scale.stops?.map((stop) => stop.value)).toEqual([55, 68, 76, 85]);
+    expect(explicitStops.scale.stops?.map((stop) => stop.value)).toEqual([0, 1]);
+    expect(perEntity.entities[1]?.scale?.stops?.map((stop) => stop.value)).toEqual([13, 20, 24.5, 29.5]);
+  });
+
   it("infers the preset from the active entity rather than the first", () => {
     const card = {
       entities: ["sensor.room_temperature", "sensor.example_power"],
