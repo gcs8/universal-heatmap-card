@@ -1,6 +1,7 @@
-import { inferPresetFromEntity, resolvePreset } from "./presets";
+import { inferPresetFromEntity, presetScaleForEntity, resolvePreset } from "./presets";
 import type {
   DateRange,
+  HassEntity,
   HeatmapCardConfig,
   HeatmapEntityConfig,
   HomeAssistant,
@@ -73,7 +74,7 @@ export function normalizeConfig(
       mode: config.missing?.mode ?? "empty",
     },
     scale: {
-      ...preset.scale,
+      ...presetScaleForEntity(preset, stateObj),
       ...config.scale,
       preset: scalePresetName,
     },
@@ -136,7 +137,7 @@ function normalizeEntities(
         ? String(stateObj.attributes.friendly_name)
         : entityConfig.entity);
 
-    const scale = resolveEntityScale(entityConfig.scale);
+    const scale = resolveEntityScale(entityConfig.scale, stateObj);
 
     return {
       ...entityConfig,
@@ -152,12 +153,15 @@ function normalizeEntities(
 // preset's shape-defining keys are pinned explicitly (undefined included):
 // without that, a card-level preset's unit, bounds or stops would leak into
 // an entity whose own preset leaves them open.
-function resolveEntityScale(scale: ScaleConfig | undefined): ScaleConfig | undefined {
+function resolveEntityScale(
+  scale: ScaleConfig | undefined,
+  stateObj?: HassEntity,
+): ScaleConfig | undefined {
   if (!scale?.preset) {
     return scale;
   }
 
-  const presetScale = resolvePreset(scale.preset).scale;
+  const presetScale = presetScaleForEntity(resolvePreset(scale.preset), stateObj);
   return {
     min: undefined,
     max: undefined,

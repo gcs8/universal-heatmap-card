@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { normalizeConfig } from "../src/config";
 import { buildScale, colorForValue, formatValue, legendGradient } from "../src/scale";
 import type { BucketValue } from "../src/types";
 
@@ -250,5 +251,57 @@ describe("scale", () => {
     const scale = buildScale(bucketsFor([10, 12, 15, 20]), { min: 50 });
 
     expect(colorForValue(scale.min, scale)).not.toBe(colorForValue(scale.max, scale));
+  });
+});
+
+describe("temperature preset in Celsius", () => {
+  it("colors cells and the legend through the normalized Celsius preset without converting values", () => {
+    const series = bucketsFor([18, 19.5, 21, 22.5, 24, 25.5]);
+    const values = series.map((bucket) => bucket.value);
+    const config = normalizeConfig({ entity: "sensor.celsius" }, {
+      states: {
+        "sensor.celsius": {
+          entity_id: "sensor.celsius", state: "21",
+          attributes: { device_class: "temperature", unit_of_measurement: "°C" },
+        },
+      },
+      callWS: async <T>() => ({}) as T,
+    });
+    const scale = buildScale(series, config.scale);
+    expect(new Set(series.map((bucket) => colorForValue(bucket.value, scale))).size).toBe(series.length);
+    const colors = legendGradient(scale).match(/rgb\([^)]+\)|#[0-9a-f]{6}/gi) ?? [];
+    expect(new Set(colors).size).toBeGreaterThan(1);
+    expect(series.map((bucket) => bucket.value)).toEqual(values);
+    expect(scale.unit).toBe("°");
+  });
+
+  it("produces a gradient for a Celsius room instead of one color", () => {
+    const celsiusStops = [
+      { value: 13, color: "#315f9d" },
+      { value: 20, color: "#58a4b0" },
+      { value: 24.5, color: "#f2c14e" },
+      { value: 29.5, color: "#d94841" },
+    ];
+    const fahrenheitStops = [
+      { value: 55, color: "#315f9d" },
+      { value: 68, color: "#58a4b0" },
+      { value: 76, color: "#f2c14e" },
+      { value: 85, color: "#d94841" },
+    ];
+    const buckets: BucketValue[] = [18, 19.5, 21, 22.5, 24, 25.5].map((value, index) => ({
+      start: new Date(2026, 4, 1 + index),
+      end: new Date(2026, 4, 2 + index),
+      value,
+      quality: "ok",
+      source: "statistics",
+    }));
+
+    const withFahrenheit = buildScale(buckets, { stops: fahrenheitStops });
+    const withCelsius = buildScale(buckets, { stops: celsiusStops });
+    const distinct = (scale: ReturnType<typeof buildScale>) =>
+      new Set(buckets.map((bucket) => colorForValue(bucket.value, scale))).size;
+
+    expect(distinct(withFahrenheit)).toBe(1);
+    expect(distinct(withCelsius)).toBe(buckets.length);
   });
 });

@@ -4,6 +4,11 @@
 
 - Read recorder `change` for `bucket.value: sum` so statistics show per-bucket totals rather than cumulative meter totals. Raw-history sums remain sums of samples and are documented separately. (#52)
 - Documented the existing `scale.ignore_zero: auto` rule and zero-color clamping without changing scale behavior. (#56)
+- Kept cached selections and reselected requests tied to their current load generation so stale responses cannot replace another entity's heatmap or clear its request marker. (#53)
+- Redraw the canvas when its width changes and map hover coordinates through CSS scaling. (#51)
+- Anchored x-axis labels to the correct column edge or center. (#55)
+- Selected Celsius comfort stops from each temperature entity's metadata while preserving Fahrenheit defaults and explicit scale overrides. (#50)
+- Updated Vite, TypeScript, Node types and the pinned setup-node action. Updated Vitest for TypeScript 7 compatibility and refreshed source-map-js to clear dependency advisories.
 
 ## 0.1.4
 
