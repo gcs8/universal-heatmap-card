@@ -469,6 +469,10 @@ export class UniversalHeatmapCard extends LitElement {
     const cacheKey = this._seriesCacheKey(config, activeEntity);
     const cached = this._cache.get(cacheKey);
     if (cached && this._isCacheFresh(cached, config.data.refresh_interval)) {
+      // Showing a cached series supersedes any load still in flight for a
+      // previous selection. Without this bump that response would pass the
+      // sequence check and land its buckets under this entity's title.
+      this._loadSeq += 1;
       debugLog(this._debug, "cache hit", {
         entity: activeEntity.entity,
         source: cached.result.source,
