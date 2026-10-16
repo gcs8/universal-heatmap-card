@@ -929,7 +929,17 @@ export class UniversalHeatmapCard extends LitElement {
 
     if (this._normalized.axes.x_labels) {
       for (const tick of this._xAxisTicks(layout)) {
-        const x = layout.gridX + tick.col * (layout.cell + layout.gap);
+        // Anchor the label to the part of its column the alignment implies:
+        // a centred label sits over the column centre, a right-aligned one
+        // ends at the column's right edge. Using the left edge for all three
+        // drew centred labels half a cell to the left of the column they name.
+        const left = layout.gridX + tick.col * (layout.cell + layout.gap);
+        const x =
+          tick.align === "center"
+            ? left + layout.cell / 2
+            : tick.align === "right"
+              ? left + layout.cell
+              : left;
         ctx.textAlign = tick.align;
         ctx.textBaseline = "top";
         ctx.fillText(tick.label, x, 0);
