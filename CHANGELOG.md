@@ -3,9 +3,11 @@
 ## 0.1.5
 
 - Kept every hourly and 5-minute column inside narrow canvases, with shared width-fit rules for rendering and height estimates. (#66)
+- Reduced narrow-grid gaps so colored cells remain visible instead of spending most of the width on spacing. (#71)
 - Cleared the previous entity's cells, legend, summary and hover targets while a different uncached entity loads or fails. Same-series refreshes keep their own data while pending. (#68)
 - Left not-yet-started missing buckets empty under zero/carry-forward modes and used one captured fetch time across statistics/history fallback. (#67)
 - Documented and regression-tested raw-history limits in elapsed hours, including 23/25-hour local days, without changing the configured cap. (#69)
+- Reported the actual elapsed window and configured raw-history cap in rejection warnings, without describing custom caps as defaults. (#72)
 - Inferred battery presets from units and explicit device class instead of name alone, preserving other explicit metric classes. (#54, PR #60)
 - Aligned Gregorian weekday/month labels and grid placement after preset inference. (#49, PR #62)
 - Read recorder `change` for `bucket.value: sum` so statistics show per-bucket totals rather than cumulative meter totals. Raw-history sums remain sums of samples and are documented separately. (#52)
