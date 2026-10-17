@@ -1,6 +1,7 @@
 import { calculateRange, estimateCellCount } from "../config";
 import type {
   BucketValue,
+  DateRange,
   HistoryStateRow,
   HomeAssistant,
   NormalizedConfig,
@@ -26,8 +27,10 @@ export async function fetchHeatmapBuckets(
   config: NormalizedConfig,
   entity: NormalizedEntityConfig,
 ): Promise<ProviderResult> {
-  const cellCount = estimateCellCount(config);
-  const range = calculateRange(config.range);
+  const now = Date.now();
+  const fetchTime = new Date(now);
+  const cellCount = estimateCellCount(config, fetchTime);
+  const range = calculateRange(config.range, fetchTime);
   const windows = generateBucketWindows(range, config.bucket.interval);
 
   if (cellCount > config.data.max_cells) {
@@ -44,12 +47,12 @@ export async function fetchHeatmapBuckets(
 
   if ((provider === "auto" || provider === "statistics") && canUseStatistics) {
     try {
-      const unfilledBuckets = await fetchStatisticsBuckets(hass, config, entity, windows);
+      const unfilledBuckets = await fetchStatisticsBuckets(hass, config, entity, windows, range);
       const hasUsableStatistics = unfilledBuckets.some((bucket) => bucket.value !== null);
       if (hasUsableStatistics || provider === "statistics") {
         return {
           source: "statistics",
-          buckets: applyMissingMode(unfilledBuckets, config.missing.mode),
+          buckets: applyMissingMode(unfilledBuckets, config.missing.mode, now),
         };
       }
       statisticsFallbackReason =
@@ -72,6 +75,8 @@ export async function fetchHeatmapBuckets(
       config,
       entity,
       windows,
+      range,
+      now,
       statisticsFallbackReason !== undefined,
     );
     if (statisticsFallbackReason) {
@@ -97,13 +102,13 @@ async function fetchStatisticsBuckets(
   config: NormalizedConfig,
   entity: NormalizedEntityConfig,
   windows: Array<{ start: Date; end: Date }>,
+  range: DateRange,
 ): Promise<BucketValue[]> {
   const statType = statisticsTypeForValue(config.bucket.value);
   if (!statType) {
     return emptyBuckets(windows, "statistics");
   }
 
-  const range = calculateRange(config.range);
   const response = await hass.callWS<StatisticsResponse>({
     type: "recorder/statistics_during_period",
     start_time: range.start.toISOString(),
@@ -121,9 +126,10 @@ async function fetchHistoryBuckets(
   config: NormalizedConfig,
   entity: NormalizedEntityConfig,
   windows: Array<{ start: Date; end: Date }>,
+  range: DateRange,
+  now: number,
   hideFailureDetails = false,
 ): Promise<ProviderResult> {
-  const range = calculateRange(config.range);
   const hours = (range.end.getTime() - range.start.getTime()) / 3_600_000;
 
   if (!hass.callApi) {
@@ -138,7 +144,7 @@ async function fetchHistoryBuckets(
     return {
       source: "history",
       buckets: emptyBuckets(windows, "history"),
-      warning: `Raw history fallback is capped at ${config.data.raw_history_hours} hours by default. Use recorder statistics or reduce range.`,
+      warning: `This window spans ${hours} elapsed hours, over data.raw_history_hours (${config.data.raw_history_hours}). Use recorder statistics, reduce the range, or explicitly raise the cap.`,
     };
   }
 
@@ -157,7 +163,7 @@ async function fetchHistoryBuckets(
     const rows = response.flat();
     return {
       source: "history",
-      buckets: historyRowsToBuckets(windows, rows, config.bucket.value, config.missing.mode),
+      buckets: historyRowsToBuckets(windows, rows, config.bucket.value, config.missing.mode, now),
     };
   } catch (error) {
     return {

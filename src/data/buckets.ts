@@ -114,12 +114,13 @@ export function statisticsRowsToBuckets(
   rows: StatisticsRow[],
   requestedValue: BucketValueName,
   missingMode: MissingMode,
+  now = Date.now(),
 ): BucketValue[] {
   const statType = statisticsTypeForValue(requestedValue);
   const buckets = emptyBuckets(windows, "statistics");
 
   if (!statType) {
-    return applyMissingMode(buckets, missingMode);
+    return applyMissingMode(buckets, missingMode, now);
   }
 
   for (const row of rows) {
@@ -145,7 +146,7 @@ export function statisticsRowsToBuckets(
     };
   }
 
-  return applyMissingMode(buckets, missingMode);
+  return applyMissingMode(buckets, missingMode, now);
 }
 
 export function historyRowsToBuckets(
@@ -153,6 +154,7 @@ export function historyRowsToBuckets(
   rows: HistoryStateRow[],
   requestedValue: BucketValueName,
   missingMode: MissingMode,
+  now = Date.now(),
 ): BucketValue[] {
   const valuesByBucket = windows.map(() => [] as Array<{ at: number; value: number }>);
 
@@ -186,12 +188,13 @@ export function historyRowsToBuckets(
     };
   });
 
-  return applyMissingMode(buckets, missingMode);
+  return applyMissingMode(buckets, missingMode, now);
 }
 
 export function applyMissingMode(
   buckets: BucketValue[],
   missingMode: MissingMode,
+  now = Date.now(),
 ): BucketValue[] {
   if (missingMode === "empty") {
     return buckets;
@@ -201,6 +204,11 @@ export function applyMissingMode(
   return buckets.map((bucket) => {
     if (bucket.value !== null) {
       carried = bucket.value;
+      return bucket;
+    }
+    // Only fill gaps in buckets that have started. Preserve observed values,
+    // including future-dated rows, rather than treating filling as filtering.
+    if (bucket.start.getTime() >= now) {
       return bucket;
     }
     if (missingMode === "zero") {
