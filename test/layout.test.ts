@@ -37,7 +37,7 @@ describe("sections layout estimates", () => {
   });
 
   it.each([
-    { interval: "hour" as const, width: 208, height: 21 },
+    { interval: "hour" as const, width: 208, height: 22 },
     { interval: "5minute" as const, width: 448, height: 52 },
     { interval: "5minute" as const, width: 528, height: 64 },
   ])("estimates a width-fitted $interval grid at $width px", ({ interval, width, height }) => {

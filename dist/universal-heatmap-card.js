@@ -1229,7 +1229,7 @@ async function gt(e, t, n, r, i, a, o = !1) {
 	if (s > t.data.raw_history_hours) return {
 		source: "history",
 		buckets: W(r, "history"),
-		warning: `Raw history fallback is capped at ${t.data.raw_history_hours} hours by default. Use recorder statistics or reduce range.`
+		warning: `This window spans ${s} elapsed hours, over data.raw_history_hours (${t.data.raw_history_hours}). Use recorder statistics, reduce the range, or explicitly raise the cap.`
 	};
 	try {
 		let o = new URLSearchParams({
@@ -1660,12 +1660,12 @@ function Gt(e) {
 }
 /** Share the width fit between the renderer and height estimates. */
 function Kt(e) {
-	let { cols: t, interval: n } = e, r = Gt(e.width), i = Math.min($t(n), Math.floor(Math.max(0, r - t) / Math.max(1, t - 1))), a = Math.max(0, t - 1) * i, o = Math.min(e.labelWidth, Math.max(0, r - t - a)), s = e.reserveValues ? kt : Ot;
+	let { cols: t, interval: n } = e, r = Gt(e.width), i = Math.floor(Math.max(0, r - e.labelWidth) / t), a = Math.min($t(n), Math.floor(i / 3), Math.floor(Math.max(0, r - t) / Math.max(1, t - 1))), o = Math.max(0, t - 1) * a, s = Math.min(e.labelWidth, Math.max(0, r - t - o)), c = e.reserveValues ? kt : Ot;
 	return {
 		width: r,
-		cell: Math.max(1, Math.min(s, Math.floor((r - o - a) / t))),
-		gap: i,
-		labelWidth: o
+		cell: Math.max(1, Math.min(c, Math.floor((r - s - o) / t))),
+		gap: a,
+		labelWidth: s
 	};
 }
 function qt(e, t) {

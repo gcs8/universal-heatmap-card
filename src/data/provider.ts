@@ -144,7 +144,7 @@ async function fetchHistoryBuckets(
     return {
       source: "history",
       buckets: emptyBuckets(windows, "history"),
-      warning: `Raw history fallback is capped at ${config.data.raw_history_hours} hours by default. Use recorder statistics or reduce range.`,
+      warning: `This window spans ${hours} elapsed hours, over data.raw_history_hours (${config.data.raw_history_hours}). Use recorder statistics, reduce the range, or explicitly raise the cap.`,
     };
   }
 

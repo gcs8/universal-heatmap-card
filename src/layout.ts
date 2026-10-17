@@ -241,9 +241,11 @@ export function fitCanvasColumns(options: {
 }): { width: number; cell: number; gap: number; labelWidth: number } {
   const { cols, interval } = options;
   const width = canvasWidthForContainer(options.width);
-  // At extreme widths, give up gaps and then label room before losing cells.
+  // Preserve color-bearing pixels before decorative gaps at narrow widths.
+  const gaplessCell = Math.floor(Math.max(0, width - options.labelWidth) / cols);
   const gap = Math.min(
     canvasGapForInterval(interval),
+    Math.floor(gaplessCell / 3),
     Math.floor(Math.max(0, width - cols) / Math.max(1, cols - 1)),
   );
   const gapsWidth = Math.max(0, cols - 1) * gap;

@@ -74,7 +74,9 @@ describe.each(["history", "auto-empty", "auto-failure"] as const)("absolute raw-
     expect(callWS).toHaveBeenCalledTimes(provider === "history" ? 0 : 1);
     if (elapsed > config.data.raw_history_hours) {
       expect(callApi).not.toHaveBeenCalled();
-      expect(result.warning).toContain(`Raw history fallback is capped at ${cap ?? 24} hours`);
+      expect(result.warning).toContain(`This window spans ${elapsed} elapsed hours`);
+      expect(result.warning).toContain(`data.raw_history_hours (${cap ?? 24})`);
+      expect(result.warning).not.toContain("by default");
       expect(result.buckets.length).toBeGreaterThan(0);
       expect(result.buckets.every((bucket) => bucket.value === null && bucket.quality === "missing")).toBe(true);
     } else {

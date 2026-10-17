@@ -228,7 +228,7 @@ describe("fetchHeatmapBuckets automatic provider diagnostics", () => {
 
     expect(historyCalls).toBe(0);
     expect(result.warning).toBe(
-      "Statistics query failed. Raw history fallback is capped at 24 hours by default. Use recorder statistics or reduce range.",
+      "Statistics query failed. This window spans 48 elapsed hours, over data.raw_history_hours (24). Use recorder statistics, reduce the range, or explicitly raise the cap.",
     );
   });
 
