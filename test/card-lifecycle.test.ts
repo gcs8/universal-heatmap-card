@@ -202,6 +202,54 @@ describe("card load ownership", () => {
     expect(fetchHeatmapBuckets).toHaveBeenCalledTimes(1);
   });
 
+  it.each(["resolve", "reject"] as const)("invalidates in-flight A before deferring B, then ignores A %s", async (completion) => {
+    const card = cardFixture();
+    const state = inside(card);
+    canvasFixture(card);
+    const old = deferred<ProviderResult>();
+    vi.mocked(fetchHeatmapBuckets).mockReturnValueOnce(old.promise);
+    const load = select(card, 0);
+    await tick();
+    state._normalized.data.defer_until_visible = true;
+    vi.stubGlobal("IntersectionObserver", class {});
+    Object.assign(state, { _visibleForLoad: false, _activeIndex: 1 });
+    state._requestActiveSeriesLoad();
+    expectEmptyDisplay(state);
+    if (completion === "resolve") old.resolve(result(10, "obsolete A warning"));
+    else old.reject(new Error("obsolete A error"));
+    await load;
+    expectEmptyDisplay(state);
+    expect(state._error).toBeUndefined();
+    expect(state._warning).toBeUndefined();
+    expect(state._loading).toBe(false);
+    expect(state._inFlightKey).toBeUndefined();
+    vi.mocked(fetchHeatmapBuckets).mockResolvedValueOnce(result(200));
+    Object.assign(state, { _visibleForLoad: true });
+    await select(card, 1);
+    expect(state._buckets[0]?.value).toBe(200);
+    expect(fetchHeatmapBuckets).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps a current same-key request owned when visibility defers another attempt", async () => {
+    const card = cardFixture();
+    const state = inside(card);
+    canvasFixture(card);
+    const pending = deferred<ProviderResult>();
+    vi.mocked(fetchHeatmapBuckets).mockReturnValueOnce(pending.promise);
+    const load = select(card, 0);
+    await tick();
+    const key = state._inFlightKey;
+    state._normalized.data.defer_until_visible = true;
+    vi.stubGlobal("IntersectionObserver", class {});
+    Object.assign(state, { _visibleForLoad: false });
+    state._requestActiveSeriesLoad();
+    expect(state._inFlightKey).toBe(key);
+    pending.resolve(result(10));
+    await load;
+    expect(state._buckets[0]?.value).toBe(10);
+    expect(fetchHeatmapBuckets).toHaveBeenCalledTimes(1);
+  });
+
   it.each(["resolve", "reject"] as const)("cached B owns the display after stale A %s", async (completion) => {
     const card = cardFixture();
     const state = inside(card);

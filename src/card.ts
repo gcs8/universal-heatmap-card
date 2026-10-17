@@ -622,8 +622,20 @@ export class UniversalHeatmapCard extends LitElement {
 
     if (this._shouldDeferLoad()) {
       const entity = this._normalized.entities[this._activeIndex];
-      if (entity && this._displayedSeriesKey !== this._seriesCacheKey(this._normalized, entity)) {
-        this._clearDisplayedSeries();
+      if (entity) {
+        const key = this._seriesCacheKey(this._normalized, entity);
+        if (this._inFlightKey && this._inFlightKey !== key) {
+          // Deferring the replacement must still revoke the old request's
+          // ownership. Keep a same-key request alive when only visibility changes.
+          this._loadSeq += 1;
+          this._inFlightKey = undefined;
+          this._loading = false;
+        }
+        if (this._displayedSeriesKey !== key) {
+          this._clearDisplayedSeries();
+          this._error = undefined;
+          this._warning = undefined;
+        }
       }
       this._deferredLoadPending = true;
       debugLog(this._debug, "load deferred until visible", {

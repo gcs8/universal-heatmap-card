@@ -2315,7 +2315,11 @@ var wn = "universal-heatmap-card", Tn = "Universal Heatmap Card", En = "0.1.5", 
 		if (this._normalized && this.hass) {
 			if (this._shouldDeferLoad()) {
 				let e = this._normalized.entities[this._activeIndex];
-				e && this._displayedSeriesKey !== this._seriesCacheKey(this._normalized, e) && this._clearDisplayedSeries(), this._deferredLoadPending = !0, J(this._debug, "load deferred until visible", { queue: Be(this._normalized.data.max_concurrent_requests) });
+				if (e) {
+					let t = this._seriesCacheKey(this._normalized, e);
+					this._inFlightKey && this._inFlightKey !== t && (this._loadSeq += 1, this._inFlightKey = void 0, this._loading = !1), this._displayedSeriesKey !== t && (this._clearDisplayedSeries(), this._error = void 0, this._warning = void 0);
+				}
+				this._deferredLoadPending = !0, J(this._debug, "load deferred until visible", { queue: Be(this._normalized.data.max_concurrent_requests) });
 				return;
 			}
 			this._deferredLoadPending = !1, this._loadActiveSeries();
